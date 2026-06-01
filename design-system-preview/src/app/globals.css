@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+ * FFIE × shadcn bridge
+ * ============================================================================
+ * shadcn/ui consumes CSS variables in HSL form on role-based slots
+ * (--primary, --background, --ring, etc.). We map each slot to a FFIE token
+ * per theme so generated shadcn components automatically inherit the FFIE
+ * visual design without any per-component overrides.
+ *
+ * The data-theme attribute is set on <html> by ThemeProvider. The same
+ * attribute drives tailwind.config's darkMode trigger so dark: utilities
+ * activate when data-theme="dark" OR data-theme="sunlight".
+ * --------------------------------------------------------------------------- */
+
+:root,
+[data-theme="light"] {
+  --background: 0 0% 100%;             /* surface.default = white */
+  --foreground: 222 39% 11%;           /* text.body = gray[900] */
+  --card: 0 0% 100%;
+  --card-foreground: 222 39% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 39% 11%;
+  --primary: 190 96% 27%;              /* brand.teal[700] = AA on white */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 13% 95%;            /* gray[100] */
+  --secondary-foreground: 222 39% 11%;
+  --muted: 220 13% 95%;
+  --muted-foreground: 217 14% 34%;     /* gray[600] AAA muted */
+  --accent: 189 100% 33%;              /* brand.teal[600] — ffie.fr CTA hue */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 73% 51%;            /* red[600] */
+  --destructive-foreground: 0 0% 100%;
+  --border: 218 14% 89%;               /* border.default = gray[200] */
+  --input: 218 10% 65%;                /* border.strong = gray[400] */
+  --ring: 189 100% 33%;                /* border.focus = brand.teal[600] */
+  --radius: 0.5rem;                    /* radii.md = 8px */
+}
+
+[data-theme="dark"] {
+  --background: 222 43% 7%;            /* gray[950] */
+  --foreground: 220 14% 97%;           /* gray[50] */
+  --card: 217 28% 17%;                 /* gray[800] */
+  --card-foreground: 220 14% 97%;
+  --popover: 222 39% 11%;
+  --popover-foreground: 220 14% 97%;
+  --primary: 189 95% 45%;              /* brand.teal[400] */
+  --primary-foreground: 222 43% 7%;
+  --secondary: 217 28% 17%;
+  --secondary-foreground: 220 14% 97%;
+  --muted: 217 28% 17%;
+  --muted-foreground: 218 10% 65%;
+  --accent: 189 72% 59%;               /* brand.teal[300] */
+  --accent-foreground: 222 43% 7%;
+  --destructive: 0 91% 71%;            /* red[400] */
+  --destructive-foreground: 222 43% 7%;
+  --border: 215 19% 27%;               /* gray[700] */
+  --input: 220 9% 46%;
+  --ring: 189 72% 59%;
+}
+
+[data-theme="sunlight"] {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;               /* black — 21:1 max AAA */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 229 50% 14%;              /* brand.navy[900] — deepest outdoor anchor */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 100%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 100%;
+  --muted-foreground: 217 28% 17%;     /* gray[800] 13:1 AAA */
+  --accent: 190 96% 27%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 35%;            /* red[800] */
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 0%;                   /* borders carry elevation outdoors */
+  --input: 0 0% 0%;
+  --ring: 229 50% 14%;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
+}
+
+:root {
+  /* The brand chain still lists Museo Sans first — if the user has it
+     installed (or FFIE later licenses a webfont), it renders. Otherwise the
+     system stack takes over. Montserrat is loaded by next/font for display
+     roles and exposed as a CSS variable. */
+  --font-brand: "Museo Sans", Museo, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-montserrat, "Montserrat"), "Museo Sans",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-brand);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Button focus ring — Button.md §5 / §7. The color is set per-theme via
+   inline style as --btn-focus-color so :focus-visible can read it. */
+.ffie-button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.ffie-button:focus-visible {
+  outline: 2px solid var(--btn-focus-color, currentColor);
+  outline-offset: 2px;
+}
+
+/* Loading spinner rotation — motion.duration.loop (1000ms), linear. */
+@keyframes ffie-spin {
+  to { transform: rotate(360deg); }
+}
+.ffie-spin {
+  animation: ffie-spin 1000ms linear infinite;
+}
+
+/* StatusPill pulse — used by name="syncing" by default. */
+@keyframes ffie-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Spinner KEEPS rotating per Button.md §7 — the rotation IS the loading
+     affordance. Only the press-scale transform is dropped (component-level). */
+}

@@ -1,0 +1,16 @@
+diff --git a/node_modules/expo/node_modules/@expo/cli/build/src/utils/downloadAppAsync.js b/node_modules/expo/node_modules/@expo/cli/build/src/utils/downloadAppAsync.js
+index 6a387a1..f9887e3 100644
+--- a/node_modules/expo/node_modules/@expo/cli/build/src/utils/downloadAppAsync.js
++++ b/node_modules/expo/node_modules/@expo/cli/build/src/utils/downloadAppAsync.js
+@@ -69,10 +69,7 @@ async function downloadAsync({ url, outputPath, cacheDirectory, onProgress }) {
+     }
+     debug(`Downloading ${url} to ${outputPath}`);
+     const res = await fetchInstance(url, {
+-        onProgress,
+-        dispatcher: new (_undici()).Agent({
+-            connectTimeout: TIMER_DURATION
+-        })
++        onProgress
+     });
+     if (!res.ok || !res.body) {
+         throw new _errors.CommandError('FILE_DOWNLOAD', `Unexpected response: ${res.statusText}. From url: ${url}`);

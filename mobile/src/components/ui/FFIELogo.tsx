@@ -1,0 +1,49 @@
+// FFIE federation logo — sourced from
+// /Users/du-mac/FFIE/design-system-preview/public/logo-ffie.svg
+// (same asset shown on the web preview Overview).
+//
+// Rendered via react-native-svg's SvgXml so we don't need to set up
+// react-native-svg-transformer in the Metro pipeline.
+
+import React from "react";
+import { View } from "react-native";
+import { SvgXml } from "react-native-svg";
+import { themes, primitives, type ThemeName } from "@tokens";
+
+const FFIE_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133.4 112.3"><path fill="#222D5D" d="M16.2 0h100.4v67.4H16.2z"/><radialGradient id="SVGID_1_" cx="52.388" cy="-17.074" r="100.022" gradientUnits="userSpaceOnUse"><stop offset=".401" stop-color="#009ddf"/><stop offset=".561" stop-color="#008bc6"/><stop offset=".844" stop-color="#006ca0"/><stop offset=".983" stop-color="#006192"/></radialGradient><path fill="url(#SVGID_1_)" d="M61.5 46.8l14.6 8.4c10.1 4.1 19 5.4 29.3 1.9 4.2-1.4 9.5-3.7 11.2-6.4l.3 61.6H16.1V47c0-1.5 9.5-3.5 18.3-5.2.3-.1.8-.1 1.3-.2 8.7-1.2 18.2.9 25.8 5.2z"/><path fill="#FFF" d="M132.5 35.8c-3.8 4.9-7.8 9.6-12.6 13.7-4.7 4.1-10 7.9-16.4 10.2l-2.4.8c-.4.1-.8.3-1.2.4l-1.3.2c-.9.2-1.7.3-2.6.5-.9.1-1.8.1-2.6.2l-1.3.1c-.4 0-.9 0-1.3-.1-.9-.1-1.8-.1-2.7-.2l-2.6-.5c-.4-.1-.9-.2-1.3-.3l-1.2-.4c-3.4-.9-6.4-2.4-9.3-3.9-2.9-1.5-5.5-3.1-8.1-4.5-2.6-1.5-5.1-2.9-7.6-4-1.3-.7-2.5-1.1-3.8-1.6-.6-.3-1.3-.4-1.9-.6-.6-.2-1.3-.5-1.9-.6-5.2-1.4-10.6-1.7-16.3-1-5.6.7-11.3 2.2-16.9 4.2l-2.4.6c-.7.2-1.4.6-2.1.8-1.4.6-2.8 1.1-4.2 1.7l-2.1.9-2.1.9c-1.4.5-2.8 1.1-4.3 1.7 2.3-2.1 4.6-4.2 7.1-6 2.5-1.8 5-3.7 7.7-5.3 5.3-3.3 11.2-6 17.6-7.6 6.3-1.6 13.3-1.9 20-.6.8.1 1.6.4 2.5.6.8.2 1.7.4 2.4.7 1.6.6 3.2 1.1 4.7 1.8.8.3 1.5.7 2.2 1l2.2 1.1c1.5.7 2.8 1.5 4.2 2.3 2.7 1.6 5.3 3.1 7.8 4.5s5 2.7 7.4 3.5l.9.4.9.3 1.9.5c.6.1 1.3.2 1.9.3.3 0 .6.1.9.1h1c.6 0 1.3.1 1.9.1.6-.1 1.3-.1 1.9-.2l1-.1c.3 0 .7-.1 1-.2l2-.4c5.3-1.2 10.7-3.7 15.8-6.6 1.3-.7 2.6-1.4 3.9-2.2l3.9-2.4c1.3-.8 2.6-1.7 3.8-2.5 1.4-.6 2.6-1.5 4-2.3z"/><path fill="#222D5D" d="M133.4 35.1l-3.4 3.1-1.7 1.5c-.6.5-1.2 1-1.8 1.4l-3.7 2.8-3.9 2.6c-5.3 3.2-11.1 5.9-17.4 6.8-.4.1-.8.1-1.2.2l-1.2.1-2.4.1c-.8 0-1.6-.1-2.4-.1-.8-.1-1.6-.1-2.4-.2l-2.4-.4c-.8-.1-1.6-.4-2.3-.6-1.6-.4-3-1-4.5-1.5-5.9-2.3-11.2-5.5-16.6-8.2-5.3-2.7-10.8-5-16.6-5.7l-2.2-.3c-.7-.1-1.4-.1-2.2-.1h-2.2l-2.2.2c-.7.2-1.4.2-2.1.3l-2.2.4c-.7.1-1.5.2-2.2.4l-2.1.6-2.1.6c-.7.2-1.4.5-2.1.8l-2.1.8-1.1.3-1 .5-4.1 1.8c-1.3.7-2.7 1.4-4 2.1l-2 1.1c-.7.4-1.3.8-2 1.2L7.7 50c-1.3.8-2.6 1.7-3.8 2.5L0 55c2.3-2 4.6-4 7-6l3.7-2.8c.6-.5 1.2-.9 1.9-1.4l1.9-1.3c5.1-3.5 10.7-6.3 16.6-8.3 5.9-2.1 12.4-2.9 18.8-2.2 6.4.6 12.4 3.1 18 5.9 5.5 2.8 10.7 6 16.2 8.2 5.4 2.2 11.2 3.5 17 2.8 5.8-.6 11.5-2.7 16.8-5.4l4-2.1 3.9-2.4c.6-.4 1.3-.8 1.9-1.2l1.9-1.3 3.8-2.4z"/><path fill="#FFF" d="M40.4 77.4v1.4H28.1v9.8h10.6V90H28.1v10.7h-1.7V77.4h14zm25.7 0v1.4H53.9v9.8h10.6V90H53.9v10.7h-1.7V77.4h13.9zm13.5 23.2h-1.7V77.4h1.7v23.2zm27.3-23.2l.8 1.4H95.4v9.4h10.2v1.4H95.4v9.7h12.3l-.8 1.4H93.7V77.4h13.2z"/></svg>`;
+
+const ASPECT = 133.4 / 112.3; // logo intrinsic ratio
+
+export function FFIELogo({
+  size = 96,
+  themeName = "light",
+}: {
+  size?: number;
+  themeName?: ThemeName;
+}) {
+  const t = themes[themeName];
+  const width = size;
+  const height = size / ASPECT;
+
+  // The logo's navy block disappears against dark surfaces — wrap it in a
+  // white card so it stays legible. Mirrors the web spec.
+  const needsCard = themeName === "dark";
+
+  const inner = <SvgXml xml={FFIE_LOGO_SVG} width={width} height={height} />;
+
+  if (!needsCard) return inner;
+
+  return (
+    <View
+      style={{
+        backgroundColor: "#FFFFFF",
+        padding: primitives.space[2],
+        borderRadius: primitives.radii.md,
+      }}
+    >
+      {inner}
+    </View>
+  );
+  // theme `t` referenced for typing — silences unused warning without `_`.
+  void t;
+}

@@ -1,0 +1,13 @@
+#, Epic Name, Persona, Description
+1, Authentication & access, Member + Non-member company + General public + FFIE administrator,"Member login, public access without login, differentiated navigation according to profiles, role and rights management, and secure integration with existing FFIE member systems."
+2, News feed, All," Display of articles, press releases, events and editorial content, with categories, chronological display and detailed reading."
+3, Document database, Member," Synchronization of existing documents from the FFIE site, structuring of the document library, consultation, downloading, filtering and searching by category."
+4, Discover the professions, General public," A section for the general public presenting careers in the electrical industry through job descriptions, educational content and presentation videos."
+5, Video content, All, Playback of video and multimedia content within the application.
+6, Partners, All,"Section presenting the FFIE partners mentioned in the proposal: Qualifelec, Consuel and OPPBTP, with links to their platforms."
+7, Push notifications, All, Notifications sent to users when new content or important information is published.
+8, Partial offline mode, All, Caching of viewed content to allow faster access and limited viewing without login.
+9, Security & GDPR, All," Securing exchanges, managing personal data and complying with GDPR obligations."
+10, FFIE Back Office, FFIE Administrator," Web interface allowing FFIE teams to manage content, documents, news, videos, users and notifications."
+11, Tutorial area, Member," Phase 2 — Space dedicated to educational content: video tutorials, practical sheets, technical guides, filters, categories and search."
+12, Technical calculators, Member,Phase 2 — Module integrating business calculation tools and offering the first calculators defined by the FFIE.

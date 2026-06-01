@@ -1,0 +1,35 @@
+# Local Claude settings (not shared)
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Expo / build artifacts
+.expo/
+**/.expo/
+dist/
+web-build/
+ios/
+android/
+*.log
+*.tsbuildinfo
+
+# Next.js (design-system-preview)
+.next/
+**/.next/
+out/

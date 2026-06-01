@@ -1,0 +1,176 @@
+{
+  "Nav": {
+    "designSystem": "Système de design",
+    "overview": "Vue d'ensemble",
+    "color": "Couleurs",
+    "typography": "Typographie",
+    "spacing": "Espacement",
+    "sizing": "Tailles",
+    "motion": "Animation",
+    "radii": "Coins arrondis",
+    "elevation": "Élévation",
+    "themes": "Thèmes",
+    "tokens": "Tokens",
+    "flows": "Parcours",
+    "components": "Composants",
+    "input": "Input",
+    "button": "Button",
+    "statusPill": "StatusPill",
+    "toast": "Toast",
+    "modal": "Modal",
+    "card": "Card",
+    "updated": "Mis à jour le {date}"
+  },
+  "LocaleSwitcher": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "Modal": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "acknowledge": "J'ai compris"
+  },
+  "CardPreview": {
+    "lede": "Card est la primitive de composition pour toute surface en ligne ou en bloc. La même spec sert le fil d'actualités (Julien, P1), la bibliothèque de documents (P2), la ligne de tableau back-office (Sylvie, P5 density=compact) et le bloc d'atterrissage public (P7 density=spacious). Changez de thème et de densité pour tester.",
+    "newsFeed": {
+      "eyebrow": "Fil d'actualités · Julien (P1, P2)",
+      "description": "Densité comfortable. En-tête + corps + pied. La StatusPill en haut à droite indique l'état du cache hors-ligne.",
+      "category": "Actualités · Chantier",
+      "title": "Nouvelles exigences CE pour les installations basse tension",
+      "body": "Les mises à jour de NF C 15-100 entrent en vigueur le 1er juillet 2026. Incluent une liste de contrôle pour les installations résidentielles livrées après cette date.",
+      "read": "Lire la mise à jour",
+      "save": "Enregistrer",
+      "meta": "Mis à jour il y a 2 heures · 4 min de lecture"
+    },
+    "docLibrary": {
+      "eyebrow": "Bibliothèque de documents · Julien (P2, P3)",
+      "description": "Cards en ligne empilées. L'indicateur « téléchargé » est porté par la StatusPill — la couleur ne le porte jamais seule.",
+      "items": {
+        "downloaded": "Disponible hors-ligne · mis en cache aujourd'hui",
+        "stale": "Mis en cache il y a 12 jours — actualisation",
+        "online": "Disponible en ligne · 2,4 Mo"
+      },
+      "cableManagement": "NF C 15-100 §7.2 — Cheminement de câbles",
+      "earthBonding": "NF C 15-100 §6.4 — Mise à la terre",
+      "ceMarking": "Décret 2026-184 — Marquage CE résidentiel"
+    },
+    "backOffice": {
+      "eyebrow": "Ligne back-office · Sylvie (P5 density=compact)",
+      "description": "Même spec Card, density=\"compact\". Le padding rétrécit, le texte passe à body.sm, les cibles tactiles des Buttons internes restent à 44pt — la densité ne compresse JAMAIS les primitives interactives.",
+      "title": "Article",
+      "status": "Statut",
+      "published": "Publié",
+      "views": "Vues",
+      "drafts": "Brouillons",
+      "articleTitle": "{title}",
+      "rows": {
+        "ceMarking": "Nouvelles exigences marquage CE",
+        "winterTraining": "Programme de formation hiver 2026",
+        "memberDirectory": "Outil annuaire membres mis à jour"
+      }
+    },
+    "stale": {
+      "eyebrow": "État stale · P2",
+      "description": "stale={true} estompe la zone de contenu à opacity.stale (0,6) et affiche un indicateur d'actualisation calme. La StatusPill est exemptée — l'utilisateur doit VOIR l'état."
+    },
+    "landing": {
+      "eyebrow": "Bloc d'atterrissage public · Karim + Léa (P6, P7)",
+      "description": "density=\"spacious\" pour la surface de découverte publique. Pas de mur de connexion (P6). La substance avant la relation (P7).",
+      "title": "Découvrez le métier d'intégrateur électrique",
+      "body": "Guides gratuits, vrais récits de chantier, calendrier de formation pratique — construits par la FFIE, fédération de 7 300 professionnels.",
+      "explore": "Explorer le métier"
+    }
+  },
+  "ModalPreview": {
+    "info": {
+      "title": "Modale d'information",
+      "description": "Une seule action — accuser réception et fermer. Pas de chemin destructif.",
+      "trigger": "Afficher l'info",
+      "modalTitle": "Maintenance programmée",
+      "modalDescription": "Le back-office sera indisponible le dimanche 7 juin 2026 de 02h00 à 04h00 pour une mise à niveau base de données."
+    },
+    "confirm": {
+      "title": "Modale de confirmation",
+      "description": "Action non destructive — publier, envoyer, valider. Cancel ramène l'éditeur au brouillon.",
+      "trigger": "Publier l'article",
+      "modalTitle": "Publier cet article ?",
+      "modalDescription": "« Nouvelles exigences CE pour les installations basse tension » sera visible immédiatement par les 7 300 membres FFIE.",
+      "confirmed": "Article publié."
+    },
+    "destructive": {
+      "title": "Modale destructive · undo",
+      "description": "P5 — La modale est la confirmation. Au clic sur Supprimer, on ferme et on affiche un toast d'annulation de 60s.",
+      "trigger": "Supprimer le document",
+      "modalTitle": "Supprimer ce document ?",
+      "modalDescription": "« NF C 15-100 §7.2 — Cheminement de câbles » sera retiré de la bibliothèque fédérale. Les copies cachées par les membres restent jusqu'à leur prochaine synchro.",
+      "undoToast": "Document supprimé.",
+      "undoAction": "Annuler",
+      "undoConfirmed": "Suppression annulée."
+    }
+  },
+  "Overview": {
+    "eyebrow": "FFIE · Système de design",
+    "title": "Système de design FFIE",
+    "tagline": "Construisons l'électricité, ensemble.",
+    "federation": "Fédération Française des Intégrateurs Électriciens",
+    "lede": "Aperçu en direct du module de tokens canonique qui alimente l'application mobile FFIE et le back-office. Les modifications de tokens.ts se rechargent ici automatiquement.",
+    "metrics": {
+      "version": "version",
+      "updated": "mise à jour",
+      "themes": "thèmes",
+      "ramps": "rampes de couleurs"
+    },
+    "brandResolution": {
+      "title": "Identité de marque",
+      "body": "La couche de marque a été extraite de {ffieLink} le {date}. La couleur navy institutionnelle {navy} provient du logo de la fédération ; le teal des CTA {teal} est la couleur la plus utilisée dans la feuille de style compilée du site (58 occurrences). Les deux rampes vivent sous {brandToken}. Le placeholder indigo précédent a été supprimé."
+    },
+    "syncBlock": {
+      "title": "Comment cet aperçu reste à jour",
+      "body": "Cette application Next.js importe le module de tokens canonique directement depuis {tokensPath} via un alias webpack et {externalDir}. Quand une valeur de token change en amont, Next Fast Refresh re-rend l'aperçu — aucun étape de synchronisation. Les badges de contraste sur tout le site sont calculés au moment du rendu depuis {contrastPath}, non codés en dur."
+    }
+  },
+  "OverviewCards": {
+    "color": {
+      "title": "Couleurs",
+      "blurb": "Rampes primitives (50–950) incluant le navy + teal de la marque FFIE. Liens sémantiques par thème, badges WCAG AAA/AA calculés au moment du rendu."
+    },
+    "typography": {
+      "title": "Typographie",
+      "blurb": "Échelle modulaire 1.25 sur une base de 16pt, pile de polices système, quatre graisses, quatre interlignes."
+    },
+    "spacing": {
+      "title": "Espacement",
+      "blurb": "Base 4pt. Pas de 4 entre 0 et 16, pas de 8 au-delà. Nombres sans unité compatibles avec React Native."
+    },
+    "sizing": {
+      "title": "Tailles",
+      "blurb": "Cibles tactiles (44 / 48 / 56) selon P1. Tailles d'icônes xs→xl."
+    },
+    "motion": {
+      "title": "Animation",
+      "blurb": "Les durées incluent la fenêtre d'annulation FFIE de 60 000ms (P5) et la confirmation destructive de 600ms."
+    },
+    "radii": {
+      "title": "Coins arrondis",
+      "blurb": "none → full pill, utilisés de manière cohérente sur tous les composants."
+    },
+    "elevation": {
+      "title": "Élévation",
+      "blurb": "Tokens structurés par plateforme : { ios, android, web } pour la portabilité RN."
+    },
+    "themes": {
+      "title": "Thèmes",
+      "blurb": "Basculer entre light, dark et sunlight. Sunlight est un thème sémantique distinct — les bordures portent l'élévation, pas les ombres."
+    },
+    "tokens": {
+      "title": "Table des tokens",
+      "blurb": "Vue plate et recherchable de chaque token primitif et binding de thème."
+    },
+    "flows": {
+      "title": "Parcours utilisateur",
+      "blurb": "Scénarios canoniques du brief personas, tracés contre les principes de design. À lire comme un contrat produit."
+    }
+  }
+}

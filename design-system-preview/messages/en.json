@@ -1,0 +1,176 @@
+{
+  "Nav": {
+    "designSystem": "Design System",
+    "overview": "Overview",
+    "color": "Color",
+    "typography": "Typography",
+    "spacing": "Spacing",
+    "sizing": "Sizing",
+    "motion": "Motion",
+    "radii": "Radii",
+    "elevation": "Elevation",
+    "themes": "Themes",
+    "tokens": "Tokens",
+    "flows": "Flows",
+    "components": "Components",
+    "input": "Input",
+    "button": "Button",
+    "statusPill": "StatusPill",
+    "toast": "Toast",
+    "modal": "Modal",
+    "card": "Card",
+    "updated": "Updated {date}"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "Modal": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "acknowledge": "Got it"
+  },
+  "CardPreview": {
+    "lede": "Card is the composition primitive for any row-like or block-like surface. The same component spec serves the news feed (Julien, P1), the document library (P2), the back-office data row (Sylvie, P5 density=compact), and the public landing block (P7 density=spacious). Switch theme + density to stress-test.",
+    "newsFeed": {
+      "eyebrow": "News feed · Julien (P1, P2)",
+      "description": "Comfortable density. Header + body + footer. StatusPill in the top-right corner conveys the offline-first cache state.",
+      "category": "News · Worksite",
+      "title": "New CE-marking requirements for low-voltage installations",
+      "body": "Updates to NF C 15-100 take effect 1 July 2026. Includes a checklist for residential installations completed after the effective date.",
+      "read": "Read the update",
+      "save": "Save",
+      "meta": "Updated 2 hours ago · 4 min read"
+    },
+    "docLibrary": {
+      "eyebrow": "Document library · Julien (P2, P3)",
+      "description": "Row-style Cards in a stack. The downloaded indicator is part of the StatusPill — color alone never carries it.",
+      "items": {
+        "downloaded": "Available offline · cached today",
+        "stale": "Cached 12 days ago — refreshing",
+        "online": "Available online · 2.4 MB"
+      },
+      "cableManagement": "NF C 15-100 §7.2 — Cable management",
+      "earthBonding": "NF C 15-100 §6.4 — Earth bonding",
+      "ceMarking": "Decree 2026-184 — CE marking residential"
+    },
+    "backOffice": {
+      "eyebrow": "Back-office data row · Sylvie (P5 density=compact)",
+      "description": "Same Card spec, density=\"compact\". Padding shrinks, font drops to body.sm, touch targets in nested Buttons stay at 44pt — density NEVER compresses interactive primitives.",
+      "title": "Article",
+      "status": "Status",
+      "published": "Published",
+      "views": "Views",
+      "drafts": "Drafts",
+      "articleTitle": "{title}",
+      "rows": {
+        "ceMarking": "New CE-marking requirements",
+        "winterTraining": "Winter training programme 2026",
+        "memberDirectory": "Updated member directory tool"
+      }
+    },
+    "stale": {
+      "eyebrow": "Stale state · P2",
+      "description": "stale={true} dims the content area to opacity.stale (0.6) and shows a calm refreshing indicator. The StatusPill is exempt — the user must SEE the status."
+    },
+    "landing": {
+      "eyebrow": "Public landing block · Karim + Léa (P6, P7)",
+      "description": "density=\"spacious\" for the public-facing discovery surface. No login wall (P6). Substance before relationship (P7).",
+      "title": "Discover the electrical-integration trade",
+      "body": "Free guides, real worksite stories, and a hands-on training calendar — built by the FFIE federation of 7,300 professionals.",
+      "explore": "Explore the trade"
+    }
+  },
+  "ModalPreview": {
+    "info": {
+      "title": "Info modal",
+      "description": "Single action — acknowledge and close. No destructive path.",
+      "trigger": "Show notice",
+      "modalTitle": "Scheduled maintenance",
+      "modalDescription": "The back-office will be unavailable on Sunday 7 June 2026 from 02:00 to 04:00 for a database upgrade."
+    },
+    "confirm": {
+      "title": "Confirm modal",
+      "description": "Non-destructive action — publish, send, validate. Cancel returns the editor to draft.",
+      "trigger": "Publish article",
+      "modalTitle": "Publish this article?",
+      "modalDescription": "“New CE-marking requirements for low-voltage installations” will be visible to all 7,300 FFIE members immediately.",
+      "confirmed": "Article published."
+    },
+    "destructive": {
+      "title": "Destructive modal · undo",
+      "description": "P5 — the modal IS the confirmation. Clicking Delete closes the modal and fires a 60s undo toast.",
+      "trigger": "Delete document",
+      "modalTitle": "Delete this document?",
+      "modalDescription": "“NF C 15-100 §7.2 — Cable management” will be removed from the federation library. Members' cached copies remain until their next sync.",
+      "undoToast": "Document deleted.",
+      "undoAction": "Undo",
+      "undoConfirmed": "Deletion undone."
+    }
+  },
+  "Overview": {
+    "eyebrow": "FFIE · Design System",
+    "title": "FFIE Design System",
+    "tagline": "Building electricity, together.",
+    "federation": "Fédération Française des Intégrateurs Électriciens",
+    "lede": "A live preview of the canonical token module that powers the FFIE mobile app and back-office. Edits to tokens.ts hot-reload here automatically.",
+    "metrics": {
+      "version": "version",
+      "updated": "updated",
+      "themes": "themes",
+      "ramps": "color ramps"
+    },
+    "brandResolution": {
+      "title": "Brand resolution",
+      "body": "The brand layer was extracted from {ffieLink} on {date}. The institutional navy {navy} comes from the federation logo; the teal CTA {teal} is the most-used color in the site's compiled stylesheet (58 occurrences). Both ramps live under {brandToken}. The previous indigo placeholder has been removed."
+    },
+    "syncBlock": {
+      "title": "How this preview stays in sync",
+      "body": "This Next.js app imports the canonical tokens module directly from {tokensPath} via a webpack alias and {externalDir}. When a token value changes upstream, Next Fast Refresh re-renders the preview — no sync step. The contrast badges throughout the site are computed at render time from {contrastPath}, not hardcoded."
+    }
+  },
+  "OverviewCards": {
+    "color": {
+      "title": "Color",
+      "blurb": "Primitive ramps (50–950) including the FFIE brand navy + teal. Semantic bindings per theme, WCAG AAA/AA badges computed at render time."
+    },
+    "typography": {
+      "title": "Typography",
+      "blurb": "1.25 modular scale on a 16pt base, system font stack, four weights, four line-heights."
+    },
+    "spacing": {
+      "title": "Spacing",
+      "blurb": "4pt base. 4-step from 0–16, 8-step from 16+. Unitless RN-compatible numbers."
+    },
+    "sizing": {
+      "title": "Sizing",
+      "blurb": "Touch targets (44 / 48 / 56) per P1. Icon sizes xs→xl."
+    },
+    "motion": {
+      "title": "Motion",
+      "blurb": "Durations include the FFIE-specific 60000ms undo window (P5) and 600ms destructive confirm."
+    },
+    "radii": {
+      "title": "Radii",
+      "blurb": "none → full pill, used consistently across components."
+    },
+    "elevation": {
+      "title": "Elevation",
+      "blurb": "Structured per-platform tokens: { ios, android, web } for RN portability."
+    },
+    "themes": {
+      "title": "Themes",
+      "blurb": "Switch between light, dark, and sunlight. Sunlight is a separate semantic theme — borders carry elevation, not shadows."
+    },
+    "tokens": {
+      "title": "Tokens table",
+      "blurb": "Flat, searchable view of every primitive and theme binding."
+    },
+    "flows": {
+      "title": "User flows",
+      "blurb": "Canonical scenarios from the personas brief, drawn against the design principles. Read each as a product contract."
+    }
+  }
+}

@@ -1,0 +1,5 @@
+#, Persona, Description
+1, Member," Electrical integration company, member of the FFIE. Access restricted content and resources after logging in."
+2, Non-member company, Electrical integration company not a member of the FFIE. Access to the application sections authorized for this profile.
+3, General public," General public user accessing public content, including the section on discovering careers in the electricity sector."
+4, FFIE Administrator," Member of the FFIE team using the back-office to manage content, documents, news, videos, users and notifications."
