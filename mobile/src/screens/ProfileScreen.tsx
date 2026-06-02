@@ -8,7 +8,8 @@
 //   - Biometric on/off (moved from onboarding to settings)
 //   - Sign out (its own group, destructive, iOS-style)
 //
-// Rows are tappable but actions are stubs. Sign out drops role to guest in v1.
+// Rows are tappable but actions are stubs. Sign out is delegated to the
+// parent (MemberShell → App), which clears the session and returns to login.
 
 import React from "react";
 import {
@@ -41,14 +42,12 @@ export function ProfileScreen({
 }) {
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
-  const { role, setRole } = useRole();
+  const { role } = useRole();
 
+  // All rows delegate to the parent. "signout" is handled by MemberShell
+  // (clears the session + returns to the login screen); the rest route to
+  // their sub-screens or remain stubs.
   const handlePress = (rowKey: string) => {
-    if (rowKey === "signout") {
-      // v1 mock: drop role back to guest. Real flow clears the session.
-      setRole("guest-public");
-      return;
-    }
     onRowPress?.(rowKey);
   };
 

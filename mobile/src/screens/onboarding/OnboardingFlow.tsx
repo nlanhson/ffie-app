@@ -35,11 +35,15 @@ type AuthOverlay = "none" | "email" | "otp";
 export function OnboardingFlow({
   themeName = "light",
   onComplete,
+  initialStep = "splash",
 }: {
   themeName?: ThemeName;
   onComplete: (result: OnboardingResult) => void;
+  // Launch starts on the brand splash; an explicit sign-out passes "path" to
+  // land straight on the login / path-selection screen (no splash replay).
+  initialStep?: Step;
 }) {
-  const [step, setStep] = useState<Step>("splash");
+  const [step, setStep] = useState<Step>(initialStep);
   const [authStep, setAuthStep] = useState<AuthOverlay>("none");
   const [discoverVisible, setDiscoverVisible] = useState(false);
   const [email, setEmail] = useState<string>("");

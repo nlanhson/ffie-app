@@ -57,7 +57,7 @@ const offline = false;
 const ENABLE_ROLE_DEBUG = false;
 
 type AppState =
-  | { phase: "onboarding" }
+  | { phase: "onboarding"; skipSplash?: boolean }
   | { phase: "main"; result: OnboardingResult };
 
 // The global Raleway-400 default for <Text> is installed in
@@ -97,14 +97,28 @@ function AppRoot() {
     setAppState({ phase: "main", result });
   };
 
+  // Sign out is a full logout: clear the (mock) session role AND return to the
+  // login / path-selection screen. Dropping the role alone left the app in the
+  // "main" phase, which falls through to the guest shell (News) as a public
+  // user — the bug this fixes. skipSplash sends the user straight to the login
+  // screen instead of replaying the launch splash on an explicit logout.
+  const handleSignOut = () => {
+    setRole("guest-public");
+    setAppState({ phase: "onboarding", skipSplash: true });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: t.surface.default }}>
       <StatusBar style={themeName === "dark" ? "light" : "dark"} />
 
       {appState.phase === "onboarding" ? (
-        <OnboardingFlow themeName={themeName} onComplete={completeOnboarding} />
+        <OnboardingFlow
+          themeName={themeName}
+          onComplete={completeOnboarding}
+          initialStep={appState.skipSplash ? "path" : "splash"}
+        />
       ) : (
-        <MainSurface />
+        <MainSurface onSignOut={handleSignOut} />
       )}
 
       {ENABLE_ROLE_DEBUG && appState.phase === "main" ? (
@@ -117,11 +131,11 @@ function AppRoot() {
 // MainSurface: the live role decides which top-level surface renders.
 //   - Member/Admin → MemberShell (Library / News / Partners / Profile)
 //   - Guest → GuestShell (Discover / News / Partners / Join FFIE)
-function MainSurface() {
+function MainSurface({ onSignOut }: { onSignOut: () => void }) {
   const { role } = useRole();
 
   if (role === "member" || role === "admin") {
-    return <MemberShell />;
+    return <MemberShell onSignOut={onSignOut} />;
   }
 
   return <GuestShell />;
@@ -132,7 +146,7 @@ function MainSurface() {
 // `settingsOverlay` tracks Profile-row presses that route to sub-screens
 // (currently just Notifications); each lands as a slide-up Modal so the
 // member tab bar stays mounted underneath.
-function MemberShell() {
+function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<MemberTabKey>("news");
   const [settingsOverlay, setSettingsOverlay] = useState<"none" | "notifications">("none");
   // Bumped each time the already-active tab is re-tapped, so a screen sitting
@@ -158,8 +172,9 @@ function MemberShell() {
   };
 
   const handleProfileRowPress = (rowKey: string) => {
+    if (rowKey === "signout") return onSignOut();
     if (rowKey === "notifications") setSettingsOverlay("notifications");
-    // Other rows (account, offline, biometric, signout) are still stubs.
+    // Other rows (account, offline, biometric) are still stubs.
   };
 
   return (
