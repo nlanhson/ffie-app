@@ -291,7 +291,7 @@ function NewsFeed({
         {/* News / Events toggle. Sits under the large title like an iOS
             segmented control; switching to Events reveals a blank placeholder
             (the feature is not built yet). */}
-        <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 4 }}>
+        <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
           <SegmentedControl
             themeName={themeName}
             value={tab}

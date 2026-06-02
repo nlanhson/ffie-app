@@ -278,7 +278,7 @@ export function PartnersScreen({
         {/* Segment toggle. Sits under the large title like an iOS segmented
             control; switching to Mission & valeurs / Organisation reveals a
             blank placeholder (those features are not built yet). */}
-        <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 4 }}>
+        <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
           <SegmentedControl
             themeName={themeName}
             value={tab}
