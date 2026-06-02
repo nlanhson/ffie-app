@@ -22,6 +22,7 @@ import {
   View,
   type GestureResponderEvent,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { themes, type ThemeName } from "@tokens";
 import { FFIELogo } from "@/components/ui/FFIELogo";
@@ -42,6 +43,11 @@ export function PathSelectionScreen({
 
   return (
     <View style={styles.root}>
+      {/* This screen is a fixed dark photo in every theme, so the status bar
+          must always use light (white) content — independent of the app's
+          theme-driven global StatusBar. The deepest-mounted StatusBar wins
+          while this screen is shown, then reverts on navigate-away. */}
+      <StatusBar style="light" />
       <ImageBackground source={BG} resizeMode="cover" style={StyleSheet.absoluteFill} />
       {/* Subtle scrim — keeps the white header text readable on the
           image without dulling the photo. */}
