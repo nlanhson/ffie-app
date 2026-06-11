@@ -66,26 +66,26 @@ export function EmailEntryScreen({
         >
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Retour"
+            accessibilityLabel="Back"
             onPress={onBack}
             hitSlop={16}
             style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
           >
             <ChevronLeft size={20} color={t.text.muted} />
-            <Text style={styles.backLabel}>Retour</Text>
+            <Text style={styles.backLabel}>Back</Text>
           </Pressable>
 
           <View style={styles.header}>
-            <Text style={styles.title}>Continuer avec votre adresse e-mail</Text>
+            <Text style={styles.title}>Continue with your email address</Text>
             <Text style={styles.subtitle}>
-              Inscrivez-vous ou connectez-vous avec votre adresse e-mail. Nous vous enverrons un code de vérification.
+              Sign up or sign in with your email address. We'll send you a verification code.
             </Text>
           </View>
 
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Adresse e-mail"
+            placeholder="Email address"
             placeholderTextColor="#8B94A6"
             autoCapitalize="none"
             autoCorrect={false}
@@ -93,7 +93,7 @@ export function EmailEntryScreen({
             returnKeyType="go"
             autoFocus
             onSubmitEditing={() => canContinue && onSubmit(trimmed)}
-            accessibilityLabel="Adresse e-mail"
+            accessibilityLabel="Email address"
             style={[styles.field, hasValue && styles.fieldActive]}
           />
 
@@ -102,7 +102,7 @@ export function EmailEntryScreen({
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ disabled: !canContinue }}
-            accessibilityLabel="Continuer"
+            accessibilityLabel="Continue"
             disabled={!canContinue}
             onPress={() => onSubmit(trimmed)}
             style={({ pressed }) => [
@@ -117,7 +117,7 @@ export function EmailEntryScreen({
                 !canContinue && styles.ctaLabelDisabled,
               ]}
             >
-              Continuer
+              Continue
             </Text>
           </Pressable>
         </View>

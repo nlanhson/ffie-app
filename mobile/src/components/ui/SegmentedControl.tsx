@@ -35,15 +35,21 @@ export function SegmentedControl<K extends string>({
   value,
   options,
   onChange,
+  tint,
 }: {
   themeName?: ThemeName;
   value: K;
   options: SegmentOption<K>[];
   onChange: (key: K) => void;
+  /** Selected-thumb colour. Defaults to the brand accent (teal). Pass a brand
+   *  colour (e.g. the header navy) to match a screen's surface. The label over
+   *  the thumb is always white, so keep this dark enough for contrast. */
+  tint?: string;
 }) {
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
   const reducedMotion = useReducedMotion();
+  const thumbColor = tint ?? t.brand.accent;
 
   const bw = c.cardBorder ? 1 : 0;
   const n = options.length;
@@ -104,7 +110,7 @@ export function SegmentedControl<K extends string>({
             width: segW,
             height: SEG_H,
             borderRadius: primitives.radii.sm,
-            backgroundColor: t.brand.accent,
+            backgroundColor: thumbColor,
             transform: [{ translateX }],
           }}
         />

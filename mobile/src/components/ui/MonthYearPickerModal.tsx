@@ -3,7 +3,7 @@
 // (@react-native-community/datetimepicker), so it looks and feels native on
 // each platform:
 //
-//   • iOS     → the wheel spinner sits in a bottom sheet with Annuler / OK.
+//   • iOS     → the wheel spinner sits in a bottom sheet with Cancel / OK.
 //               (iOS has no month-year-only mode, so it's a full date spinner;
 //               we only use the month + year — the caller snaps to that week.)
 //   • Android → the OS dialog presents itself; we just translate its result.
@@ -154,7 +154,7 @@ export function MonthYearPickerModal({
             }}
           >
             <Text style={{ color: t.text.body, fontSize: 15, lineHeight: 21 }}>
-              Le sélecteur de date nécessite une reconstruction de l'application.
+              The date picker requires a rebuild of the app.
             </Text>
           </View>
         </Pressable>
@@ -193,7 +193,7 @@ export function MonthYearPickerModal({
       <Animated.View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)", opacity: anim }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fermer"
+          accessibilityLabel="Close"
           onPress={onClose}
           style={{ flex: 1 }}
         />
@@ -220,7 +220,7 @@ export function MonthYearPickerModal({
           }}
         >
           <Pressable onPress={onClose} hitSlop={8}>
-            <Text style={{ color: t.text.muted, fontSize: 16 }}>Annuler</Text>
+            <Text style={{ color: t.text.muted, fontSize: 16 }}>Cancel</Text>
           </Pressable>
           <Text
             style={{
@@ -230,7 +230,7 @@ export function MonthYearPickerModal({
               fontWeight: "700",
             }}
           >
-            Choisir le mois
+            Choose month
           </Text>
           <Pressable onPress={() => onConfirm(draft)} hitSlop={8}>
             <Text
@@ -250,7 +250,7 @@ export function MonthYearPickerModal({
           value={draft}
           mode="date"
           display="spinner"
-          locale="fr-FR"
+          locale="en-US"
           textColor={t.text.body}
           themeVariant={themeName === "dark" ? "dark" : "light"}
           onChange={(_e: DateTimePickerEvent, d?: Date) => {

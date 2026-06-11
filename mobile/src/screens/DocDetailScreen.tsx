@@ -9,7 +9,7 @@
 //   - PERSONAS #8: "Share-to-WhatsApp / share-to-Mail must be one tap from
 //     any document." → the share action in the nav bar.
 //
-// "Ouvrir le document" opens a real PDF (doc.sourceUrl) in the in-app
+// "Open the document" opens a real PDF (doc.sourceUrl) in the in-app
 // PdfViewerScreen — an embedded react-native-webview reader with the app's own
 // chrome (FFIE-DOC-02: "opened in the application"). Documents that only have an
 // HTML detail page (no public file URL) open in the in-app browser instead — the
@@ -61,7 +61,7 @@ export function DocDetailScreen({
   // A real PDF opens in the embedded reader; an HTML-only detail page opens in
   // the in-app browser (the right tool for a web page).
   const hasPdf = !!doc.sourceUrl;
-  const openLabel = hasPdf ? "Ouvrir le document (PDF)" : "Voir sur ffie.fr";
+  const openLabel = hasPdf ? "Open the document (PDF)" : "View on ffie.fr";
   const openDocument = () => {
     if (hasPdf) {
       setPdfOpen(true);
@@ -103,7 +103,7 @@ export function DocDetailScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour à la bibliothèque"
+          accessibilityLabel="Back to library"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -116,12 +116,12 @@ export function DocDetailScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Bibliothèque</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Library</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Partager ce document"
+          accessibilityLabel="Share this document"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -158,7 +158,7 @@ export function DocDetailScreen({
                 onError={() => setCoverFailed(true)}
                 resizeMode="contain"
                 style={StyleSheet.absoluteFill}
-                accessibilityLabel={`Couverture : ${doc.title}`}
+                accessibilityLabel={`Cover: ${doc.title}`}
               />
             ) : (
               <>
@@ -174,7 +174,7 @@ export function DocDetailScreen({
                 >
                   <FileText size={28} color="#FFFFFF" />
                 </View>
-                <Text style={{ color: t.text.muted, fontSize: 12 }}>Aperçu du document FFIE</Text>
+                <Text style={{ color: t.text.muted, fontSize: 12 }}>FFIE document preview</Text>
               </>
             )}
           </View>
@@ -203,15 +203,15 @@ export function DocDetailScreen({
 
         {/* Offline — the FFIE-DOC-03 control (member only) */}
         <InsetGroup
-          header="Hors ligne"
-          footer="Les documents enregistrés s'ouvrent sans connexion internet."
+          header="Offline"
+          footer="Saved documents open without an internet connection."
           themeName={themeName}
         >
           <InsetRow
             icon={WifiOff}
             iconBg={t.brand.accent}
-            title="Enregistré hors ligne"
-            subtitle={savedOffline ? "Disponible sans internet" : "Télécharger pour conserver sur cet appareil"}
+            title="Saved offline"
+            subtitle={savedOffline ? "Available offline" : "Download to keep on this device"}
             themeName={themeName}
             isLast
             showChevron={false}
@@ -220,7 +220,7 @@ export function DocDetailScreen({
                 value={savedOffline}
                 onValueChange={setSavedOffline}
                 trackColor={{ true: t.brand.accent, false: t.border.default }}
-                accessibilityLabel="Enregistrer ce document pour un accès hors ligne"
+                accessibilityLabel="Save this document for offline access"
               />
             }
           />
@@ -238,7 +238,7 @@ export function DocDetailScreen({
           <InsetRow
             icon={Share2}
             iconBg="#5B6577"
-            title="Partager"
+            title="Share"
             themeName={themeName}
             isLast
             showChevron={false}
@@ -247,10 +247,10 @@ export function DocDetailScreen({
         </InsetGroup>
 
         {/* Details */}
-        <InsetGroup header="Détails" themeName={themeName}>
+        <InsetGroup header="Details" themeName={themeName}>
           <InsetRow title="Format" value="PDF" themeName={themeName} showChevron={false} />
           <InsetRow
-            title="Famille"
+            title="Family"
             value={doc.family}
             themeName={themeName}
             showChevron={false}
@@ -258,7 +258,7 @@ export function DocDetailScreen({
           />
           {doc.categories.length > 0 ? (
             <InsetRow
-              title={doc.categories.length > 1 ? "Catégories" : "Catégorie"}
+              title={doc.categories.length > 1 ? "Categories" : "Category"}
               subtitle={doc.categories.join(" · ")}
               themeName={themeName}
               showChevron={false}

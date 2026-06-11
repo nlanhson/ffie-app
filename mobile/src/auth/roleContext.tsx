@@ -1,10 +1,10 @@
 // Role / access model — v1 mock.
 //
 // The 4-role taxonomy mirrors the FFIE access matrix:
-//   - "guest-public"  → Grand public (Léa)            — unauthenticated
-//   - "guest-company" → Entreprise non adhérente (Karim) — unauthenticated
-//   - "member"        → Adhérent (Julien)              — authenticated, full access
-//   - "admin"         → Admin FFIE                     — back-office WEB ONLY
+//   - "guest-public"  → General public (Léa)           — unauthenticated
+//   - "guest-company" → Non-member company (Karim)     — unauthenticated
+//   - "member"        → Member (Julien)                — authenticated, full access
+//   - "admin"         → FFIE Admin                     — back-office WEB ONLY
 //
 // "admin" is intentionally included so the type is total against the brief,
 // but it should never appear on a mobile session. RequireRole treats it as

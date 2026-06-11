@@ -74,23 +74,23 @@ export function OtpEntryScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour"
+          accessibilityLabel="Back"
           onPress={onBack}
           hitSlop={16}
           style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
         >
           <ChevronLeft size={20} color={t.text.muted} />
-          <Text style={styles.backLabel}>Retour</Text>
+          <Text style={styles.backLabel}>Back</Text>
         </Pressable>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Saisissez le code</Text>
-          <Text style={styles.subtitle}>Code envoyé à {email}</Text>
+          <Text style={styles.title}>Enter the code</Text>
+          <Text style={styles.subtitle}>Code sent to {email}</Text>
         </View>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Code de vérification, ${code.length} chiffres sur ${CODE_LENGTH} saisis. Appuyez deux fois pour modifier.`}
+          accessibilityLabel={`Verification code, ${code.length} of ${CODE_LENGTH} digits entered. Double-tap to edit.`}
           onPress={focusInput}
           style={styles.dotsWrap}
         >
@@ -99,12 +99,12 @@ export function OtpEntryScreen({
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Renvoyer le code"
+          accessibilityLabel="Resend code"
           onPress={onResend}
           hitSlop={8}
           style={({ pressed }) => [styles.resend, pressed && styles.resendPressed]}
         >
-          <Text style={styles.resendLabel}>Renvoyer le code</Text>
+          <Text style={styles.resendLabel}>Resend code</Text>
         </Pressable>
 
         {/* Off-screen TextInput that owns the keyboard. Positioned far above
@@ -122,7 +122,7 @@ export function OtpEntryScreen({
           textContentType="oneTimeCode"
           autoComplete="one-time-code"
           style={styles.hiddenInput}
-          accessibilityLabel="Code de vérification"
+          accessibilityLabel="Verification code"
         />
       </View>
     </SafeAreaView>

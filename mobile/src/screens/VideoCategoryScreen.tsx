@@ -1,6 +1,6 @@
-// Video category reader — pushed when a tile on the Vidéos segment of the
-// Trades tab is tapped. Clones an FFIE video page (e.g. "L'intelligence
-// artificielle"): a slim back/share bar, the category title, then each film as
+// Video category reader — pushed when a tile on the Videos segment of the
+// Trades tab is tapped. Clones an FFIE video page (e.g. "Artificial
+// intelligence"): a slim back/share bar, the category title, then each film as
 // a title + an inline YouTube player (YouTubeEmbed) that plays IN the app — no
 // redirect to the website (FFIE-VIDEO-01, captions on by default).
 //
@@ -39,7 +39,7 @@ export function VideoCategoryScreen({
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Slim nav bar: back + share (mirrors the News / formation readers). */}
+      {/* Slim nav bar: back + share (mirrors the News / course readers). */}
       <View
         style={{
           flexDirection: "row",
@@ -51,7 +51,7 @@ export function VideoCategoryScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour aux vidéos"
+          accessibilityLabel="Back to videos"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -64,12 +64,12 @@ export function VideoCategoryScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Vidéos</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Videos</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Partager cette vidéo"
+          accessibilityLabel="Share this video"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -122,7 +122,7 @@ export function VideoCategoryScreen({
               ) : null}
               <YouTubeEmbed
                 youtubeId={video.youtubeId}
-                accessibilityLabel={`Vidéo : ${video.title ?? category.title}`}
+                accessibilityLabel={`Video: ${video.title ?? category.title}`}
               />
             </View>
           ))}

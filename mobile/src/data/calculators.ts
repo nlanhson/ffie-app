@@ -1,11 +1,11 @@
 // Technical calculators — the module behind FFIE-CALC-01/02 (🟢 Phase 2,
-// réservé aux adhérents). FFIE-CALC-01: "a module integrates industry-specific
+// members only). FFIE-CALC-01: "a module integrates industry-specific
 // calculation tools"; FFIE-CALC-02: "each calculator accepts the necessary
-// inputs and displays a result". The PRD names three domains — puissance,
-// dimensionnement, normes — but the exact calculator list is still TBC with
+// inputs and displays a result". The PRD names three domains — power,
+// sizing, standards — but the exact calculator list is still TBC with
 // FFIE (see project/STATE.md). So this registry ships ONE fully-working,
-// physics-correct calculator (puissance ↔ intensité) and lists the other
-// domains honestly as "à venir", exactly like the rest of the app handles
+// physics-correct calculator (power ↔ current) and lists the other
+// domains honestly as "coming soon", exactly like the rest of the app handles
 // not-yet-built content (no fabricated data — see CLAUDE.md conventions).
 //
 // The compute functions here are pure (no React, no I/O) so the screen can call
@@ -30,55 +30,55 @@ export type CalculatorEntry = {
   /** One-line description of what the tool computes (the row subtitle). */
   subtitle: string;
   icon: LucideIcon;
-  /** Domain tag from the PRD (puissance / dimensionnement / normes). */
-  domain: "Puissance" | "Dimensionnement" | "Normes";
+  /** Domain tag from the PRD (power / sizing / standards). */
+  domain: "Power" | "Sizing" | "Standards";
 } & ({ available: true; kind: CalculatorKind } | { available: false });
 
 export const CALCULATORS: ReadonlyArray<CalculatorEntry> = [
   {
     id: "power-current",
-    title: "Puissance & intensité",
-    subtitle: "Courant et puissance apparente d'une charge mono/triphasée",
+    title: "Power & current",
+    subtitle: "Current and apparent power of a single/three-phase load",
     icon: Activity,
-    domain: "Puissance",
+    domain: "Power",
     available: true,
     kind: "power",
   },
   {
     id: "voltage-drop",
-    title: "Chute de tension",
-    subtitle: "ΔU en ligne et conformité NF C 15-100",
+    title: "Voltage drop",
+    subtitle: "Line ΔU and NF C 15-100 compliance",
     icon: Gauge,
-    domain: "Normes",
+    domain: "Standards",
     available: true,
     kind: "voltage-drop",
   },
   {
     id: "cable-sizing",
-    title: "Section de câble",
-    subtitle: "Dimensionnement selon la NF C 15-100",
+    title: "Cable cross-section",
+    subtitle: "Sizing according to NF C 15-100",
     icon: Cable,
-    domain: "Dimensionnement",
+    domain: "Sizing",
     available: false,
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Puissance ↔ intensité — the working calculator.
+// Power ↔ current — the working calculator.
 //
 // Given an active power P (kW), a line voltage U (V) and a power factor cos φ,
 // compute the line current I (A) and the apparent power S (kVA):
 //
 //   S = P / cos φ
-//   monophasé : I = (P × 1000) / (U × cos φ)
-//   triphasé  : I = (P × 1000) / (√3 × U × cos φ)
+//   single-phase : I = (P × 1000) / (U × cos φ)
+//   three-phase  : I = (P × 1000) / (√3 × U × cos φ)
 //
 // These are exact, universal electrical relations — no normative assumptions.
 // ---------------------------------------------------------------------------
 export type Phase = "single" | "three";
 
-/** Default line voltage per régime in France (LV distribution). Editable by
- *  the user — these are just the sensible pre-fills. */
+/** Default line voltage per phase configuration in France (LV distribution).
+ *  Editable by the user — these are just the sensible pre-fills. */
 export const DEFAULT_VOLTAGE: Record<Phase, number> = {
   single: 230,
   three: 400,
@@ -139,21 +139,21 @@ export function computePower(input: PowerInput): PowerResult {
 }
 
 // ---------------------------------------------------------------------------
-// Chute de tension — voltage drop along a feeder. The NF C 15-100 formula:
+// Voltage drop along a feeder. The NF C 15-100 formula:
 //
 //   ΔU = b × ( ρ × (L / S) × cos φ  +  λ × L × sin φ ) × I_B
 //
-//   b   = 2 en monophasé (aller-retour), 1 en triphasé
-//   ρ   = résistivité du conducteur à sa température de service (Ω·mm²/m)
-//   L   = longueur de la canalisation (m)
-//   S   = section du conducteur (mm²)
-//   λ   = réactance linéique (Ω/m) — valeur conventionnelle 0,08 mΩ/m
-//   I_B = courant d'emploi (A)
+//   b   = 2 for single-phase (out-and-back), 1 for three-phase
+//   ρ   = conductor resistivity at its operating temperature (Ω·mm²/m)
+//   L   = feeder run length (m)
+//   S   = conductor cross-section (mm²)
+//   λ   = linear reactance (Ω/m) — conventional value 0.08 mΩ/m
+//   I_B = operating current (A)
 //
 // ρ and λ here are the conventional values used by NF C 15-100 (ρ at the
-// operating temperature, i.e. 1,25 × ρ₂₀), not invented figures. The relative
+// operating temperature, i.e. 1.25 × ρ₂₀), not invented figures. The relative
 // drop ΔU/U is compared to the standard's limits for a public-LV-fed
-// installation (§525): 3 % éclairage, 5 % autres usages.
+// installation (§525): 3% lighting, 5% other uses.
 // ---------------------------------------------------------------------------
 export type Conductor = "copper" | "aluminium";
 export type LoadType = "lighting" | "other";
@@ -164,7 +164,7 @@ export const RESISTIVITY: Record<Conductor, number> = {
   aluminium: 0.036,
 };
 
-/** Conventional linear reactance of a conductor, Ω/m (0,08 mΩ/m). */
+/** Conventional linear reactance of a conductor, Ω/m (0.08 mΩ/m). */
 const REACTANCE_PER_M = 0.00008;
 
 /** Max relative voltage drop for an installation fed from the public LV

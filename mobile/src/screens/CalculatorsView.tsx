@@ -1,13 +1,13 @@
-// CalculatorsView — the "Calculateurs" segment of the Trades tab (FFIE-CALC-01/
-// 02, 🟢 Phase 2, réservé aux adhérents).
+// CalculatorsView — the "Calculators" segment of the Trades tab (FFIE-CALC-01/
+// 02, 🟢 Phase 2, members only).
 //
 // Two states, decided by role (the access model — src/auth/roleContext):
-//   • Guest  → a member-only locked state (Lock + "Réservé aux adhérents"),
+//   • Guest  → a member-only locked state (Lock + "Members only"),
 //              matching how the rest of the app gates member content. Per the
 //              tech requirement, gated surfaces inform & invite, never 403.
 //   • Member → the calculators module: a grouped list of tools. The working
-//              tool (Puissance & intensité) opens in a sheet; the planned tools
-//              (dimensionnement, normes) read as "Bientôt", honestly, since
+//              tool (Power & current) opens in a sheet; the planned tools
+//              (sizing, standards) read as "Coming soon", honestly, since
 //              their reference data is still TBC with FFIE.
 //
 // The calculator itself (PowerCalculatorSheet) computes live as the user types,
@@ -56,12 +56,12 @@ export function CalculatorsView({ themeName = "light" }: { themeName?: ThemeName
     <>
       <View style={{ paddingHorizontal: GUTTER, paddingTop: 2, paddingBottom: 18 }}>
         <Text style={{ color: themes[themeName].text.muted, fontSize: 15, lineHeight: 22 }}>
-          Vos outils de calcul métier. D'autres calculateurs définis par la FFIE
-          arriveront dans les prochaines versions.
+          Your trade calculation tools. More calculators defined by FFIE will
+          arrive in upcoming versions.
         </Text>
       </View>
 
-      <InsetGroup themeName={themeName} footer="Réservé aux adhérents FFIE.">
+      <InsetGroup themeName={themeName} footer="FFIE members only.">
         {CALCULATORS.map((calc, i) => {
           const t = themes[themeName];
           const last = i === CALCULATORS.length - 1;
@@ -76,10 +76,10 @@ export function CalculatorsView({ themeName = "light" }: { themeName?: ThemeName
               title={calc.title}
               subtitle={calc.subtitle}
               isLast={last}
-              value={calc.available ? undefined : "Bientôt"}
+              value={calc.available ? undefined : "Coming soon"}
               onPress={calc.available ? () => setOpenKind(calc.kind) : undefined}
               accessibilityLabel={`${calc.title}. ${calc.subtitle}.`}
-              accessibilityHint={calc.available ? "Ouvre le calculateur" : "Bientôt disponible"}
+              accessibilityHint={calc.available ? "Opens the calculator" : "Coming soon"}
             />
           );
         })}
@@ -100,7 +100,7 @@ export function CalculatorsView({ themeName = "light" }: { themeName?: ThemeName
 }
 
 // ---------------------------------------------------------------------------
-// MemberLockedView — what a guest sees on the Calculateurs segment. Lock glyph,
+// MemberLockedView — what a guest sees on the Calculators segment. Lock glyph,
 // an honest one-liner, and the phase badge. (Apply / sign-in CTAs live on the
 // dedicated MemberOnlyPrompt screen reached from the avatar; inside a segment
 // we keep it to a clear, calm gate.)
@@ -135,7 +135,7 @@ function MemberLockedView({ themeName }: { themeName: ThemeName }) {
           marginTop: 20,
         }}
       >
-        Calculateurs techniques
+        Technical calculators
       </Text>
 
       <Text
@@ -148,8 +148,8 @@ function MemberLockedView({ themeName }: { themeName: ThemeName }) {
           maxWidth: 320,
         }}
       >
-        Les outils de calcul métier (puissance, dimensionnement, normes) sont
-        réservés aux adhérents FFIE.
+        The trade calculation tools (power, sizing, standards) are
+        reserved for FFIE members.
       </Text>
 
       <View
@@ -173,7 +173,7 @@ function MemberLockedView({ themeName }: { themeName: ThemeName }) {
             textTransform: "uppercase",
           }}
         >
-          Réservé aux adhérents
+          Members only
         </Text>
       </View>
     </View>
@@ -181,15 +181,18 @@ function MemberLockedView({ themeName }: { themeName: ThemeName }) {
 }
 
 // ---------------------------------------------------------------------------
-// PowerCalculatorSheet — puissance ↔ intensité. The result sits at the top so
+// PowerCalculatorSheet — power ↔ current. The result sits at the top so
 // it stays visible while the number pad is up; the controls are below it.
 // Computes live from the pure helpers; shows a placeholder until the inputs are
 // physically valid.
 //
 // Reduced motion (P5): the sheet snaps in with no slide when the OS setting is
 // on, like the other sheets in the app.
+//
+// Exported so the Tools hub (ToolsHubView) can reuse the same sheet from its
+// "Power calculation" tile — one calculator, two entry points.
 // ---------------------------------------------------------------------------
-function PowerCalculatorSheet({
+export function PowerCalculatorSheet({
   visible,
   themeName,
   onClose,
@@ -207,7 +210,7 @@ function PowerCalculatorSheet({
   const [voltageV, setVoltageV] = useState(String(DEFAULT_VOLTAGE.single));
   const [powerFactor, setPowerFactor] = useState(String(DEFAULT_POWER_FACTOR));
 
-  // Switching régime re-seeds the voltage to that régime's standard LV value.
+  // Switching phase re-seeds the voltage to that phase's standard LV value.
   const onPhaseChange = (next: Phase) => {
     setPhase(next);
     setVoltageV(String(DEFAULT_VOLTAGE[next]));
@@ -238,7 +241,7 @@ function PowerCalculatorSheet({
         <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 8, paddingTop: 4 }}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Fermer"
+            accessibilityLabel="Close"
             onPress={onClose}
             hitSlop={8}
             style={({ pressed }) => ({
@@ -271,11 +274,11 @@ function PowerCalculatorSheet({
                 letterSpacing: -0.6,
               }}
             >
-              Puissance & intensité
+              Power & current
             </Text>
             <Text style={{ color: t.text.muted, fontSize: 14.5, lineHeight: 22, marginTop: 8 }}>
-              Courant de ligne et puissance apparente d'une charge à partir de sa
-              puissance active.
+              Line current and apparent power of a load from its
+              active power.
             </Text>
           </View>
 
@@ -292,7 +295,7 @@ function PowerCalculatorSheet({
               }}
             >
               <ResultCell
-                label="Intensité"
+                label="Current"
                 value={result ? formatFr(result.currentA, 1) : "—"}
                 unit="A"
                 themeName={themeName}
@@ -300,7 +303,7 @@ function PowerCalculatorSheet({
               />
               <View style={{ width: 1, backgroundColor: t.border.subtle, marginHorizontal: 18 }} />
               <ResultCell
-                label="Puissance apparente"
+                label="Apparent power"
                 value={result ? formatFr(result.apparentKva, 2) : "—"}
                 unit="kVA"
                 themeName={themeName}
@@ -308,21 +311,21 @@ function PowerCalculatorSheet({
             </View>
             {!valid ? (
               <Text style={{ color: t.text.muted, fontSize: 12.5, lineHeight: 17, marginTop: 8, marginHorizontal: 4 }}>
-                Renseignez une puissance, une tension et un facteur de puissance
-                (entre 0 et 1) pour obtenir le résultat.
+                Enter a power, a voltage and a power factor
+                (between 0 and 1) to get the result.
               </Text>
             ) : null}
           </View>
 
-          {/* Régime — monophasé (230 V) vs triphasé (400 V). */}
+          {/* Phase — single-phase (230 V) vs three-phase (400 V). */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 28 }}>
-            <FieldLabel label="Régime" themeName={themeName} />
+            <FieldLabel label="Phase" themeName={themeName} />
             <SegmentedControl
               themeName={themeName}
               value={phase}
               options={[
-                { key: "single", label: "Monophasé" },
-                { key: "three", label: "Triphasé" },
+                { key: "single", label: "Single-phase" },
+                { key: "three", label: "Three-phase" },
               ]}
               onChange={onPhaseChange}
             />
@@ -333,26 +336,26 @@ function PowerCalculatorSheet({
             <Input
               themeName={themeName}
               type="decimal"
-              label="Puissance active (kW)"
+              label="Active power (kW)"
               value={powerKw}
               onChangeText={setPowerKw}
-              placeholder="ex. 7,5"
+              placeholder="e.g. 7.5"
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Tension (V)"
+              label="Voltage (V)"
               value={voltageV}
               onChangeText={setVoltageV}
-              helperText={phase === "three" ? "Tension entre phases" : "Tension phase-neutre"}
+              helperText={phase === "three" ? "Phase-to-phase voltage" : "Phase-to-neutral voltage"}
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Facteur de puissance (cos φ)"
+              label="Power factor (cos φ)"
               value={powerFactor}
               onChangeText={setPowerFactor}
-              placeholder="ex. 0,85"
+              placeholder="e.g. 0.85"
             />
           </View>
 
@@ -370,10 +373,10 @@ function PowerCalculatorSheet({
           >
             <Text style={{ color: t.text.muted, fontSize: 12.5, lineHeight: 19 }}>
               {phase === "three"
-                ? "Formule : I = P / (√3 × U × cos φ),  S = P / cos φ."
-                : "Formule : I = P / (U × cos φ),  S = P / cos φ."}
-              {"\n"}Aide au pré-dimensionnement uniquement : le choix final de la
-              protection et de la section de câble relève de la NF C 15-100.
+                ? "Formula: I = P / (√3 × U × cos φ),  S = P / cos φ."
+                : "Formula: I = P / (U × cos φ),  S = P / cos φ."}
+              {"\n"}Pre-sizing aid only: the final choice of protection
+              and cable cross-section is governed by NF C 15-100.
             </Text>
           </View>
         </ScrollView>
@@ -383,12 +386,15 @@ function PowerCalculatorSheet({
 }
 
 // ---------------------------------------------------------------------------
-// VoltageDropSheet — chute de tension. Same shape as the power sheet: result on
+// VoltageDropSheet — voltage drop. Same shape as the power sheet: result on
 // top (ΔU in volts + the relative %), then the controls. Adds a conformity pill
-// comparing ΔU/U to the NF C 15-100 limit for the selected usage — the "normes"
+// comparing ΔU/U to the NF C 15-100 limit for the selected usage — the "standards"
 // angle of the module.
+//
+// Exported so the Tools hub (ToolsHubView) can reuse it from its "Falling
+// tension" tile (the client's label for chute de tension / voltage drop).
 // ---------------------------------------------------------------------------
-function VoltageDropSheet({
+export function VoltageDropSheet({
   visible,
   themeName,
   onClose,
@@ -444,7 +450,7 @@ function VoltageDropSheet({
         <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 8, paddingTop: 4 }}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Fermer"
+            accessibilityLabel="Close"
             onPress={onClose}
             hitSlop={8}
             style={({ pressed }) => ({
@@ -477,11 +483,11 @@ function VoltageDropSheet({
                 letterSpacing: -0.6,
               }}
             >
-              Chute de tension
+              Voltage drop
             </Text>
             <Text style={{ color: t.text.muted, fontSize: 14.5, lineHeight: 22, marginTop: 8 }}>
-              Chute de tension d'une canalisation et vérification de sa conformité
-              à la NF C 15-100.
+              Voltage drop of a cable run and check of its compliance
+              with NF C 15-100.
             </Text>
           </View>
 
@@ -498,7 +504,7 @@ function VoltageDropSheet({
             >
               <View style={{ flexDirection: "row" }}>
                 <ResultCell
-                  label="Chute ΔU"
+                  label="Drop ΔU"
                   value={result ? formatFr(result.dropV, 2) : "—"}
                   unit="V"
                   themeName={themeName}
@@ -519,49 +525,49 @@ function VoltageDropSheet({
             </View>
             {!valid ? (
               <Text style={{ color: t.text.muted, fontSize: 12.5, lineHeight: 17, marginTop: 8, marginHorizontal: 4 }}>
-                Renseignez la longueur, la section, le courant d'emploi et le
-                facteur de puissance pour obtenir le résultat.
+                Enter the length, cross-section, operating current and
+                power factor to get the result.
               </Text>
             ) : null}
           </View>
 
-          {/* Régime. */}
+          {/* Phase. */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 28 }}>
-            <FieldLabel label="Régime" themeName={themeName} />
+            <FieldLabel label="Phase" themeName={themeName} />
             <SegmentedControl
               themeName={themeName}
               value={phase}
               options={[
-                { key: "single", label: "Monophasé" },
-                { key: "three", label: "Triphasé" },
+                { key: "single", label: "Single-phase" },
+                { key: "three", label: "Three-phase" },
               ]}
               onChange={onPhaseChange}
             />
           </View>
 
-          {/* Matériau du conducteur. */}
+          {/* Conductor material. */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 20 }}>
-            <FieldLabel label="Conducteur" themeName={themeName} />
+            <FieldLabel label="Conductor" themeName={themeName} />
             <SegmentedControl
               themeName={themeName}
               value={conductor}
               options={[
-                { key: "copper", label: "Cuivre" },
+                { key: "copper", label: "Copper" },
                 { key: "aluminium", label: "Aluminium" },
               ]}
               onChange={setConductor}
             />
           </View>
 
-          {/* Usage — sets the conformity limit (3 % éclairage / 5 % autres). */}
+          {/* Usage — sets the conformity limit (3% lighting / 5% other). */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 20 }}>
             <FieldLabel label="Usage" themeName={themeName} />
             <SegmentedControl
               themeName={themeName}
               value={loadType}
               options={[
-                { key: "other", label: "Autres usages" },
-                { key: "lighting", label: "Éclairage" },
+                { key: "other", label: "Other usage" },
+                { key: "lighting", label: "Lighting" },
               ]}
               onChange={setLoadType}
             />
@@ -572,42 +578,42 @@ function VoltageDropSheet({
             <Input
               themeName={themeName}
               type="decimal"
-              label="Longueur de la ligne (m)"
+              label="Line length (m)"
               value={lengthM}
               onChangeText={setLengthM}
-              placeholder="ex. 35"
+              placeholder="e.g. 35"
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Section du conducteur (mm²)"
+              label="Conductor cross-section (mm²)"
               value={sectionMm2}
               onChangeText={setSectionMm2}
-              placeholder="ex. 6"
+              placeholder="e.g. 6"
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Courant d'emploi I_B (A)"
+              label="Operating current I_B (A)"
               value={currentA}
               onChangeText={setCurrentA}
-              placeholder="ex. 32"
+              placeholder="e.g. 32"
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Facteur de puissance (cos φ)"
+              label="Power factor (cos φ)"
               value={powerFactor}
               onChangeText={setPowerFactor}
-              placeholder="ex. 0,85"
+              placeholder="e.g. 0.85"
             />
             <Input
               themeName={themeName}
               type="decimal"
-              label="Tension (V)"
+              label="Voltage (V)"
               value={voltageV}
               onChangeText={setVoltageV}
-              helperText={phase === "three" ? "Tension entre phases" : "Tension phase-neutre"}
+              helperText={phase === "three" ? "Phase-to-phase voltage" : "Phase-to-neutral voltage"}
             />
           </View>
 
@@ -625,9 +631,9 @@ function VoltageDropSheet({
           >
             <Text style={{ color: t.text.muted, fontSize: 12.5, lineHeight: 19 }}>
               ΔU = {phase === "single" ? "2" : "√3"} × (ρ × L/S × cos φ + λ × L × sin φ) × I_B,
-              avec ρ et λ aux valeurs conventionnelles de la NF C 15-100.
-              {"\n"}Limites pour une installation alimentée par le réseau public BT
-              (§525) : 3 % en éclairage, 5 % pour les autres usages.
+              with ρ and λ at the conventional NF C 15-100 values.
+              {"\n"}Limits for an installation supplied by the public LV network
+              (§525): 3% for lighting, 5% for other usage.
             </Text>
           </View>
         </ScrollView>
@@ -650,7 +656,7 @@ function ConformityPill({
 }) {
   const t = themes[themeName];
   const tone = conforme ? t.feedback.subtle.success : t.feedback.subtle.danger;
-  const label = conforme ? `Conforme (limite ${limit} %)` : `Dépassement (limite ${limit} %)`;
+  const label = conforme ? `Compliant (limit ${limit}%)` : `Exceeds limit (${limit}%)`;
   return (
     <View
       accessibilityRole="text"
@@ -753,7 +759,7 @@ function FieldLabel({ label, themeName }: { label: string; themeName: ThemeName 
   );
 }
 
-// Format a number the French way (comma decimal separator), fixed precision.
+// Format a number with a fixed precision (period decimal separator).
 function formatFr(value: number, decimals: number): string {
-  return value.toFixed(decimals).replace(".", ",");
+  return value.toFixed(decimals);
 }

@@ -1,5 +1,5 @@
-// LockTag — member-only indicator: a lock glyph + "Adhérents" label. Mirrors
-// the FFIE site's "Contenu réservé aux adhérents" badge. Shown only to viewers
+// LockTag — member-only indicator: a lock glyph + "Members" label. Mirrors
+// the FFIE site's "Members-only content" badge. Shown only to viewers
 // who can't access member content (guests), per the News/Library convention.
 //
 // Icon + word (never colour alone, P4) so the lock reads for everyone. Shared
@@ -14,7 +14,7 @@ import { ralewayFamily } from "@/theme/fonts";
 export function LockTag({
   themeName,
   small = false,
-  label = "Adhérents",
+  label = "Members",
 }: {
   themeName: ThemeName;
   small?: boolean;

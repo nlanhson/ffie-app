@@ -7,9 +7,8 @@
 
 import React from "react";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { primitives, type ThemeName } from "@tokens";
-import { GUTTER, LargeTitleHeader, useGroupedColors } from "@/components/ui/ios";
+import { GUTTER, useGroupedColors } from "@/components/ui/ios";
 import {
   SkeletonBlock,
   SkeletonCircle,
@@ -19,7 +18,7 @@ import {
 
 const THUMB_WIDTH = 50;
 const THUMB_HEIGHT = 66;
-// The screen opens showing INITIAL_VISIBLE rows before "Afficher plus".
+// The screen opens showing INITIAL_VISIBLE rows before "Show more".
 const VISIBLE_ROWS = 10;
 
 // One grouped-list document row: thumbnail + title/subtitle + trailing badge,
@@ -75,10 +74,9 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
   const searchH = Platform.OS === "android" ? 46 : 38;
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
+    <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
-        <ScrollView contentContainerStyle={{ paddingBottom: 32 }} scrollEnabled={false}>
-          <LargeTitleHeader title="Bibliothèque" themeName={themeName} />
+        <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 18 }} scrollEnabled={false}>
 
           {/* Search field + filter button */}
           <View
@@ -115,7 +113,7 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
             ))}
           </View>
 
-          {/* "Afficher plus" button */}
+          {/* "Show more" button */}
           <View style={{ alignItems: "center", marginTop: 16 }}>
             <SkeletonBlock width={170} height={40} radius={20} themeName={themeName} />
           </View>
@@ -140,6 +138,6 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
           </View>
         </ScrollView>
       </SkeletonGroup>
-    </SafeAreaView>
+    </View>
   );
 }

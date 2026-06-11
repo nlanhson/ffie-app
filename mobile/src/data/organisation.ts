@@ -4,11 +4,11 @@
 // "Organisation" segment has the federation's real copy.
 //
 // The page presents a short intro then the three bodies that run the federation:
-// the Bureau, the Conseil d'administration, and the permanent Équipe.
+// the Executive Board, the Board of Directors, and the permanent Team.
 
 // Subtitle under the large "Organisation" title.
 export const ORG_SUBTITLE =
-  "Un bureau et un conseil d'administration, composés exclusivement de chefs d'entreprise du secteur de l'intégration électrique, participent à l'organisation et définissent l'orientation générale.";
+  "An executive board and a board of directors, made up exclusively of business leaders from the electrical integration sector, take part in running the organisation and define its overall direction.";
 
 // One card per governing body. `stat` (optional) is the headline figure shown as
 // a small badge; `body` is the descriptive line.
@@ -22,20 +22,20 @@ export type OrgBody = {
 export const ORG_BODIES: OrgBody[] = [
   {
     id: "bureau",
-    title: "Bureau",
-    stat: "9 membres",
-    body: "L'organe décisionnaire de la FFIE, composé de chefs d'entreprise du secteur et présidé par Pascal Toggenburger.",
+    title: "Executive Board",
+    stat: "9 members",
+    body: "The FFIE's decision-making body, made up of business leaders from the sector and chaired by Pascal Toggenburger.",
   },
   {
     id: "conseil",
-    title: "Conseil d'administration",
-    stat: "46 membres",
-    body: "46 chefs d'entreprise — l'ensemble des délégués régionaux, les membres du bureau et les administrateurs honoraires — assurent une représentation élargie de la gouvernance.",
+    title: "Board of Directors",
+    stat: "46 members",
+    body: "46 business leaders — all the regional delegates, the executive board members and the honorary directors — ensure broad governance representation.",
   },
   {
     id: "equipe",
-    title: "Équipe",
-    body: "Toute l'action de l'équipe permanente de la FFIE est tournée vers le service aux entreprises adhérentes : informer, conseiller, défendre et accompagner.",
+    title: "Team",
+    body: "Everything the FFIE's permanent team does is geared towards serving member companies: informing, advising, defending and supporting them.",
   },
 ];
 
@@ -54,92 +54,93 @@ export type OrgMember = {
   roles: string[];
 };
 
-// Members of the Bureau, from the "Les membres du bureau FFIE" org chart.
+// Members of the Executive Board, from the "Les membres du bureau FFIE" org chart.
 export const BUREAU_MEMBERS: OrgMember[] = [
-  { name: "Pascal Toggenburger", initials: "PT", roles: ["Président"] },
+  { name: "Pascal Toggenburger", initials: "PT", roles: ["President"] },
   {
     name: "Renaud Collard de Soucy",
     initials: "RC",
-    roles: ["Vice-président", "Commission Économique"],
+    roles: ["Vice-President", "Economic Commission"],
   },
   {
     name: "François Bressolette",
     initials: "FB",
-    roles: ["Vice-président", "Trésorier", "Chef de file IRVE"],
+    roles: ["Vice-President", "Treasurer", "EV Charging Lead"],
   },
-  { name: "Philippe Ceschia", initials: "PC", roles: ["Animateur du GT Courants forts"] },
+  { name: "Philippe Ceschia", initials: "PC", roles: ["Facilitator of the High-Voltage Working Group"] },
   {
     name: "Julien Chomont",
     initials: "JC",
-    roles: ["Chef de file Social", "Président de la CSEEE (à partir de janvier 2026)"],
+    roles: ["Social Affairs Lead", "President of the CSEEE (from January 2026)"],
   },
-  { name: "Frédéric Demongeot", initials: "FD", roles: ["Commission Technique et Innovations"] },
-  { name: "Cathie Meppiel", initials: "CM", roles: ["Commission Emploi et Compétences"] },
-  { name: "Francis Renier", initials: "FR", roles: ["Commission Artisanat"] },
-  { name: "Jérôme Teste", initials: "JT", roles: ["Président du GMPV"] },
+  { name: "Frédéric Demongeot", initials: "FD", roles: ["Technical and Innovations Commission"] },
+  { name: "Cathie Meppiel", initials: "CM", roles: ["Employment and Skills Commission"] },
+  { name: "Francis Renier", initials: "FR", roles: ["Craft Trades Commission"] },
+  { name: "Jérôme Teste", initials: "JT", roles: ["President of the GMPV"] },
 ];
 
-// Members of the Conseil d'administration, from the "Les membres du conseil
-// d'administration" page — 46 chefs d'entreprise (regional delegates, department
+// Members of the Board of Directors, from the "Les membres du conseil
+// d'administration" page — 46 business leaders (regional delegates, department
 // presidents, commission leads). The page also lists honorary administrators,
-// not named here. Names are normalised to "Prénom NOM" order; roles preserve the
-// page's labels, split into stacked lines where it lists two distinct roles.
+// not named here. Names are normalised to "First name SURNAME" order; roles
+// preserve the page's labels, split into stacked lines where it lists two
+// distinct roles.
 export const CONSEIL_MEMBERS: OrgMember[] = [
-  { name: "Julien Adrast", roles: ["Président de l'Indre-et-Loire"] },
-  { name: "Jean-Marie Bailly", roles: ["Délégué régional Grand Est", "Président de l'Aube"] },
-  { name: "Arnaud Belloir", roles: ["Délégué régional Pays de la Loire"] },
-  { name: "Edith Berard", roles: ["Présidente des Pyrénées-Orientales"] },
-  { name: "Daniel Bisegna", roles: ["Président du Calvados"] },
-  { name: "Philippe Boni", roles: ["Animateur du GT Énergie"] },
-  { name: "Christophe Bouguin", roles: ["Président FFB Yvelines"] },
-  { name: "François Bressolette", roles: ["Vice-président Trésorier", "Chef de file IRVE"] },
+  { name: "Julien Adrast", roles: ["President of Indre-et-Loire"] },
+  { name: "Jean-Marie Bailly", roles: ["Regional Delegate, Grand Est", "President of Aube"] },
+  { name: "Arnaud Belloir", roles: ["Regional Delegate, Pays de la Loire"] },
+  { name: "Edith Berard", roles: ["President of Pyrénées-Orientales"] },
+  { name: "Daniel Bisegna", roles: ["President of Calvados"] },
+  { name: "Philippe Boni", roles: ["Facilitator of the Energy Working Group"] },
+  { name: "Christophe Bouguin", roles: ["President, FFB Yvelines"] },
+  { name: "François Bressolette", roles: ["Vice-President, Treasurer", "EV Charging Lead"] },
   { name: "Claude Cadario", roles: ["Rhône"] },
-  { name: "Philippe Ceschia", roles: ["Président du Territoire de Belfort"] },
-  { name: "Franck Chaput", roles: ["Président de la Haute-Vienne"] },
+  { name: "Philippe Ceschia", roles: ["President of the Territoire de Belfort"] },
+  { name: "Franck Chaput", roles: ["President of Haute-Vienne"] },
   { name: "Julien Chomont", roles: ["CSEEE"] },
-  { name: "Renaud Collard de Soucy", roles: ["Vice-président", "Président de la Commission Économique"] },
-  { name: "Fabien Crief", roles: ["Délégué régional", "Président de la Seine-et-Marne"] },
+  { name: "Renaud Collard de Soucy", roles: ["Vice-President", "President of the Economic Commission"] },
+  { name: "Fabien Crief", roles: ["Regional Delegate", "President of Seine-et-Marne"] },
   { name: "Régine Delanerie", roles: ["Hautes-Alpes"] },
   {
     name: "Frédéric Demongeot",
-    roles: ["Délégué régional Bourgogne-Franche-Comté", "Président de la Commission Technique et Innovations"],
+    roles: ["Regional Delegate, Bourgogne-Franche-Comté", "President of the Technical and Innovations Commission"],
   },
-  { name: "Bertrand Desplats", roles: ["Délégué régional Occitanie", "Président de l'Aude"] },
-  { name: "Jonathan Duval", roles: ["Président de l'AniTEC"] },
-  { name: "Sylvain François", roles: ["Président Le Havre Pointe de Caux"] },
-  { name: "Cédric Ghigou", roles: ["Président du Var"] },
+  { name: "Bertrand Desplats", roles: ["Regional Delegate, Occitanie", "President of Aude"] },
+  { name: "Jonathan Duval", roles: ["President of AniTEC"] },
+  { name: "Sylvain François", roles: ["President, Le Havre Pointe de Caux"] },
+  { name: "Cédric Ghigou", roles: ["President of Var"] },
   { name: "Bernard Gioan", roles: ["Alpes-Maritimes"] },
-  { name: "Frédéric Gondeau", roles: ["Président du Rhône"] },
+  { name: "Frédéric Gondeau", roles: ["President of Rhône"] },
   { name: "Gaëtan Guchet", roles: ["Grand Paris"] },
-  { name: "Xavier Guidez", roles: ["Président Nord Pas-de-Calais"] },
-  { name: "Thierry Guillot", roles: ["Délégué régional Nouvelle-Aquitaine"] },
-  { name: "Nathalie Lacroix", roles: ["Présidente du Gers"] },
-  { name: "Didier Lahure", roles: ["Président Nord Pas-de-Calais"] },
-  { name: "Claude Leboue", roles: ["Délégué régional Hauts-de-France"] },
-  { name: "Jocelyn Lefebvre", roles: ["Délégué régional Normandie"] },
-  { name: "Stéphane Lelievre", roles: ["Délégué régional Bretagne"] },
-  { name: "Alexandre Mahout", roles: ["Délégué régional Île-de-France 78-91-95"] },
+  { name: "Xavier Guidez", roles: ["President, Nord Pas-de-Calais"] },
+  { name: "Thierry Guillot", roles: ["Regional Delegate, Nouvelle-Aquitaine"] },
+  { name: "Nathalie Lacroix", roles: ["President of Gers"] },
+  { name: "Didier Lahure", roles: ["President, Nord Pas-de-Calais"] },
+  { name: "Claude Leboue", roles: ["Regional Delegate, Hauts-de-France"] },
+  { name: "Jocelyn Lefebvre", roles: ["Regional Delegate, Normandie"] },
+  { name: "Stéphane Lelievre", roles: ["Regional Delegate, Bretagne"] },
+  { name: "Alexandre Mahout", roles: ["Regional Delegate, Île-de-France 78-91-95"] },
   { name: "Nicolas Maillet-Avenel", roles: ["Seine-Maritime"] },
-  { name: "Dominique Mathieu", roles: ["Président Meurthe-et-Moselle"] },
+  { name: "Dominique Mathieu", roles: ["President, Meurthe-et-Moselle"] },
   {
     name: "Cathie Meppiel",
-    roles: ["Présidente du Bas-Rhin", "Présidente de la Commission Emploi et Compétences"],
+    roles: ["President of Bas-Rhin", "President of the Employment and Skills Commission"],
   },
   { name: "Patrick Moulard", roles: ["Alpes-Maritimes"] },
   { name: "Denis Onimus", roles: ["Grand Paris"] },
   { name: "Eric Ouvrard", roles: ["Essonne"] },
-  { name: "Vincent Pireddu", roles: ["Délégué régional Corse"] },
-  { name: "Marc Potier", roles: ["Président Côte d'Or"] },
-  { name: "Francis Renier", roles: ["Président Commission Artisanat", "Délégué régional Centre-Val de Loire"] },
-  { name: "Patrick Richaud", roles: ["Délégué régional PACA", "Président des Bouches-du-Rhône"] },
-  { name: "Xavier Rosa", roles: ["Délégué régional Grand Paris", "Chef de file Social"] },
-  { name: "Jérôme Teste", roles: ["Délégué régional Auvergne-Rhône-Alpes"] },
-  { name: "Pascal Texereau", roles: ["Président de la Vienne"] },
-  { name: "Pascal Toggenburger", roles: ["Président de la FFIE"] },
-  { name: "Philippe Zanni", roles: ["Président de l'Hérault et du Gard"] },
+  { name: "Vincent Pireddu", roles: ["Regional Delegate, Corse"] },
+  { name: "Marc Potier", roles: ["President, Côte d'Or"] },
+  { name: "Francis Renier", roles: ["President of the Craft Trades Commission", "Regional Delegate, Centre-Val de Loire"] },
+  { name: "Patrick Richaud", roles: ["Regional Delegate, PACA", "President of Bouches-du-Rhône"] },
+  { name: "Xavier Rosa", roles: ["Regional Delegate, Grand Paris", "Social Affairs Lead"] },
+  { name: "Jérôme Teste", roles: ["Regional Delegate, Auvergne-Rhône-Alpes"] },
+  { name: "Pascal Texereau", roles: ["President of Vienne"] },
+  { name: "Pascal Toggenburger", roles: ["President of the FFIE"] },
+  { name: "Philippe Zanni", roles: ["President of Hérault and Gard"] },
 ];
 
-// Administrateurs honoraires — listed alongside the Conseil d'administration,
+// Honorary administrators — listed alongside the Board of Directors,
 // separate from its 46 acting members. A few hold an honorific presidency.
 export const CONSEIL_HONORARY: OrgMember[] = [
   { name: "Jean-Claude Albarran", roles: [] },
@@ -147,40 +148,40 @@ export const CONSEIL_HONORARY: OrgMember[] = [
   { name: "Patrick Aygobere", roles: [] },
   { name: "Christian Desplats", roles: [] },
   { name: "Dominique Gabrielle", roles: [] },
-  { name: "Emmanuel Gravier", roles: ["Président d'honneur"] },
-  { name: "Jean-Claude Guillot", roles: ["Président d'honneur"] },
+  { name: "Emmanuel Gravier", roles: ["Honorary President"] },
+  { name: "Jean-Claude Guillot", roles: ["Honorary President"] },
   { name: "Jean Lagarrigue", roles: [] },
-  { name: "Francis Lepers", roles: ["Président honoraire"] },
+  { name: "Francis Lepers", roles: ["Honorary President"] },
   { name: "Jean-Pierre Monclin", roles: [] },
 ];
 
 // The permanent team (the "Équipe FFIE" org chart). Portraits aren't ours to
-// ship, so the popup renders initials monograms. The "Courants Forts" engineer
+// ship, so the popup renders initials monograms. The "High-Voltage" engineer
 // slot is shown as a vacancy on the source (no name yet).
 export const EQUIPE_MEMBERS: OrgMember[] = [
-  { name: "Philippe Rifaux", roles: ["Délégué Général"] },
-  { name: "Carole Falguières", roles: ["Secrétaire Générale"] },
-  { name: "Solange Caboche", roles: ["Assistante Secrétariat Général"] },
-  { name: "Leïla Ricato", roles: ["Ingénieure Performance Énergétique"] },
-  { name: "Laurence Auger", roles: ["Assistante du Président et du Délégué Général"] },
-  { name: "Clotilde Lepape", roles: ["Responsable Communication"] },
-  { name: "Louis-Michel Rodrigues", roles: ["Responsable des Affaires Intérieures"] },
-  { name: "Antoine Appol", roles: ["Assistant des Affaires Intérieures"] },
-  { name: "Pierre-Mary Le Person", roles: ["Directeur des Affaires Techniques"] },
-  { name: "Adel Guediri", roles: ["Ingénieur Courants Faibles"] },
-  { name: "Poste à pourvoir", initials: "?", roles: ["Ingénieur Courants Forts"] },
+  { name: "Philippe Rifaux", roles: ["General Delegate"] },
+  { name: "Carole Falguières", roles: ["Secretary General"] },
+  { name: "Solange Caboche", roles: ["Secretary General's Assistant"] },
+  { name: "Leïla Ricato", roles: ["Energy Performance Engineer"] },
+  { name: "Laurence Auger", roles: ["Assistant to the President and General Delegate"] },
+  { name: "Clotilde Lepape", roles: ["Communications Manager"] },
+  { name: "Louis-Michel Rodrigues", roles: ["Internal Affairs Manager"] },
+  { name: "Antoine Appol", roles: ["Internal Affairs Assistant"] },
+  { name: "Pierre-Mary Le Person", roles: ["Director of Technical Affairs"] },
+  { name: "Adel Guediri", roles: ["Low-Voltage Engineer"] },
+  { name: "Position to be filled", initials: "?", roles: ["High-Voltage Engineer"] },
 ];
 
 // ANITEC team, shown as a separate cluster on the same org chart.
 export const ANITEC_MEMBERS: OrgMember[] = [
-  { name: "Lilian Caule", roles: ["Directeur technique"] },
-  { name: "Karine Clément", roles: ["Assistante de direction"] },
+  { name: "Lilian Caule", roles: ["Technical Director"] },
+  { name: "Karine Clément", roles: ["Executive Assistant"] },
 ];
 
 // Switchboard numbers from the foot of the org chart. Real FFIE contact data.
 export type OrgContact = { label: string; phone: string };
 export const ORG_CONTACTS: OrgContact[] = [
-  { label: "Accueil FFIE", phone: "01 44 05 84 00" },
-  { label: "Hot line Technique", phone: "01 44 05 84 01" },
-  { label: "Accueil Anitec", phone: "01 44 05 84 40" },
+  { label: "FFIE Reception", phone: "01 44 05 84 00" },
+  { label: "Technical Hotline", phone: "01 44 05 84 01" },
+  { label: "Anitec Reception", phone: "01 44 05 84 40" },
 ];

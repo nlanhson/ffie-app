@@ -2,7 +2,7 @@
 // page in both shells. A circular avatar-style button whose icon and
 // destination depend on the role:
 //   - Guest (non-member): a user-plus glyph → opens the federation directory
-//     (BecomeMemberScreen: the map + departmental list, with a "Se connecter"
+//     (BecomeMemberScreen: the map + departmental list, with a "Sign in"
 //     login button at its bottom).
 //   - Member: a plain user glyph → opens the personal Profile / settings page.
 //
@@ -40,7 +40,7 @@ export function AdhererButton({
 
   const isMember = variant === "member";
   const Icon = isMember ? User : UserPlus;
-  const label = isMember ? "Mon profil" : "Adhérer à la FFIE";
+  const label = isMember ? "My profile" : "Join the FFIE";
 
   return (
     // box-none: the host spans the top strip but only the disc is tappable, so

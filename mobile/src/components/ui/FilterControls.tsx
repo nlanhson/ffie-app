@@ -35,10 +35,10 @@ import { useGroupedColors } from "@/components/ui/ios";
 export type FilterOption<K extends string> = { key: K; label: string };
 
 /** One titled group of chips inside the sheet. A sheet can stack several — the
- *  Library stacks "Famille" + "Hors ligne". Keys are plain strings at this
+ *  Library stacks "Family" + "Offline". Keys are plain strings at this
  *  boundary; each caller keeps its own typed Set behind `onToggle`. */
 export type FilterSection = {
-  /** Uppercase label above this chip group, e.g. "Famille". */
+  /** Uppercase label above this chip group, e.g. "Family". */
   label: string;
   options: FilterOption<string>[];
   selected: Set<string>;
@@ -135,18 +135,18 @@ export function FilterSheet<K extends string>({
   onToggle,
   onReset,
   onClose,
-  title = "Filtre",
+  title = "Filter",
 }: {
   visible: boolean;
   themeName: ThemeName;
   /** Single-section API (News, Partners): provide these OR `sections`.
-   *  Uppercase label above the chip group, e.g. "Catégorie". */
+   *  Uppercase label above the chip group, e.g. "Category". */
   sectionLabel?: string;
   options?: FilterOption<K>[];
   selected?: Set<K>;
   onToggle?: (key: K) => void;
   /** Multi-section API: stack several titled chip groups (the Library stacks
-   *  "Famille" + "Hors ligne"). Takes precedence over the single-section props. */
+   *  "Family" + "Offline"). Takes precedence over the single-section props. */
   sections?: FilterSection[];
   resultCount: number;
   onReset: () => void;
@@ -240,7 +240,7 @@ export function FilterSheet<K extends string>({
 
           {/* Tap-outside dismiss layer, between scrim and sheet. */}
           <Pressable
-            accessibilityLabel="Fermer le filtre"
+            accessibilityLabel="Close filter"
             accessibilityRole="button"
             onPress={onClose}
             style={StyleSheet.absoluteFill}
@@ -284,7 +284,7 @@ export function FilterSheet<K extends string>({
                 <Pressable
                   onPress={onClose}
                   accessibilityRole="button"
-                  accessibilityLabel="Fermer le filtre"
+                  accessibilityLabel="Close filter"
                   hitSlop={12}
                   style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
                 >
@@ -342,7 +342,7 @@ export function FilterSheet<K extends string>({
               <View style={sheetStyles.actionsRow}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Réinitialiser les filtres"
+                  accessibilityLabel="Reset filters"
                   onPress={onReset}
                   disabled={totalSelected === 0}
                   style={({ pressed }) => ({
@@ -364,12 +364,12 @@ export function FilterSheet<K extends string>({
                       fontWeight: "600",
                     }}
                   >
-                    Réinitialiser
+                    Reset
                   </Text>
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`Voir ${resultCount} résultats`}
+                  accessibilityLabel={`See ${resultCount} results`}
                   onPress={onClose}
                   style={({ pressed }) => ({
                     flex: 2,
@@ -388,7 +388,7 @@ export function FilterSheet<K extends string>({
                       fontWeight: "600",
                     }}
                   >
-                    Voir {resultCount} {resultCount === 1 ? "résultat" : "résultats"}
+                    See {resultCount} {resultCount === 1 ? "result" : "results"}
                   </Text>
                 </Pressable>
               </View>

@@ -1,12 +1,12 @@
 // MissionInfographic — animated, mobile-native rebuild of the FFIE "en chiffres"
-// infographic at the foot of the Missions et valeurs page (the dark-navy chart
-// with the métiers rail, circular gauges and big numbers).
+// infographic at the foot of the Mission & values page (the dark-navy chart
+// with the trades rail, circular gauges and big numbers).
 //
 // The source is a wide, branched diagram; on a phone we restack it into a single
 // column of stat blocks on FFIE's institutional navy gradient, keeping the same
-// figures, the cyan electricity-flow accent, and the métiers rail. The motion is
+// figures, the cyan electricity-flow accent, and the trades rail. The motion is
 // the point of the rebuild:
-//   - numbers count up (8 500, 150 000, 25 Mds€),
+//   - numbers count up (8,500, 150,000, €25bn),
 //   - the circular gauges sweep from 0 to their percentage,
 //   - blocks fade/slide in, staggered.
 //
@@ -70,7 +70,7 @@ const WHITE = "#FFFFFF";
 const MUTED = "rgba(255,255,255,0.68)";
 const FAINT = "rgba(255,255,255,0.5)";
 
-// French thousands grouping with a narrow no-break space (8 500, 150 000).
+// Thousands grouping with a narrow no-break space (8 500, 150 000).
 const fr = (n: number) =>
   Math.round(n)
     .toString()
@@ -326,16 +326,16 @@ function PanelLabel({ children }: { children: string }) {
   );
 }
 
-// Métier → icon map (left rail of the source infographic).
+// Trade → icon map (left rail of the source infographic).
 const METIER_ICON: Record<string, LucideIcon> = {
-  Automatismes: Cog,
+  Automation: Cog,
   Communication: Wifi,
-  "Confort thermique": Thermometer,
-  Éclairage: Lightbulb,
-  Énergies: Sun,
-  "Gestion technique du bâtiment": Laptop,
+  "Thermal comfort": Thermometer,
+  Lighting: Lightbulb,
+  Energy: Sun,
+  "Building management systems": Laptop,
   Maintenance: Wrench,
-  Sécurité: Lock,
+  Security: Lock,
 };
 
 export function MissionInfographic({ scrollY }: { scrollY?: Animated.Value }) {
@@ -352,10 +352,10 @@ export function MissionInfographic({ scrollY }: { scrollY?: Animated.Value }) {
       >
         {/* Header */}
         <Reveal play={inView} reduced={reduced}>
-          <PanelLabel>La FFIE en chiffres</PanelLabel>
+          <PanelLabel>The FFIE in numbers</PanelLabel>
         </Reveal>
 
-        {/* Entreprises adhérentes — the headline figure */}
+        {/* Member companies — the headline figure */}
         <Reveal play={inView} reduced={reduced} delay={60}>
           <View style={{ flexDirection: "row", alignItems: "center", columnGap: 14, marginBottom: 26 }}>
             <IconBadge Icon={Building2} />
@@ -375,16 +375,16 @@ export function MissionInfographic({ scrollY }: { scrollY?: Animated.Value }) {
                   letterSpacing: -1,
                 }}
               />
-              <Text style={statLabel}>entreprises adhérentes</Text>
+              <Text style={statLabel}>member companies</Text>
             </View>
           </View>
         </Reveal>
 
-        {/* 50 % des salariés → 150 000 actifs FFIE */}
+        {/* 50% of the workforce → 150,000 FFIE workers */}
         <Reveal play={inView} reduced={reduced} delay={120}>
           <GaugeRow
             pct={F.salariesPct}
-            caption={"des salariés\ndu secteur"}
+            caption={"of the sector's\nworkforce"}
             play={inView}
             reduced={reduced}
             delay={200}
@@ -399,15 +399,15 @@ export function MissionInfographic({ scrollY }: { scrollY?: Animated.Value }) {
                 style={bigValueText}
               />
             }
-            valueLabel="actifs FFIE"
+            valueLabel="FFIE workers"
           />
         </Reveal>
 
-        {/* 50 % du CA → 25 Mds€ */}
+        {/* 50% of turnover → €25bn */}
         <Reveal play={inView} reduced={reduced} delay={180}>
           <GaugeRow
             pct={F.caPct}
-            caption={"du chiffre\nd'affaires du secteur"}
+            caption={"of the sector's\nturnover"}
             play={inView}
             reduced={reduced}
             delay={260}
@@ -421,52 +421,52 @@ export function MissionInfographic({ scrollY }: { scrollY?: Animated.Value }) {
                   delay={260}
                   style={bigValueText}
                 />
-                <Text style={[bigValueText, { fontSize: 22 }]}> Mds€</Text>
+                <Text style={[bigValueText, { fontSize: 22 }]}> €bn</Text>
               </View>
             }
-            valueLabel="de chiffre d'affaires"
+            valueLabel="in turnover"
           />
         </Reveal>
 
         <Divider />
 
-        {/* Répartition du chiffre d'affaires : neuf / rénovation */}
+        {/* Breakdown of turnover: new build / renovation */}
         <Reveal play={inView} reduced={reduced} delay={220}>
-          <PanelLabel>Répartition du chiffre d'affaires</PanelLabel>
+          <PanelLabel>Breakdown of turnover</PanelLabel>
           <View style={miniRow}>
-            <MiniGauge pct={F.neufPct} label="Neuf" Icon={HardHat} play={inView} reduced={reduced} delay={300} />
-            <MiniGauge pct={F.renovationPct} label="Rénovation" Icon={Hammer} play={inView} reduced={reduced} delay={360} />
+            <MiniGauge pct={F.neufPct} label="New build" Icon={HardHat} play={inView} reduced={reduced} delay={300} />
+            <MiniGauge pct={F.renovationPct} label="Renovation" Icon={Hammer} play={inView} reduced={reduced} delay={360} />
           </View>
         </Reveal>
 
         <Divider />
 
-        {/* Nature des travaux : réseaux / bâtiments */}
+        {/* Type of work: networks / buildings */}
         <Reveal play={inView} reduced={reduced} delay={260}>
-          <PanelLabel>Nature des travaux</PanelLabel>
+          <PanelLabel>Type of work</PanelLabel>
           <View style={miniRow}>
-            <MiniGauge pct={F.reseauxPct} label={"Travaux et\nréseaux"} Icon={Network} play={inView} reduced={reduced} delay={340} />
-            <MiniGauge pct={F.batimentsPct} label={"Travaux dans\nles bâtiments"} Icon={Building2} play={inView} reduced={reduced} delay={400} />
+            <MiniGauge pct={F.reseauxPct} label={"Works and\nnetworks"} Icon={Network} play={inView} reduced={reduced} delay={340} />
+            <MiniGauge pct={F.batimentsPct} label={"Works in\nbuildings"} Icon={Building2} play={inView} reduced={reduced} delay={400} />
           </View>
         </Reveal>
 
         <Divider />
 
-        {/* Travaux dans les bâtiments : résidentiel / tertiaire / industriel */}
+        {/* Works in buildings: residential / commercial / industrial */}
         <Reveal play={inView} reduced={reduced} delay={300}>
-          <PanelLabel>Travaux dans les bâtiments</PanelLabel>
+          <PanelLabel>Works in buildings</PanelLabel>
           <View style={miniRow}>
-            <MiniGauge pct={F.residentielPct} label="Résidentiel" Icon={Home} size={82} play={inView} reduced={reduced} delay={380} />
-            <MiniGauge pct={F.tertiairePct} label="Tertiaire" Icon={Building2} size={82} play={inView} reduced={reduced} delay={440} />
-            <MiniGauge pct={F.industrielPct} label="Industriel" Icon={Factory} size={82} play={inView} reduced={reduced} delay={500} />
+            <MiniGauge pct={F.residentielPct} label="Residential" Icon={Home} size={82} play={inView} reduced={reduced} delay={380} />
+            <MiniGauge pct={F.tertiairePct} label="Commercial" Icon={Building2} size={82} play={inView} reduced={reduced} delay={440} />
+            <MiniGauge pct={F.industrielPct} label="Industrial" Icon={Factory} size={82} play={inView} reduced={reduced} delay={500} />
           </View>
         </Reveal>
 
         <Divider />
 
-        {/* Les métiers — left rail of the source, here a chip grid */}
+        {/* The trades — left rail of the source, here a chip grid */}
         <Reveal play={inView} reduced={reduced} delay={340}>
-          <PanelLabel>{`${MISSION_METIERS.length} métiers`}</PanelLabel>
+          <PanelLabel>{`${MISSION_METIERS.length} trades`}</PanelLabel>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             {MISSION_METIERS.map((m) => {
               const Icon = METIER_ICON[m] ?? Cog;
@@ -526,8 +526,8 @@ function IconBadge({ Icon, size = 52 }: { Icon: LucideIcon; size?: number }) {
   );
 }
 
-// GaugeRow — a big gauge on the left, a "soit" connector, then the resulting
-// figure on the right with its icon. Mirrors the source's "50 % → soit → N".
+// GaugeRow — a big gauge on the left, an "i.e." connector, then the resulting
+// figure on the right with its icon. Mirrors the source's "50% → i.e. → N".
 function GaugeRow({
   pct,
   caption,
@@ -561,7 +561,7 @@ function GaugeRow({
           }}
         >
           <Text style={{ color: FAINT, fontSize: 11, letterSpacing: 0.5, fontFamily: ralewayFamily("600"), fontWeight: "600" }}>
-            soit
+            i.e.
           </Text>
         </View>
       </View>

@@ -63,14 +63,14 @@ const ICON_BY_NAME: Record<StatusName, LucideIcon> = {
 
 // Canonical labels — same source of truth as web.
 const LABEL_BY_NAME: Record<StatusName, string> = {
-  success: "Réussi",
-  warning: "Attention",
-  danger: "Erreur",
+  success: "Success",
+  warning: "Warning",
+  danger: "Error",
   info: "Info",
-  offline: "Hors ligne",
-  syncing: "Synchro…",
-  stale: "Obsolète",
-  fresh: "À jour",
+  offline: "Offline",
+  syncing: "Syncing…",
+  stale: "Outdated",
+  fresh: "Up to date",
 };
 
 function resolveFeedbackName(name: StatusName): Exclude<StatusName, "fresh"> {

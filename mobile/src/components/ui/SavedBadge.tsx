@@ -36,12 +36,12 @@ export function SavedBadge({
     : { bg: t.surface.subtle, fg: t.text.muted, border: t.border.default };
 
   const Icon = saved ? CheckCircle2 : ArrowDownToLine;
-  const label = saved ? "Enregistré" : "Non enregistré";
+  const label = saved ? "Saved" : "Not saved";
 
   return (
     <View
       accessibilityRole="text"
-      accessibilityLabel={saved ? "Enregistré hors ligne" : "Non enregistré hors ligne"}
+      accessibilityLabel={saved ? "Saved offline" : "Not saved offline"}
       style={{
         height: sz.height,
         paddingHorizontal: sz.padX,

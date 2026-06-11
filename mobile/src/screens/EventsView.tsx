@@ -1,4 +1,4 @@
-// EventsView — body of the Événements tab: a swipeable weekly calendar up top,
+// EventsView — body of the Events tab: a swipeable weekly calendar up top,
 // then the list of FFIE events below it. Rendered inside the News tab's feed
 // scroll (it brings its own gutter, not its own ScrollView).
 //
@@ -22,11 +22,11 @@ import { FFIELogo } from "@/components/ui/FFIELogo";
 import { canAccess, useRole } from "@/auth/roleContext";
 import { EVENTS, type FfieEvent } from "@/data/events";
 
-// Short French month labels for the date block (matches the web list's compact
+// Short month labels for the date block (matches the web list's compact
 // date treatment).
 const MONTHS_SHORT = [
-  "janv.", "févr.", "mars", "avr.", "mai", "juin",
-  "juil.", "août", "sept.", "oct.", "nov.", "déc.",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
 function parseIso(iso: string): { day: number; month: number } {
@@ -105,7 +105,7 @@ function EventRow({
 
   // Locked = greyed out: the accent (date block + rule) drops to muted, the
   // title dims, and a lock tag appears. Colour is never the only signal — the
-  // lock icon + "Adhérents" label carry it too (P4).
+  // lock icon + "Members" label carry it too (P4).
   const accentColor = locked ? t.text.muted : t.brand.accent;
   const ruleColor = locked ? t.border.default : t.brand.accent;
   const titleColor = locked ? t.text.muted : t.text.body;
@@ -113,8 +113,8 @@ function EventRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${event.title}, le ${day} ${MONTHS_SHORT[month]}.${
-        locked ? " Réservé aux adhérents." : ""
+      accessibilityLabel={`${event.title}, on ${MONTHS_SHORT[month]} ${day}.${
+        locked ? " Members only." : ""
       }`}
       onPress={onPress}
       style={({ pressed }) => ({
@@ -194,7 +194,7 @@ function EventRow({
                 fontWeight: "500",
               }}
             >
-              Adhérents
+              Members
             </Text>
           </View>
         ) : null}

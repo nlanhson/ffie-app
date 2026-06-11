@@ -1,5 +1,5 @@
-// Content for the Vidéos segment of the Trades tab — a clone of the FFIE
-// "Vidéos" page (ffie.fr/les-metiers-de-lelectricite/videos): an intro, four
+// Content for the Videos segment of the Trades tab — a clone of the FFIE
+// "Videos" page (ffie.fr/les-metiers-de-lelectricite/videos): an intro, four
 // themed video categories, and the federation's YouTube channel.
 //
 // Each category links to its FFIE video page, where the YouTube films play; we
@@ -36,7 +36,7 @@ export type VideoCategory = {
 export const youtubeThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 
 export const VIDEOS_INTRO =
-  "Découvrez les métiers de l'électricité ! Les métiers de la filière en images ; consultez aussi notre chaîne YouTube pour tout voir.";
+  "Discover the electrical trades! The trades of the sector in pictures; check out our YouTube channel too to see everything.";
 
 export const YOUTUBE_CHANNEL_URL =
   "https://www.youtube.com/channel/UCtGdYMwterw35bjXRXm2zXw";
@@ -47,31 +47,31 @@ const IMG_BASE = "https://www.ffie.fr/fileadmin/user_upload";
 export const VIDEO_CATEGORIES: VideoCategory[] = [
   {
     id: "ai",
-    title: "L'intelligence artificielle",
+    title: "Artificial intelligence",
     imageUrl: `${IMG_BASE}/csm_Ai2310_c9c4d19e56.png`,
     seed: "ffie-video-ai",
     url: `${VIDEO_BASE}/lintelligence-artificielle`,
-    alt: "Visuel abstrait évoquant l'intelligence artificielle dans l'électricité",
+    alt: "Abstract visual evoking artificial intelligence in the electrical field",
     videos: [
       {
         youtubeId: "4jQJT9gOluo",
-        title: "L'intelligence artificielle au service des professionnels de l'électricité",
+        title: "Artificial intelligence serving electrical professionals",
         description:
-          "Un motion design réalisé à l'occasion des Rencontres FFIE 2020 : une introduction à l'IA pour signifier l'importance de sa présence au quotidien et l'évolution inéluctable des métiers de la filière électricité.",
+          "A motion design produced for the FFIE 2020 Meetings: an introduction to AI to signal the importance of its everyday presence and the inevitable evolution of the trades in the electrical sector.",
       },
     ],
   },
   {
     id: "smart-city",
-    title: "La smart city",
+    title: "The smart city",
     imageUrl: `${IMG_BASE}/AdobeStock_181088041.jpeg`,
     seed: "ffie-video-smartcity",
     url: `${VIDEO_BASE}/la-smart-city`,
-    alt: "Vue d'une ville connectée la nuit, parcourue de lignes lumineuses",
+    alt: "View of a connected city at night, crossed by glowing lines",
     videos: [
       {
         youtubeId: "0AD84IGyGaM",
-        title: "La Smart City, une réalité à portée des installateurs électriciens.",
+        title: "The Smart City, a reality within reach of electrical installers.",
       },
     ],
   },
@@ -81,33 +81,33 @@ export const VIDEO_CATEGORIES: VideoCategory[] = [
     imageUrl: `${IMG_BASE}/AdobeStock_73920809.jpeg`,
     seed: "ffie-video-poe",
     url: `${VIDEO_BASE}/poe-power-over-ethernet`,
-    alt: "Câbles et connecteurs réseau Ethernet alimentant des équipements",
+    alt: "Ethernet network cables and connectors powering equipment",
     videos: [
       {
         youtubeId: "cU5UACxCd5o",
-        title: "Power over Ethernet, et si ça changeait votre quotidien ?",
+        title: "Power over Ethernet, what if it changed your everyday work?",
       },
     ],
   },
   {
     id: "temoignages",
-    title: "Les témoignages",
+    title: "Testimonials",
     imageUrl: `${IMG_BASE}/AdobeStock_372453660_Preview.jpeg`,
     seed: "ffie-video-temoignages",
     url: `${VIDEO_BASE}/les-temoignages`,
-    alt: "Portraits de professionnels de l'électricité partageant leur parcours",
+    alt: "Portraits of electrical professionals sharing their career paths",
     videos: [
-      { youtubeId: "zKP5j27P1Ng", title: "Témoignage salarié Calasys — Florian Saliou" },
-      { youtubeId: "hyo0hi0OWbc", title: "Témoignage apprenti CESI — Youssef Bendouche" },
-      { youtubeId: "Hk0Ah__hoig", title: "Témoignage apprenti CFA Delépine — Bamba Losseny" },
-      { youtubeId: "kaURqyLrpno", title: "Témoignage chef d'entreprise — Pascal Texereau" },
-      { youtubeId: "D3bFUpwXo4U", title: "Témoignage jeune salarié Calasys — Travis Lombert" },
-      { youtubeId: "R63mJWdWAv0", title: "Témoignage apprentie CESI — Naurine Crevel" },
-      { youtubeId: "LSCm4FSDPk0", title: "Témoignage chef d'entreprise — Alexis Delepoulle" },
+      { youtubeId: "zKP5j27P1Ng", title: "Calasys employee testimonial — Florian Saliou" },
+      { youtubeId: "hyo0hi0OWbc", title: "CESI apprentice testimonial — Youssef Bendouche" },
+      { youtubeId: "Hk0Ah__hoig", title: "CFA Delépine apprentice testimonial — Bamba Losseny" },
+      { youtubeId: "kaURqyLrpno", title: "Company owner testimonial — Pascal Texereau" },
+      { youtubeId: "D3bFUpwXo4U", title: "Young Calasys employee testimonial — Travis Lombert" },
+      { youtubeId: "R63mJWdWAv0", title: "CESI apprentice testimonial — Naurine Crevel" },
+      { youtubeId: "LSCm4FSDPk0", title: "Company owner testimonial — Alexis Delepoulle" },
       {
         youtubeId: "u3vNh911ExM",
         title:
-          "Micro-trottoir : que pensent les étudiants de leur avenir dans les métiers de l'électricité ?",
+          "Vox pop: what do students think about their future in the electrical trades?",
       },
     ],
   },

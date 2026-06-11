@@ -441,6 +441,22 @@ const breakpoints = {
   xl: 1280,
 } as const;
 
+// Decorative brand gradients — for marketing / hub surfaces (currently the
+// Home dashboard's "Public space" cards). These are NOT semantic theme colors:
+// like the navy hero header, each is a FIXED two-stop linear gradient that
+// reads the same in every theme. Each entry is an ordered [from, to] tuple
+// (consumed top-left → bottom-right by expo-linear-gradient). The raw hex lives
+// here so it stays centralized in the token module rather than in components.
+// Greens/violets sit outside the navy+teal brand core deliberately, so the two
+// public-space cards read as a distinct, contrasting pair.
+// Both stops are dark enough that WHITE title + subtitle clear WCAG AA (4.5:1)
+// across the whole card, not just the darker corner — the lighter stop is the
+// binding constraint (#0E7C57 ≈ 4.8:1 on white, #5E2BB0 ≈ 8.6:1).
+const gradients = {
+  findPro: ["#0E7C57", "#0A5A42"], // emerald — "Find a pro" geolocated directory
+  trades: ["#6E39C8", "#46208F"], // violet — "Our trades" discovery
+} as const;
+
 export const primitives = {
   colors,
   fontFamilies,
@@ -456,6 +472,7 @@ export const primitives = {
   opacity,
   elevation,
   breakpoints,
+  gradients,
 } as const;
 
 export type TextStyleName = keyof typeof textStyles;

@@ -5,9 +5,8 @@
 
 import React from "react";
 import { ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { primitives, themes, type ThemeName } from "@tokens";
-import { GUTTER, LargeTitleHeader, useGroupedColors } from "@/components/ui/ios";
+import { GUTTER, useGroupedColors } from "@/components/ui/ios";
 import { SkeletonBlock, SkeletonGroup, SkeletonTextLine } from "@/components/ui/Skeleton";
 
 const GRID_GAP = 14;
@@ -67,12 +66,11 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
   const colW = (screenW - GUTTER * 2 - GRID_GAP) / 2;
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
+    <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} scrollEnabled={false}>
-          <LargeTitleHeader title="Métiers" themeName={themeName} />
+        <ScrollView contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }} scrollEnabled={false}>
 
-          {/* Métiers / Vidéos / Calculateurs segmented control. */}
+          {/* Trades / Videos / Calculators segmented control. */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 18 }}>
             <SkeletonBlock width="100%" height={40} radius={primitives.radii.md} themeName={themeName} />
           </View>
@@ -144,6 +142,6 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
           </View>
         </ScrollView>
       </SkeletonGroup>
-    </SafeAreaView>
+    </View>
   );
 }

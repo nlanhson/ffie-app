@@ -1,10 +1,10 @@
 // Member Sign-In — the auth step on the member path.
 // Per Julien's persona: "He doesn't trust new apps with his login credentials"
 // + "Hates entering credentials." So:
-//   - Field 1: numéro de membre OR email (he'll use whichever he remembers)
+//   - Field 1: member number OR email (he'll use whichever he remembers)
 //   - Field 2: password (with show/hide ETA later; basic for v1)
-//   - Below CTA: "Mot de passe oublié ?" ghost — never forces him to leave
-//   - Below: "← Pas membre ? Découvrir FFIE." ghost — escape to the public path
+//   - Below CTA: "Forgot password?" ghost — never forces him to leave
+//   - Below: "← Not a member? Discover FFIE." ghost — escape to the public path
 // No marketing copy; no badges of trust beyond the federation header.
 
 import React, { useState } from "react";
@@ -45,7 +45,7 @@ export function MemberSignInScreen({
     setTimeout(() => {
       setSubmitting(false);
       if (password === "wrong") {
-        setError("Identifiants incorrects. Réessayez ou réinitialisez votre mot de passe.");
+        setError("Incorrect credentials. Try again or reset your password.");
         return;
       }
       onSignIn(identifier.trim());
@@ -65,7 +65,7 @@ export function MemberSignInScreen({
           {/* Back row */}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Retour"
+            accessibilityLabel="Back"
             onPress={onBack}
             hitSlop={12}
             style={({ pressed }) => ({
@@ -78,7 +78,7 @@ export function MemberSignInScreen({
             })}
           >
             <ChevronLeft size={20} color={t.text.muted} />
-            <Text style={{ color: t.text.muted, fontSize: 15 }}>Retour</Text>
+            <Text style={{ color: t.text.muted, fontSize: 15 }}>Back</Text>
           </Pressable>
 
           {/* Title block */}
@@ -92,10 +92,10 @@ export function MemberSignInScreen({
                 lineHeight: 32,
               }}
             >
-              Connexion adhérent
+              Member sign-in
             </Text>
             <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 6, lineHeight: 22 }}>
-              Utilisez votre numéro d"adhérent ou votre adresse e-mail.
+              Use your member number or your email address.
             </Text>
           </View>
 
@@ -103,17 +103,17 @@ export function MemberSignInScreen({
           <View style={{ rowGap: 20 }}>
             <Input
               themeName={themeName}
-              label="Numéro d'adhérent ou e-mail"
+              label="Member number or email"
               value={identifier}
               onChangeText={setIdentifier}
-              placeholder="ex. 12345 ou jeanne.dupont@exemple.com"
+              placeholder="e.g. 12345 or jeanne.dupont@example.com"
               type="email"
               required
               returnKeyType="next"
             />
             <Input
               themeName={themeName}
-              label="Mot de passe"
+              label="Password"
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
@@ -134,9 +134,9 @@ export function MemberSignInScreen({
               loading={submitting}
               disabled={!canSubmit && !submitting}
               onPress={submit}
-              accessibilityLabel="Se connecter"
+              accessibilityLabel="Sign in"
             >
-              Se connecter
+              Sign in
             </Button>
           </View>
 
@@ -148,7 +148,7 @@ export function MemberSignInScreen({
               size="md"
               onPress={onForgotPassword}
             >
-              Mot de passe oublié ?
+              Forgot password?
             </Button>
           </View>
 
@@ -163,7 +163,7 @@ export function MemberSignInScreen({
               }}
             >
               <Text style={{ fontSize: 13, color: t.text.muted, marginBottom: 8 }}>
-                Pas encore adhérent ?
+                Not a member yet?
               </Text>
               <Button
                 themeName={themeName}
@@ -171,7 +171,7 @@ export function MemberSignInScreen({
                 size="md"
                 onPress={onDiscoverInstead}
               >
-                Découvrir la FFIE librement
+                Discover FFIE freely
               </Button>
             </View>
           </View>
@@ -187,7 +187,7 @@ export function MemberSignInScreen({
               fontFamily: "Menlo",
             }}
           >
-démo · tout identifiant fonctionne · saisissez "wrong" comme mot de passe pour voir l'erreur
+demo · any identifier works · enter "wrong" as the password to see the error
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

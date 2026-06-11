@@ -42,9 +42,9 @@ import { ralewayFamily } from "@/theme/fonts";
 const CYCLE: Role[] = ["guest-public", "member"];
 
 const LABEL: Record<Role, string> = {
-  "guest-public": "Grand public",
-  "guest-company": "Entreprise non adhérente",
-  member: "Adhérent",
+  "guest-public": "General public",
+  "guest-company": "Non-member company",
+  member: "Member",
   admin: "Admin (web-only)",
 };
 
@@ -156,7 +156,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Debug : changer de rôle. Actuel : ${LABEL[role]}. Glisser pour déplacer.`}
+          accessibilityLabel={`Debug: switch role. Current: ${LABEL[role]}. Drag to move.`}
           onPress={next}
           style={({ pressed }) => [
             styles.chip,
@@ -179,7 +179,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
           </View>
           {/* Small, tinted action hint */}
           <Text style={[styles.hint, { color: t.action.primary.fg }]} numberOfLines={1}>
-toucher pour changer · glisser pour déplacer
+tap to switch · drag to move
           </Text>
         </Pressable>
       </Animated.View>
@@ -218,8 +218,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   // Role chip uses a vertical stack: big title row over a tinted hint.
-  // Hugs its content; maxWidth caps it so the long label ("Entreprise non
-  // adhérente") wraps to two lines instead of running off-screen, while
+  // Hugs its content; maxWidth caps it so the long label ("Non-member
+  // company") wraps to two lines instead of running off-screen, while
   // shorter labels sit on one line.
   roleChip: {
     flexDirection: "column",

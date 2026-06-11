@@ -1,15 +1,15 @@
-// Formation reader — the detail screen pushed when a "Découvrez les formations"
+// Training reader — the detail screen pushed when a "Discover the courses"
 // card on the Trades tab is tapped (FFIE-TRADES-01). Mirrors the News article
 // reader (NewsArticleScreen) so the two read identically: a slim back bar, an
 // accent chip, the headline (Sora display), a muted meta line, then the body —
 // plain paragraphs or rich lines whose bold / link spans render, links opening
-// in the native in-app browser. Prev/next walk the 8 formations.
+// in the native in-app browser. Prev/next walk the 8 courses.
 //
-// A formation without `detail` (FFIE hasn't supplied copy yet) falls back to an
-// honest "Détails à venir" state — never fabricated content (see CLAUDE.md).
+// A course without `detail` (FFIE hasn't supplied copy yet) falls back to an
+// honest "Details coming" state — never fabricated content (see CLAUDE.md).
 //
 // Stateless beyond the link taps and the Share call — the parent (DiscoverScreen's
-// stack) owns which formation is open and the back transition.
+// stack) owns which course is open and the back transition.
 
 import React from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Share2 } from "lucide-react-native";
@@ -77,7 +77,7 @@ export function TrainingDetailScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour aux formations"
+          accessibilityLabel="Back to courses"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -90,12 +90,12 @@ export function TrainingDetailScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Métiers</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Trades</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Partager cette formation"
+          accessibilityLabel="Share this course"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -124,7 +124,7 @@ export function TrainingDetailScreen({
         />
 
         <View style={{ paddingHorizontal: GUTTER }}>
-          {/* Accent chip — defaults to "Formation" when none supplied. */}
+          {/* Accent chip — defaults to "Course" when none supplied. */}
           <View style={{ flexDirection: "row", marginTop: 16, marginBottom: 12 }}>
             <View
               style={{
@@ -144,7 +144,7 @@ export function TrainingDetailScreen({
                   textTransform: "uppercase",
                 }}
               >
-                {detail?.chip ?? "Formation"}
+                {detail?.chip ?? "Course"}
               </Text>
             </View>
           </View>
@@ -290,12 +290,12 @@ export function TrainingDetailScreen({
           ) : (
             // No copy yet — honest placeholder, never fabricated content.
             <Text style={{ color: t.text.muted, fontSize: 16, lineHeight: 25 }}>
-              Détails à venir.
+              Details coming.
             </Text>
           )}
 
-          {/* Previous / next formation navigation. Previous is disabled on the
-              first formation, next on the last. */}
+          {/* Previous / next course navigation. Previous is disabled on the
+              first course, next on the last. */}
           <View
             style={{
               marginTop: 28,
@@ -317,8 +317,8 @@ export function TrainingDetailScreen({
 
 // ---------------------------------------------------------------------------
 // TrainingNavButton — bottom-of-reader "previous / next" control. Shows the
-// target formation's title with a back/forward arrow. Disabled (no target) on
-// the first formation (prev) and the last (next). Mirrors the News reader's
+// target course's title with a back/forward arrow. Disabled (no target) on
+// the first course (prev) and the last (next). Mirrors the News reader's
 // ArticleNavButton.
 // ---------------------------------------------------------------------------
 function TrainingNavButton({
@@ -335,7 +335,7 @@ function TrainingNavButton({
   const t = themes[themeName];
   const disabled = !training || !onNavigate;
   const Icon = dir === "prev" ? ChevronLeft : ChevronRight;
-  const caption = dir === "prev" ? "Précédent" : "Suivant";
+  const caption = dir === "prev" ? "Previous" : "Next";
   const alignText = dir === "prev" ? "left" : "right";
 
   return (
@@ -346,8 +346,8 @@ function TrainingNavButton({
       accessibilityState={{ disabled }}
       accessibilityLabel={
         training
-          ? `Formation ${caption.toLowerCase()} : ${training.title}`
-          : `Formation ${caption.toLowerCase()}, indisponible`
+          ? `${caption} course: ${training.title}`
+          : `${caption} course, unavailable`
       }
       style={({ pressed }) => ({
         flex: 1, // split the row into two equal halves

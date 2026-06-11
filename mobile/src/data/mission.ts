@@ -4,57 +4,57 @@
 // Partners tab's "Mission & valeurs" segment has the federation's real copy.
 //
 // Structure follows the source page's sections, in order:
-//   intro → Nos missions (3 points) → Sur tout le territoire →
-//   Connectée aux marchés émergents (lead-in + list) → closing line.
+//   intro → Our missions (3 points) → Across the whole country →
+//   Connected to emerging markets (lead-in + list) → closing line.
 
 // Opening statement at the top of the page.
 export const MISSION_INTRO =
-  "Depuis 1924, la FFIE poursuit une triple mission : représenter, défendre et promouvoir les entreprises d'intégration électrique.";
+  "Since 1924, the FFIE has pursued a threefold mission: to represent, defend and promote electrical integration companies.";
 
-// "Nos missions" — the three pillars. `verb` is the action word the page
+// "Our missions" — the three pillars. `verb` is the action word the page
 // emphasises; `body` is the text that follows it.
 export type MissionPoint = { verb: string; body: string };
 
 export const MISSION_POINTS: MissionPoint[] = [
   {
-    verb: "Représenter",
-    body: "les entreprises affiliées : majors du secteur, entreprises artisanales ou indépendantes. La FFIE compte aujourd'hui 8 500 entreprises et 150 000 salariés, soit 50 % des effectifs du secteur et 50 % de son chiffre d'affaires.",
+    verb: "Represent",
+    body: "member companies: major players in the sector, craft businesses and independents alike. The FFIE today brings together 8,500 companies and 150,000 employees — 50% of the sector's workforce and 50% of its turnover.",
   },
   {
-    verb: "Défendre",
-    body: "les intérêts de la profession à l'échelon national, européen et international auprès des organismes de la filière électrique et des grands acteurs.",
+    verb: "Defend",
+    body: "the profession's interests at the national, European and international level, before the bodies of the electrical industry and its major players.",
   },
   {
-    verb: "Promouvoir",
-    body: "et diffuser aux adhérents une information continue sur l'environnement normatif, technologique ou encore économique.",
+    verb: "Promote",
+    body: "and deliver to members a continuous stream of information on the regulatory, technological and economic environment.",
   },
 ];
 
-// "Sur tout le territoire" — the federation's local footprint.
-export const MISSION_TERRITORY_TITLE = "Sur tout le territoire";
+// "Across the whole country" — the federation's local footprint.
+export const MISSION_TERRITORY_TITLE = "Across the whole country";
 export const MISSION_TERRITORY_BODY =
-  "La FFIE conseille et accompagne les entreprises au niveau local avec l'appui de ses 92 organisations départementales.";
+  "The FFIE advises and supports companies at the local level with the backing of its 92 departmental organisations.";
 
-// "Connectée aux marchés émergents" — lead-in + the nine emerging market areas
+// "Connected to emerging markets" — lead-in + the nine emerging market areas
 // the federation helps members move into.
-export const MISSION_MARKETS_TITLE = "Connectée aux marchés émergents";
+export const MISSION_MARKETS_TITLE = "Connected to emerging markets";
 export const MISSION_MARKETS_INTRO =
-  "La FFIE accompagne les entreprises adhérentes dans le développement de leur expertise et de leur savoir-faire, grâce aux conseils, outils de gestion et veille technologique ou réglementaire qu'elle délivre.";
+  "The FFIE supports member companies in developing their expertise and know-how, through the advice, management tools and technological or regulatory monitoring it provides.";
 
 export const MISSION_MARKETS: string[] = [
-  "Intégration du numérique",
+  "Digital integration",
   "PoE (Power over Ethernet)",
   "Big data, IoT",
-  "Compteurs intelligents",
-  "Transition énergétique",
-  "Photovoltaïque, autoconsommation",
-  "Intelligence artificielle",
-  "Mobilité électrique, IRVE",
+  "Smart meters",
+  "Energy transition",
+  "Photovoltaics, self-consumption",
+  "Artificial intelligence",
+  "Electric mobility, EV charging",
 ];
 
 // Closing line at the foot of the page.
 export const MISSION_CLOSING =
-  "La FFIE est engagée auprès de ses adhérents pour construire l'e-électricité.";
+  "The FFIE is committed to its members in building e-electricity.";
 
 // ---------------------------------------------------------------------------
 // Key figures — the federation's "FFIE en chiffres" infographic at the foot of
@@ -63,33 +63,33 @@ export const MISSION_CLOSING =
 // them. Percentages are 0–100.
 // ---------------------------------------------------------------------------
 export const MISSION_FIGURES = {
-  entreprises: 8500, // entreprises adhérentes
-  salariesPct: 50, // % des salariés du secteur
-  actifs: 150000, // actifs FFIE
-  caPct: 50, // % du CA du secteur
-  caMds: 25, // Mds€ de chiffre d'affaires
-  // Répartition du chiffre d'affaires
+  entreprises: 8500, // member companies
+  salariesPct: 50, // % of the sector's workforce
+  actifs: 150000, // FFIE workers
+  caPct: 50, // % of the sector's turnover
+  caMds: 25, // €bn in turnover
+  // Breakdown of turnover
   neufPct: 40,
   renovationPct: 60,
-  // Nature des travaux
-  reseauxPct: 18, // travaux et réseaux
-  batimentsPct: 82, // travaux dans les bâtiments
-  // Travaux dans les bâtiments, par marché
+  // Type of work
+  reseauxPct: 18, // works and networks
+  batimentsPct: 82, // works in buildings
+  // Works in buildings, by market
   residentielPct: 27,
   tertiairePct: 44,
   industrielPct: 29,
 } as const;
 
-// The eight métiers listed down the left rail of the infographic, in page order.
+// The eight trades listed down the left rail of the infographic, in page order.
 // The infographic maps each to an icon; labels stay here so they're translatable
 // and stay the single source of truth.
 export const MISSION_METIERS: string[] = [
-  "Automatismes",
+  "Automation",
   "Communication",
-  "Confort thermique",
-  "Éclairage",
-  "Énergies",
-  "Gestion technique du bâtiment",
+  "Thermal comfort",
+  "Lighting",
+  "Energy",
+  "Building management systems",
   "Maintenance",
-  "Sécurité",
+  "Security",
 ];

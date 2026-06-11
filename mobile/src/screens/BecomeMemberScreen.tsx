@@ -47,6 +47,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import {
   FederationMap,
   type FederationMapHandle,
@@ -250,7 +251,7 @@ function FederationRow({
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${federation.area}. ${federation.name}`}
-        accessibilityHint={open ? "Réduire les coordonnées de la fédération" : "Afficher les coordonnées de la fédération"}
+        accessibilityHint={open ? "Collapse the federation's contact details" : "Show the federation's contact details"}
         onPress={onToggle}
         style={({ pressed }) => ({
           backgroundColor: pressed ? t.border.subtle : "transparent",
@@ -363,8 +364,8 @@ function FederationRow({
             // No fabricated coordinates — clean placeholder until FFIE provides
             // this federation's contact block.
             <Text style={{ fontSize: 13, color: t.text.muted, lineHeight: 19 }}>
-              Les coordonnées de cette fédération départementale apparaîtront ici.
-              La FFIE finalise l'annuaire.
+              The contact details for this departmental federation will appear here.
+              FFIE is finalising the directory.
             </Text>
           )}
         </View>
@@ -380,10 +381,10 @@ export function BecomeMemberScreen({
   onLogin,
 }: {
   themeName?: ThemeName;
-  // When opened as a modal (from the floating Adhérer button) a close button
+  // When opened as a modal (from the floating Join button) a close button
   // is shown top-right. Omitted when the screen is hosted in a tab.
   onClose?: () => void;
-  // When set, a "Déjà adhérent ? Se connecter" button is pinned to the bottom
+  // When set, an "Already a member? Sign in" button is pinned to the bottom
   // for existing members to reach the email → OTP sign-in. Omitted in a tab.
   onLogin?: () => void;
 }) {
@@ -543,13 +544,16 @@ export function BecomeMemberScreen({
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
+      {/* Light page — keep dark status-bar icons even when opened over the navy
+          Home hero (which sets them light). */}
+      <StatusBar style="dark" />
       <View style={{ flex: 1 }}>
-      {/* Modal close — only when hosted as a slide-up (floating Adhérer CTA).
+      {/* Modal close — only when hosted as a slide-up (floating Join CTA).
           Sits top-right, clear of the left-aligned large title. */}
       {onClose ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fermer"
+          accessibilityLabel="Close"
           onPress={onClose}
           hitSlop={10}
           style={({ pressed }) => [
@@ -602,10 +606,10 @@ export function BecomeMemberScreen({
               letterSpacing: -0.8,
             }}
           >
-            Adhérer à la FFIE
+            Join FFIE
           </Text>
           <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 6, lineHeight: 21 }}>
-            Pour adhérer, adressez-vous à votre fédération départementale ci-dessous.
+            To join, contact your departmental federation below.
           </Text>
         </View>
 
@@ -627,7 +631,7 @@ export function BecomeMemberScreen({
             style={{ width: "100%", height: MAP_HEIGHT }}
             initialRegion={FRANCE_REGION}
             pins={FEDERATION_PINS}
-            accessibilityLabel="Carte des fédérations départementales"
+            accessibilityLabel="Map of departmental federations"
             onPinPress={focusFederation}
           />
         </View>
@@ -657,13 +661,13 @@ export function BecomeMemberScreen({
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Rechercher un département ou une fédération"
+              placeholder="Search a department or federation"
               placeholderTextColor={t.text.placeholder}
               style={{ flex: 1, color: t.text.body, fontSize: 16 }}
               returnKeyType="search"
               autoCorrect={false}
               autoCapitalize="none"
-              accessibilityLabel="Rechercher une fédération départementale"
+              accessibilityLabel="Search a departmental federation"
             />
             {query.length > 0 ? (
               <SearchClearButton themeName={themeName} onPress={() => setQuery("")} />
@@ -675,9 +679,9 @@ export function BecomeMemberScreen({
             window so the page can still scroll around it (nested scroll). */}
         {filtered.length === 0 ? (
           <View style={{ padding: 48, alignItems: "center" }}>
-            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>Aucune fédération trouvée.</Text>
+            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>No federation found.</Text>
             <Text style={{ color: t.text.muted, fontSize: 13, opacity: 0.8, textAlign: "center" }}>
-              Essayez un numéro de département (« 69 »), un nom (« Rhône ») ou « Bâtiment ».
+              Try a department number ("69"), a name ("Rhône") or "Building".
             </Text>
           </View>
         ) : (
@@ -729,7 +733,7 @@ export function BecomeMemberScreen({
             {collapsedList && hiddenCount > 0 ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Afficher les ${filtered.length} fédérations`}
+                accessibilityLabel={`Show all ${filtered.length} federations`}
                 onPress={() => setShowAll(true)}
                 style={({ pressed }) => ({
                   marginTop: 12,
@@ -753,7 +757,7 @@ export function BecomeMemberScreen({
                     color: t.text.body,
                   }}
                 >
-                  Afficher {hiddenCount} de plus
+                  Show {hiddenCount} more
                 </Text>
                 <ChevronDown size={18} color={t.brand.accent} />
               </Pressable>
@@ -764,7 +768,7 @@ export function BecomeMemberScreen({
             {showAll && !isSearching ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Afficher moins de fédérations`}
+                accessibilityLabel={`Show fewer federations`}
                 onPress={() => {
                   setShowAll(false);
                   scrollToTop();
@@ -791,7 +795,7 @@ export function BecomeMemberScreen({
                     color: t.text.body,
                   }}
                 >
-                  Afficher moins
+                  Show less
                 </Text>
                 <ChevronUp size={18} color={t.brand.accent} />
               </Pressable>
@@ -807,7 +811,7 @@ export function BecomeMemberScreen({
                   marginHorizontal: GUTTER + 4,
                 }}
               >
-                {`${visible.length} fédérations départementales affichées sur ${FEDERATIONS.length}.`}
+                {`Showing ${visible.length} of ${FEDERATIONS.length} departmental federations.`}
               </Text>
             ) : null}
           </>
@@ -828,8 +832,8 @@ export function BecomeMemberScreen({
           >
             <ShieldCheck size={18} color={t.brand.accent} style={{ marginTop: 1 }} />
             <Text style={{ flex: 1, fontSize: 13, color: t.text.muted, lineHeight: 19 }}>
-              Ouvert aux entreprises d'intégration électrique immatriculées en France. Les demandes sont traitées par votre
-              fédération départementale, puis examinées par la FFIE avant l'octroi de l'accès. Vous serez notifié par e-mail.
+              Open to electrical integration companies registered in France. Applications are handled by your
+              departmental federation, then reviewed by FFIE before access is granted. You will be notified by email.
             </Text>
           </View>
         </View>
@@ -859,7 +863,7 @@ export function BecomeMemberScreen({
               marginBottom: 8,
             }}
           >
-            Déjà adhérent ?
+            Already a member?
           </Text>
           <Button
             variant="primary"
@@ -867,9 +871,9 @@ export function BecomeMemberScreen({
             fullWidth
             themeName={themeName}
             onPress={onLogin}
-            accessibilityLabel="Se connecter"
+            accessibilityLabel="Sign in"
           >
-            Se connecter
+            Sign in
           </Button>
         </View>
       ) : null}
@@ -888,7 +892,7 @@ export function BecomeMemberScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour en haut"
+          accessibilityLabel="Back to top"
           onPress={scrollToTop}
           style={({ pressed }) => ({
             width: 48,

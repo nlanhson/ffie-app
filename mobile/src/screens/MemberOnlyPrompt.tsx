@@ -2,8 +2,8 @@
 // route. Per the access-model tech requirement: gated routes redirect to a
 // login + apply CTA, never a 403.
 //
-// "Demander l'adhésion" (primary) redirects to the Become-a-member page (the
-// federation directory) via onApply; "J'ai déjà un compte" (secondary) is the
+// "Request membership" (primary) redirects to the Become-a-member page (the
+// federation directory) via onApply; "I already have an account" (secondary) is the
 // sign-in affordance for existing members who reached this surface by mistake.
 // Both callbacks are wired by the caller (App.tsx).
 
@@ -38,7 +38,7 @@ export function MemberOnlyPrompt({
       {onBack ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour"
+          accessibilityLabel="Back"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -52,7 +52,7 @@ export function MemberOnlyPrompt({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Retour</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Back</Text>
         </Pressable>
       ) : null}
       <ScrollView
@@ -94,7 +94,7 @@ export function MemberOnlyPrompt({
               maxWidth: 320,
             }}
           >
-            Réservé aux adhérents FFIE
+            FFIE members only
           </Text>
 
           <Text
@@ -107,7 +107,7 @@ export function MemberOnlyPrompt({
               maxWidth: 320,
             }}
           >
-            Ce contenu fait partie de l'offre réservée aux adhérents FFIE. Demandez votre adhésion à la fédération, ou connectez-vous si vous avez déjà un compte.
+            This content is part of the offering reserved for FFIE members. Request membership of the federation, or sign in if you already have an account.
           </Text>
 
           {/* Context chip — the gated item the user tapped (e.g. the document). */}
@@ -148,9 +148,9 @@ export function MemberOnlyPrompt({
             size="lg"
             fullWidth
             onPress={onApply ?? (() => {})}
-            accessibilityLabel="Demander l'adhésion à la FFIE"
+            accessibilityLabel="Request FFIE membership"
           >
-            Demander l'adhésion
+            Request membership
           </Button>
           <Button
             themeName={themeName}
@@ -158,9 +158,9 @@ export function MemberOnlyPrompt({
             size="md"
             fullWidth
             onPress={onSignIn ?? (() => {})}
-            accessibilityHint="Si vous avez déjà un compte adhérent FFIE"
+            accessibilityHint="If you already have an FFIE member account"
           >
-            J'ai déjà un compte
+            I already have an account
           </Button>
         </View>
       </ScrollView>

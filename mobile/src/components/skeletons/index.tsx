@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from "react";
 import type { ThemeName } from "@tokens";
 import type { TabKey } from "@/navigation/tabs";
+import { HomeSkeleton } from "./HomeSkeleton";
 import { NewsSkeleton } from "./NewsSkeleton";
 import { LibrarySkeleton } from "./LibrarySkeleton";
 import { PartnersSkeleton } from "./PartnersSkeleton";
@@ -24,6 +25,8 @@ const DEFAULT_DELAY_MS = 450;
 
 export function skeletonForTab(tab: TabKey, themeName: ThemeName): React.ReactNode {
   switch (tab) {
+    case "home":
+      return <HomeSkeleton themeName={themeName} />;
     case "library":
       return <LibrarySkeleton themeName={themeName} />;
     case "news":
@@ -45,6 +48,10 @@ export function skeletonForTab(tab: TabKey, themeName: ThemeName): React.ReactNo
 // The real children element is created by the caller but isn't mounted (its
 // effects/data work don't run) until the gate flips to `ready` — so the
 // skeleton owns the first frame cleanly.
+//
+// `delayMs <= 0` skips the skeleton entirely: the screen renders on the first
+// frame, no placeholder. Use it for tabs with nothing to load (e.g. the Home
+// hero, which is a static header — a timed skeleton there just adds a stall).
 // ---------------------------------------------------------------------------
 export function TabSkeletonGate({
   skeleton,
@@ -55,9 +62,10 @@ export function TabSkeletonGate({
   delayMs?: number;
   children: React.ReactNode;
 }) {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(delayMs <= 0);
 
   useEffect(() => {
+    if (delayMs <= 0) return; // already ready — no skeleton frame
     const id = setTimeout(() => setReady(true), delayMs);
     return () => clearTimeout(id);
   }, [delayMs]);

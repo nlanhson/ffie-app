@@ -1,5 +1,5 @@
-// Events feed data (Événements tab). Mirrors the FFIE web "Événements" page:
-// FFIE's regional meetings ("rencontres régionales"), each a date + a region.
+// Events feed data (Events tab). Mirrors the FFIE web "Events" page:
+// FFIE's regional meetings ("regional meetings"), each a date + a region.
 //
 // Data-driven per the repo convention — to change what the Events tab shows,
 // edit this file, not the screen. Dates are ISO (yyyy-mm-dd, local) so the
@@ -34,19 +34,19 @@ export type FfieEvent = {
 };
 
 // Listed chronologically (soonest first) — the natural order for upcoming
-// events. Source: FFIE événements page (rencontres régionales).
+// events. Source: FFIE events page (regional meetings).
 export const EVENTS: FfieEvent[] = [
   {
     id: 1,
     date: "2026-06-04",
-    title: "Rencontre régionale Occitanie",
+    title: "Occitanie Regional Meeting",
     city: "Toulouse",
-    schedule: "De 09h30 à 12h30, suivie d'un cocktail déjeunatoire.",
+    schedule: "From 9:30 AM to 12:30 PM, followed by a lunch reception.",
     registrationUrl: "https://forms.office.com/e/M33WgFrPzK",
     detailsUrl:
       "https://www.ffie.fr/actualites-et-evenements/evenements/detail/actualite/rencontre-regionale-occitanie",
     memberOnly: true,
   },
-  { id: 2, date: "2026-11-05", title: "Rencontre régionale Bourgogne-Franche-Comté", memberOnly: true },
-  { id: 3, date: "2026-12-03", title: "Rencontre régionale Île-de-France", memberOnly: true },
+  { id: 2, date: "2026-11-05", title: "Bourgogne-Franche-Comté Regional Meeting", memberOnly: true },
+  { id: 3, date: "2026-12-03", title: "Île-de-France Regional Meeting", memberOnly: true },
 ];

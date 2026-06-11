@@ -1,10 +1,10 @@
 // Biometric Prompt — offers Face ID / Touch ID after a successful sign-in.
 // Per Julien's persona: "Will use FaceID/TouchID 100% of the time once set up.
 // Will rage-quit if forced to re-type his password weekly." Primary CTA is
-// enable; the "Plus tard" ghost gives him an out without friction.
+// enable; the "Later" ghost gives him an out without friction.
 //
 // Trust messaging:
-//   - "Vos identifiants restent protégés sur votre appareil" addresses
+//   - "Your credentials stay protected on your device" addresses
 //     his "doesn't trust new apps with credentials" pain point.
 //   - No checkmark list, no marketing slides — one screen, one decision.
 //
@@ -42,7 +42,7 @@ export function BiometricPromptScreen({
 
   const isiOS = Platform.OS === "ios";
   const BioIcon = isiOS ? ScanFace : Fingerprint;
-  const biometricName = isiOS ? "Face ID" : "données biométriques";
+  const biometricName = isiOS ? "Face ID" : "biometric data";
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: t.surface.default }}>
@@ -55,7 +55,7 @@ export function BiometricPromptScreen({
           <Pressable
             onPress={onBack}
             accessibilityRole="button"
-            accessibilityLabel="Retour"
+            accessibilityLabel="Back"
             hitSlop={8}
             style={{
               alignSelf: "flex-start",
@@ -68,7 +68,7 @@ export function BiometricPromptScreen({
             }}
           >
             <ChevronLeft size={20} color={t.text.muted} />
-            <Text style={{ fontSize: 15, color: t.text.muted }}>Retour</Text>
+            <Text style={{ fontSize: 15, color: t.text.muted }}>Back</Text>
           </Pressable>
         ) : null}
 
@@ -104,7 +104,7 @@ export function BiometricPromptScreen({
               maxWidth: 320,
             }}
           >
-            {isiOS ? "Activer Face ID ?" : "Activer la connexion biométrique ?"}
+            {isiOS ? "Enable Face ID?" : "Enable biometric sign-in?"}
           </Text>
 
           <Text
@@ -117,7 +117,7 @@ export function BiometricPromptScreen({
               maxWidth: 320,
             }}
           >
-            Ouvrez l"application en un instant, sans saisir vos identifiants à chaque fois.
+            Open the app in an instant, without entering your credentials every time.
           </Text>
 
           {memberIdentifier ? (
@@ -136,7 +136,7 @@ export function BiometricPromptScreen({
             >
               <ShieldCheck size={16} color={t.feedback.success} />
               <Text style={{ fontSize: 13, color: t.text.muted, flexShrink: 1 }} numberOfLines={1}>
-                Connecté en tant que {memberIdentifier}
+                Signed in as {memberIdentifier}
               </Text>
             </View>
           ) : null}
@@ -161,7 +161,7 @@ export function BiometricPromptScreen({
               textAlign: "center",
             }}
           >
-            Vos identifiants restent protégés sur votre appareil. La FFIE ne reçoit jamais vos {biometricName}.
+            Your credentials stay protected on your device. FFIE never receives your {biometricName}.
           </Text>
         </View>
 
@@ -176,9 +176,9 @@ export function BiometricPromptScreen({
             fullWidth
             onPress={onEnable}
             iconLeading={BioIcon}
-            accessibilityLabel={`Activer ${biometricName}`}
+            accessibilityLabel={`Enable ${biometricName}`}
           >
-            {isiOS ? "Activer Face ID" : "Activer les données biométriques"}
+            {isiOS ? "Enable Face ID" : "Enable biometric data"}
           </Button>
           <Button
             themeName={themeName}
@@ -186,9 +186,9 @@ export function BiometricPromptScreen({
             size="md"
             fullWidth
             onPress={onSkip}
-            accessibilityHint="Vous pourrez l'activer plus tard depuis les Réglages."
+            accessibilityHint="You can enable it later from Settings."
           >
-            Plus tard
+            Later
           </Button>
         </View>
       </View>

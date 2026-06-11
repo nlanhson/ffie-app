@@ -60,28 +60,28 @@ export function PathSelectionScreen({
           <View style={{ flex: 1 }} />
           <View style={styles.poster}>
             <FFIELogo size={104} themeName="dark" />
-            <Text style={styles.posterTitle}>Bienvenue à la FFIE</Text>
+            <Text style={styles.posterTitle}>Welcome to FFIE</Text>
           </View>
           <View style={{ flex: 1.4 }} />
         </SafeAreaView>
 
         <View style={[styles.card, Platform.OS === "android" && styles.cardAndroid]}>
-          <Text style={styles.cardHeading}>Commencer</Text>
+          <Text style={styles.cardHeading}>Get started</Text>
           <Text style={styles.subtitle}>
-            Adhérents comme visiteurs — chacun a sa voie à partir d"ici.
+            Members and visitors alike — everyone has their own path from here.
           </Text>
 
           <View style={styles.actions}>
             <PrimaryAction
-              label="Se connecter"
-              accessibilityLabel="Se connecter en tant qu'adhérent FFIE"
+              label="Sign in"
+              accessibilityLabel="Sign in as an FFIE member"
               onPress={() => onSelect("member")}
               bg={t.action.primary.bg}
               bgPressed={t.action.primary.bgPressed}
             />
             <SecondaryAction
-              label="Naviguer librement"
-              accessibilityLabel="Continuer en tant que visiteur"
+              label="Browse freely"
+              accessibilityLabel="Continue as a visitor"
               onPress={() => onSelect("discover")}
             />
           </View>

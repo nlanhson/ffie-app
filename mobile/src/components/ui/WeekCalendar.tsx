@@ -1,5 +1,5 @@
 // WeekCalendar — a one-week-tall calendar strip for the Events tab. Shows the
-// seven days of a week (Mon–Sun, French) with the month/year above; the user
+// seven days of a week (Mon–Sun, English) with the month/year above; the user
 // swipes left/right or taps the chevrons to move to the previous/next week.
 //
 // Infinite weeks via the classic three-page trick: the horizontal pager always
@@ -30,11 +30,11 @@ import { MonthYearPickerModal } from "@/components/ui/MonthYearPickerModal";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-// French week + month names. Week starts Monday (ISO / France).
-const WEEKDAYS = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
+// English week + month names. Week starts Monday (ISO / France).
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = [
-  "janvier", "février", "mars", "avril", "mai", "juin",
-  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 // --- date helpers (local civil dates, no timezone math) --------------------
@@ -155,7 +155,7 @@ export function WeekCalendar({
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${headerLabel}. Choisir le mois et l'année`}
+          accessibilityLabel={`${headerLabel}. Choose month and year`}
           onPress={() => setPickerOpen(true)}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -260,7 +260,7 @@ function WeekRow({
             key={iso}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
-            accessibilityLabel={`${WEEKDAYS[i]} ${day.getDate()}${hasEvent ? ", événement" : ""}`}
+            accessibilityLabel={`${WEEKDAYS[i]} ${day.getDate()}${hasEvent ? ", event" : ""}`}
             onPress={() => onSelect(iso)}
             style={{ flex: 1, alignItems: "center", paddingVertical: 2 }}
           >
@@ -335,7 +335,7 @@ function WeekArrow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={dir === "left" ? "Semaine précédente" : "Semaine suivante"}
+      accessibilityLabel={dir === "left" ? "Previous week" : "Next week"}
       onPress={onPress}
       hitSlop={10}
       style={({ pressed }) => ({

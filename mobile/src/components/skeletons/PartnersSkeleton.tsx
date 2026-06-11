@@ -1,20 +1,20 @@
-// PartnersSkeleton — loading placeholder for PartnersScreen. Mirrors it:
-// large title, the "Quick access" grouped card (3 featured rows with a square
-// monogram tile), then the "All partners" header, search field + filter, a
-// description line, and the directory card of partner rows (monogram + name +
-// category label + chevron). Same gutters / monogram size / row min-height.
+// PartnersSkeleton — loading placeholder for PartnersScreen. Mirrors the new
+// segmented showcase: the Ecosystem / Lab_FFIE / Partners toggle, then the
+// default (Ecosystem) segment's grouped lists — Distributors (2), Manufacturers
+// (3) and Member federation (1). Each row is a square logo chip, two text
+// lines, and a trailing chevron. Same gutters / chip size / row min-height as
+// the real screen so the swap to content doesn't shift the layout.
 
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { primitives, type ThemeName } from "@tokens";
-import { GUTTER, LargeTitleHeader, useGroupedColors } from "@/components/ui/ios";
+import { GUTTER, useGroupedColors } from "@/components/ui/ios";
 import { SkeletonBlock, SkeletonGroup, SkeletonTextLine } from "@/components/ui/Skeleton";
 
-const MONO = 38;
+const TILE = 46;
 
-// One grouped-list partner row: square monogram tile, two text lines, and a
-// trailing accessory (category label + chevron). Hairline inset past the tile.
+// One grouped-list partner row: logo chip, two text lines, trailing chevron.
+// Hairline separator inset past the chip (matches PartnerRow).
 function PartnerRowSkeleton({
   isLast,
   themeName,
@@ -23,7 +23,7 @@ function PartnerRowSkeleton({
   themeName: ThemeName;
 }) {
   const c = useGroupedColors(themeName);
-  const separatorInset = GUTTER + MONO + 12;
+  const separatorInset = GUTTER + TILE + 12;
   return (
     <View>
       <View
@@ -32,16 +32,16 @@ function PartnerRowSkeleton({
           alignItems: "center",
           columnGap: 12,
           paddingHorizontal: GUTTER,
-          minHeight: 48,
-          paddingVertical: 14,
+          minHeight: 64,
+          paddingVertical: 12,
         }}
       >
-        <SkeletonBlock width={MONO} height={MONO} radius={9} themeName={themeName} />
+        <SkeletonBlock width={TILE} height={TILE} radius={11} themeName={themeName} />
         <View style={{ flex: 1, rowGap: 7 }}>
-          <SkeletonTextLine width="55%" height={14} themeName={themeName} />
-          <SkeletonTextLine width="82%" height={12} themeName={themeName} />
+          <SkeletonTextLine width="50%" height={14} themeName={themeName} />
+          <SkeletonTextLine width="78%" height={12} themeName={themeName} />
         </View>
-        <SkeletonBlock width={44} height={12} themeName={themeName} />
+        <SkeletonBlock width={10} height={16} themeName={themeName} />
       </View>
       {!isLast ? (
         <View
@@ -56,28 +56,36 @@ function PartnerRowSkeleton({
   );
 }
 
-function GroupedCard({
+// One section: uppercase header placeholder + a grouped card of rows.
+function GroupSkeleton({
   rows,
+  headerWidth,
   themeName,
 }: {
   rows: number;
+  headerWidth: number;
   themeName: ThemeName;
 }) {
   const c = useGroupedColors(themeName);
   return (
-    <View
-      style={{
-        marginHorizontal: GUTTER,
-        backgroundColor: c.cardBg,
-        borderRadius: primitives.radii.lg,
-        borderWidth: c.cardBorder ? 1 : 0,
-        borderColor: c.cardBorder,
-        overflow: "hidden",
-      }}
-    >
-      {Array.from({ length: rows }).map((_, i) => (
-        <PartnerRowSkeleton key={i} isLast={i === rows - 1} themeName={themeName} />
-      ))}
+    <View style={{ marginBottom: 28 }}>
+      <View style={{ marginLeft: GUTTER + 4, marginBottom: 7 }}>
+        <SkeletonBlock width={headerWidth} height={11} themeName={themeName} />
+      </View>
+      <View
+        style={{
+          marginHorizontal: GUTTER,
+          backgroundColor: c.cardBg,
+          borderRadius: primitives.radii.lg,
+          borderWidth: c.cardBorder ? 1 : 0,
+          borderColor: c.cardBorder,
+          overflow: "hidden",
+        }}
+      >
+        {Array.from({ length: rows }).map((_, i) => (
+          <PartnerRowSkeleton key={i} isLast={i === rows - 1} themeName={themeName} />
+        ))}
+      </View>
     </View>
   );
 }
@@ -86,47 +94,25 @@ export function PartnersSkeleton({ themeName = "light" }: { themeName?: ThemeNam
   const c = useGroupedColors(themeName);
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
+    <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
-        <ScrollView contentContainerStyle={{ paddingBottom: 32 }} scrollEnabled={false}>
-          <LargeTitleHeader title="Partenaires" themeName={themeName} />
-
-          {/* Quick access section */}
-          <View style={{ marginBottom: 28 }}>
-            <View style={{ marginLeft: GUTTER + 4, marginBottom: 7 }}>
-              <SkeletonBlock width={110} height={11} themeName={themeName} />
-            </View>
-            <GroupedCard rows={3} themeName={themeName} />
+        <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }} scrollEnabled={false}>
+          {/* Segmented control */}
+          <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
+            <SkeletonBlock
+              width="100%"
+              height={40}
+              radius={primitives.radii.md}
+              themeName={themeName}
+            />
           </View>
 
-          {/* "All partners" header */}
-          <View style={{ marginLeft: GUTTER + 4, marginBottom: 12 }}>
-            <SkeletonBlock width={96} height={11} themeName={themeName} />
-          </View>
-
-          {/* Search field + filter button */}
-          <View
-            style={{
-              paddingHorizontal: GUTTER,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              columnGap: 10,
-            }}
-          >
-            <SkeletonBlock width="100%" height={38} radius={10} themeName={themeName} style={{ flex: 1 }} />
-            <SkeletonBlock width={38} height={38} radius={10} themeName={themeName} />
-          </View>
-
-          {/* Description line */}
-          <View style={{ marginHorizontal: GUTTER + 4, marginBottom: 16 }}>
-            <SkeletonTextLine width="70%" height={13} themeName={themeName} />
-          </View>
-
-          {/* Directory */}
-          <GroupedCard rows={7} themeName={themeName} />
+          {/* Default (Ecosystem) segment: Distributors / Manufacturers / Member federation */}
+          <GroupSkeleton rows={2} headerWidth={96} themeName={themeName} />
+          <GroupSkeleton rows={3} headerWidth={120} themeName={themeName} />
+          <GroupSkeleton rows={1} headerWidth={132} themeName={themeName} />
         </ScrollView>
       </SkeletonGroup>
-    </SafeAreaView>
+    </View>
   );
 }

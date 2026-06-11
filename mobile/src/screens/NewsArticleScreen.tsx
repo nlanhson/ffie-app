@@ -71,7 +71,7 @@ export function NewsArticleScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour aux actualités"
+          accessibilityLabel="Back to news"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -84,12 +84,12 @@ export function NewsArticleScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Actualités</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>News</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Partager cet article"
+          accessibilityLabel="Share this article"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -114,7 +114,7 @@ export function NewsArticleScreen({
           pixelWidth={1000}
           pixelHeight={600}
           themeName={themeName}
-          accessibilityLabel={`Illustration de ${article.title}`}
+          accessibilityLabel={`Illustration for ${article.title}`}
         />
 
         <View style={{ paddingHorizontal: GUTTER }}>
@@ -223,7 +223,7 @@ export function NewsArticleScreen({
                 marginBottom: 12,
               }}
             >
-              Documents associés
+              Related documents
             </Text>
             <View
               style={{
@@ -238,8 +238,8 @@ export function NewsArticleScreen({
                 <Pressable
                   key={doc.url}
                   accessibilityRole="button"
-                  accessibilityLabel={`Ouvrir le document : ${doc.label}`}
-                  accessibilityHint="Ouvre le document dans l'application"
+                  accessibilityLabel={`Open document: ${doc.label}`}
+                  accessibilityHint="Opens the document in the app"
                   onPress={() => openInBrowser(doc.url)}
                   style={({ pressed }) => ({
                     flexDirection: "row",
@@ -325,7 +325,7 @@ function ArticleNavButton({
   const t = themes[themeName];
   const disabled = !article || !onNavigate;
   const Icon = dir === "prev" ? ChevronLeft : ChevronRight;
-  const caption = dir === "prev" ? "Précédent" : "Suivant";
+  const caption = dir === "prev" ? "Previous" : "Next";
   const alignText = dir === "prev" ? "left" : "right";
 
   return (
@@ -335,7 +335,7 @@ function ArticleNavButton({
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       accessibilityLabel={
-        article ? `Article ${caption.toLowerCase()} : ${article.title}` : `Article ${caption.toLowerCase()}, indisponible`
+        article ? `${caption} article: ${article.title}` : `${caption} article, unavailable`
       }
       style={({ pressed }) => ({
         flex: 1, // split the row into two equal halves

@@ -82,7 +82,7 @@ export function PdfViewerScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fermer le document"
+          accessibilityLabel="Close document"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -104,7 +104,7 @@ export function PdfViewerScreen({
         {onShare ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Partager ce document"
+            accessibilityLabel="Share this document"
             onPress={onShare}
             hitSlop={8}
             style={({ pressed }) => ({
@@ -141,14 +141,14 @@ export function PdfViewerScreen({
             accessibilityRole="header"
             style={{ color: t.text.body, fontSize: 17, fontWeight: "600", textAlign: "center" }}
           >
-            Aperçu indisponible
+            Preview unavailable
           </Text>
           <Text style={{ color: t.text.muted, fontSize: 14, textAlign: "center", lineHeight: 20 }}>
-            Impossible d'afficher ce PDF ici. Vous pouvez l'ouvrir dans le navigateur.
+            This PDF can't be displayed here. You can open it in your browser.
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Ouvrir le document dans le navigateur"
+            accessibilityLabel="Open document in browser"
             onPress={openInBrowser}
             style={({ pressed }) => ({
               marginTop: 4,
@@ -161,7 +161,7 @@ export function PdfViewerScreen({
             })}
           >
             <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "600" }}>
-              Ouvrir dans le navigateur
+              Open in browser
             </Text>
           </Pressable>
         </View>
@@ -191,7 +191,7 @@ export function PdfViewerScreen({
             >
               <ActivityIndicator color={t.brand.accent} />
               <Text style={{ color: t.text.muted, fontSize: 13, marginTop: 10 }}>
-                Chargement du document…
+                Loading document…
               </Text>
             </View>
           ) : null}

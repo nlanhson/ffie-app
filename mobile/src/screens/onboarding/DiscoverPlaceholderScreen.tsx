@@ -1,5 +1,5 @@
 // Discover (public) path — placeholder for v1.
-// This is where Karim and Léa land when they pick "Découvrir FFIE" on the
+// This is where Karim and Léa land when they pick "Discover FFIE" on the
 // path-selection screen. The real screen (Screen 4 in the roadmap) is the
 // "Discover the trades" public landing. For now this is a clear placeholder
 // that honors P6 (no login wall) and P7 (substance over brochure copy) by
@@ -37,7 +37,7 @@ export function DiscoverPlaceholderScreen({
         {/* Back row → returns to path selection */}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour"
+          accessibilityLabel="Back"
           onPress={onSignInInstead}
           hitSlop={12}
           style={({ pressed }) => ({
@@ -50,7 +50,7 @@ export function DiscoverPlaceholderScreen({
           })}
         >
           <ChevronLeft size={20} color={t.text.muted} />
-          <Text style={{ color: t.text.muted, fontSize: 15 }}>Retour</Text>
+          <Text style={{ color: t.text.muted, fontSize: 15 }}>Back</Text>
         </Pressable>
 
         {/* Hero */}
@@ -64,10 +64,10 @@ export function DiscoverPlaceholderScreen({
               lineHeight: 32,
             }}
           >
-            Bienvenue, visiteur
+            Welcome, visitor
           </Text>
           <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 8, lineHeight: 22 }}>
-            Naviguez librement. Aucune création de compte n"est nécessaire pour explorer nos contenus publics.
+            Browse freely. No account is needed to explore our public content.
           </Text>
         </View>
 
@@ -76,20 +76,20 @@ export function DiscoverPlaceholderScreen({
           <PreviewRow
             themeName={themeName}
             icon={Newspaper}
-            title="Actualités publiques"
-            subtitle="Actualités du secteur et annonces de la fédération."
+            title="Public news"
+            subtitle="Industry news and federation announcements."
           />
           <PreviewRow
             themeName={themeName}
             icon={Zap}
-            title="Les métiers de l'intégration électrique"
-            subtitle="Ce que font concrètement nos 7 300 entreprises adhérentes."
+            title="The electrical integration trades"
+            subtitle="What our 7,300 member companies actually do."
           />
           <PreviewRow
             themeName={themeName}
             icon={UserCircle2}
-            title="Devenir adhérent"
-            subtitle="Conditions, avantages et démarches pour rejoindre la fédération."
+            title="Become a member"
+            subtitle="Requirements, benefits and steps to join the federation."
           />
         </View>
 
@@ -106,7 +106,7 @@ export function DiscoverPlaceholderScreen({
         >
           <Text style={{ fontSize: 13, color: t.text.muted, lineHeight: 20 }}>
             <Text style={{ fontFamily: ralewayFamily("600"), fontWeight: "600", color: t.text.body }}>v0.1 · </Text>
-            écran public en construction. Appuyez sur Continuer pour voir l'ébauche du fil d'actualités public.
+            public screen under construction. Tap Continue to see the draft of the public news feed.
           </Text>
         </View>
 
@@ -115,10 +115,10 @@ export function DiscoverPlaceholderScreen({
 
         <View style={{ marginTop: 32, rowGap: 8 }}>
           <Button themeName={themeName} size="lg" fullWidth onPress={onContinue}>
-            Continuer
+            Continue
           </Button>
           <Button themeName={themeName} variant="ghost" size="md" fullWidth onPress={onSignInInstead}>
-            J"ai déjà un compte adhérent
+            I already have a member account
           </Button>
         </View>
       </ScrollView>

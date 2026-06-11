@@ -83,7 +83,7 @@ export function Pagination({
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={dir === "left" ? "Page précédente" : "Page suivante"}
+        accessibilityLabel={dir === "left" ? "Previous page" : "Next page"}
         accessibilityState={{ disabled }}
         disabled={disabled}
         onPress={onPress}

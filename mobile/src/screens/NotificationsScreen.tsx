@@ -23,6 +23,7 @@ import {
   View,
 } from "react-native";
 import { BellRing, ChevronLeft, ExternalLink } from "lucide-react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { themes } from "@tokens";
 import { ralewayFamily } from "@/theme/fonts";
@@ -41,24 +42,27 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.root}>
+      {/* White screen — keep dark status-bar icons even when opened over the
+          navy Home hero (which sets them light). */}
+      <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.content}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour"
+          accessibilityLabel="Back"
           onPress={onBack}
           hitSlop={16}
           style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
         >
           <ChevronLeft size={20} color={t.text.muted} />
-          <Text style={styles.backLabel}>Retour</Text>
+          <Text style={styles.backLabel}>Back</Text>
         </Pressable>
 
         <View style={styles.header}>
           <Text style={styles.title}>Notifications</Text>
           <Text style={styles.subtitle}>
-            La FFIE envoie des alertes sur l'actualité de la fédération, les mises
-            à jour de documents et les évolutions réglementaires urgentes. Gérez
-            les alertes reçues sur cet appareil depuis les réglages système.
+            FFIE sends alerts about federation news, document updates and urgent
+            regulatory changes. Manage the alerts received on this device from
+            your system settings.
           </Text>
         </View>
 
@@ -67,24 +71,24 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
             <BellRing size={20} color={t.brand.accent} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.statusLabel}>Statut</Text>
-            <Text style={styles.statusValue}>Géré par votre appareil</Text>
+            <Text style={styles.statusLabel}>Status</Text>
+            <Text style={styles.statusValue}>Managed by your device</Text>
           </View>
         </View>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Ouvrir les réglages de notifications dans les réglages système de votre appareil"
+          accessibilityLabel="Open notification settings in your device's system settings"
           onPress={openSystemSettings}
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
         >
-          <Text style={styles.ctaLabel}>Ouvrir les réglages de l'appareil</Text>
+          <Text style={styles.ctaLabel}>Open device settings</Text>
           <ExternalLink size={18} color="#FFFFFF" />
         </Pressable>
 
         <Text style={styles.footer}>
-          Les réglages par catégorie — actualité de la fédération, mises à jour de
-          documents, alertes réglementaires — apparaîtront ici une fois configurés par la FFIE.
+          Per-category settings — federation news, document updates, regulatory
+          alerts — will appear here once configured by FFIE.
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -12,8 +12,11 @@ sent anywhere.
 
 At the welcome screen you choose one of two paths:
 
-1. **Adhérer (Member)** — enter **any email address**, then **any 6-digit code**
-   at the next step. You'll land in the **member** experience.
+1. **Adhérer (Member)** — on the sign-in screen enter **any email/identifier**
+   and **any password**, then tap **Connect**. Or tap **SSO federation
+   connection**, **pick your federation** (map or list) + **Continue**, then
+   **Continue to sign in** (simulated secure redirect — no password is collected
+   in-app). Either way you'll land in the **member** experience.
    Tabs: *Actualités · Partenaires · Bibliothèque · Profil*
 2. **Découvrir (Public visitor)** — no sign-in. You'll land in the **public**
    experience.
@@ -29,8 +32,8 @@ you can skip it.
 
 ## What to test
 
-- **Onboarding** — both paths (member + public); the email → code flow; skipping
-  Face ID.
+- **Onboarding** — both paths (member + public); the login screen (Connect +
+  the SSO federation picker, with search); skipping Face ID.
 - **Actualités (News)** — browse the news list and open items.
 - **Partenaires (Partners)** — browse partners.
 - **Bibliothèque (Library, members only)** — open the document library.

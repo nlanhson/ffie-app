@@ -1,10 +1,10 @@
 // EventDetailScreen — the per-event page reached by tapping an event in the
-// Événements tab. Content comes from data/events.ts (FFIE's published pages);
+// Events tab. Content comes from data/events.ts (FFIE's published pages);
 // no fabricated detail. Layout:
 //   • a location tag (map pin + city) at the top,
 //   • the date + title,
 //   • the date/time info rows,
-//   • two CTAs — "Détails" (the full FFIE page) and "Inscription" (the
+//   • two CTAs — "Details" (the full FFIE page) and "Register" (the
 //     registration form) — both opened in the in-app browser, matching the
 //     News reader and Partners directory.
 // Events FFIE hasn't published yet fall back to a "details coming" placeholder.
@@ -20,13 +20,13 @@ import { Button } from "@/components/ui/Button";
 import { EVENTS } from "@/data/events";
 
 const MONTHS = [
-  "janvier", "février", "mars", "avril", "mai", "juin",
-  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 function formatLongDate(iso: string): string {
   const [y, m, d] = iso.split("-").map((n) => parseInt(n, 10));
-  return `${d} ${MONTHS[m - 1]} ${y}`;
+  return `${MONTHS[m - 1]} ${d}, ${y}`;
 }
 
 export function EventDetailScreen({
@@ -58,7 +58,7 @@ export function EventDetailScreen({
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: t.surface.default }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Retour"
+        accessibilityLabel="Back"
         onPress={onBack}
         hitSlop={8}
         style={({ pressed }) => ({
@@ -72,7 +72,7 @@ export function EventDetailScreen({
         })}
       >
         <ChevronLeft size={26} color={t.brand.accent} />
-        <Text style={{ color: t.brand.accent, fontSize: 16 }}>Événements</Text>
+        <Text style={{ color: t.brand.accent, fontSize: 16 }}>Events</Text>
       </Pressable>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: 32 }}>
@@ -81,7 +81,7 @@ export function EventDetailScreen({
             {/* Location tag — map pin + city. */}
             {event.city ? (
               <View
-                accessibilityLabel={`Lieu : ${event.city}`}
+                accessibilityLabel={`Location: ${event.city}`}
                 style={{
                   flexDirection: "row",
                   alignSelf: "flex-start",
@@ -140,7 +140,7 @@ export function EventDetailScreen({
               ) : null}
             </View>
 
-            {/* CTAs — Détails (the FFIE page) + Inscription (the form). */}
+            {/* CTAs — Details (the FFIE page) + Register (the form). */}
             {hasCtas ? (
               <View style={{ flexDirection: "row", columnGap: 12, marginTop: 28 }}>
                 {event.detailsUrl ? (
@@ -150,9 +150,9 @@ export function EventDetailScreen({
                       fullWidth
                       themeName={themeName}
                       onPress={() => openInBrowser(event.detailsUrl!)}
-                      accessibilityHint="Ouvre la page de l'événement sur ffie.fr"
+                      accessibilityHint="Opens the event page on ffie.fr"
                     >
-                      Détails
+                      Details
                     </Button>
                   </View>
                 ) : null}
@@ -163,9 +163,9 @@ export function EventDetailScreen({
                       fullWidth
                       themeName={themeName}
                       onPress={() => openInBrowser(event.registrationUrl!)}
-                      accessibilityHint="Ouvre le formulaire d'inscription"
+                      accessibilityHint="Opens the registration form"
                     >
-                      Inscription
+                      Register
                     </Button>
                   </View>
                 ) : null}
@@ -173,13 +173,13 @@ export function EventDetailScreen({
             ) : (
               // Placeholder — FFIE hasn't published this event's detail yet.
               <Text style={{ color: t.text.muted, fontSize: 15, lineHeight: 22, marginTop: 24 }}>
-                Détails à venir.
+                Details coming.
               </Text>
             )}
           </>
         ) : (
           <Text style={{ color: t.text.muted, fontSize: 15, lineHeight: 22 }}>
-            Événement introuvable.
+            Event not found.
           </Text>
         )}
       </ScrollView>

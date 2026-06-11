@@ -16,9 +16,9 @@ import { ralewayFamily, displayFamily } from "@/theme/fonts";
 import type { MembershipApplication } from "@/auth/membershipContext";
 
 const STEPS = [
-  "La FFIE examine votre demande — généralement sous quelques jours ouvrés.",
-  "Nous confirmons votre cotisation annuelle en fonction de la taille de votre entreprise.",
-  "Vous recevez un e-mail pour activer votre compte adhérent.",
+  "FFIE reviews your application — usually within a few business days.",
+  "We confirm your annual dues based on the size of your company.",
+  "You receive an email to activate your member account.",
 ];
 
 export function ApplicationSubmittedScreen({
@@ -68,7 +68,7 @@ export function ApplicationSubmittedScreen({
               lineHeight: 30,
             }}
           >
-            Demande envoyée
+            Application submitted
           </Text>
           <Text
             style={{
@@ -80,7 +80,7 @@ export function ApplicationSubmittedScreen({
               maxWidth: 320,
             }}
           >
-            Votre demande est en attente d'examen par la FFIE. Vous n'avez rien d'autre à faire pour le moment.
+            Your application is awaiting review by FFIE. There's nothing else you need to do for now.
           </Text>
         </View>
 
@@ -95,14 +95,14 @@ export function ApplicationSubmittedScreen({
             borderColor: t.border.subtle,
           }}
         >
-          <DetailRow label="Référence" value={application.reference} themeName={themeName} />
+          <DetailRow label="Reference" value={application.reference} themeName={themeName} />
           <View style={{ height: 1, backgroundColor: t.border.subtle, marginVertical: 12 }} />
-          <DetailRow label="Envoyée le" value={application.submittedAt} themeName={themeName} />
+          <DetailRow label="Submitted on" value={application.submittedAt} themeName={themeName} />
           <View style={{ height: 1, backgroundColor: t.border.subtle, marginVertical: 12 }} />
           <View style={{ flexDirection: "row", alignItems: "center", columnGap: 8 }}>
             <Mail size={16} color={t.text.muted} />
             <Text style={{ flex: 1, fontSize: 13, color: t.text.muted, lineHeight: 18 }}>
-              Nous enverrons les mises à jour à {application.email}
+              We'll send updates to {application.email}
             </Text>
           </View>
         </View>
@@ -120,7 +120,7 @@ export function ApplicationSubmittedScreen({
             marginBottom: 14,
           }}
         >
-          Et ensuite
+          What's next
         </Text>
         <View style={{ rowGap: 14 }}>
           {STEPS.map((step, i) => (
@@ -159,9 +159,9 @@ export function ApplicationSubmittedScreen({
           size="lg"
           fullWidth
           onPress={onDone}
-          accessibilityLabel="Terminé"
+          accessibilityLabel="Done"
         >
-          Terminé
+          Done
         </Button>
       </ScrollView>
     </SafeAreaView>

@@ -22,6 +22,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes, type ThemeName, type DensityMode } from "@tokens";
 import { FONTS } from "@/theme/fonts";
+import { HomeScreen, type HomeNavTarget } from "@/screens/HomeScreen";
 import { DocLibraryScreen } from "@/screens/DocLibraryScreen";
 import { NewsScreen } from "@/screens/NewsScreen";
 import { NotificationsScreen } from "@/screens/NotificationsScreen";
@@ -33,12 +34,13 @@ import { OnboardingFlow, type OnboardingResult } from "@/screens/onboarding/Onbo
 import { RoleProvider, roleFromOnboardingMode, useRole } from "@/auth/roleContext";
 import { MembershipProvider } from "@/auth/membershipContext";
 import { MembershipApplicationFlow } from "@/screens/membership/MembershipApplicationFlow";
+import { AgendaModalScreen } from "@/screens/AgendaModalScreen";
 import { SignInFlow } from "@/screens/auth/SignInFlow";
 import { ActiveTabProvider, useActiveTab } from "@/navigation/activeTabContext";
 import { RequireRole } from "@/auth/RequireRole";
 import { RoleDebugSwitcher } from "@/components/dev/RoleDebugSwitcher";
 import { BottomTabBar } from "@/components/navigation/BottomTabBar";
-import { AdhererButton } from "@/components/navigation/AdhererButton";
+import { AppHeader } from "@/components/navigation/AppHeader";
 import { TabSkeletonGate, skeletonForTab } from "@/components/skeletons";
 import {
   MEMBER_TABS,
@@ -61,6 +63,17 @@ const ENABLE_ROLE_DEBUG = false;
 // the whole app surface (guest → member), wait the dismissal out before the
 // swap so a closing modal never strands over the next screen.
 const MODAL_DISMISS_MS = 500;
+
+// Page title shown in the persistent AppHeader (navy branded bar) on each main
+// tab. Home is excluded — it renders its own richer hero (HomeHeader) instead.
+const TAB_TITLE: Record<TabKey, string> = {
+  home: "Home",
+  news: "News",
+  library: "Library",
+  partners: "Partners",
+  discover: "Tools",
+  profile: "Profile",
+};
 
 type AppState =
   | { phase: "onboarding"; skipSplash?: boolean }
@@ -139,8 +152,8 @@ function AppRoot() {
 }
 
 // MainSurface: the live role decides which top-level surface renders.
-//   - Member/Admin → MemberShell (Library / News / Partners / Profile)
-//   - Guest → GuestShell (Discover / News / Partners / Join FFIE)
+//   - Member/Admin → MemberShell (Home / News / Library / Partners / Trades)
+//   - Guest → GuestShell (Home / News / Library / Partners / Trades)
 function MainSurface({ onSignOut }: { onSignOut: () => void }) {
   const { role } = useRole();
 
@@ -157,8 +170,10 @@ function MainSurface({ onSignOut }: { onSignOut: () => void }) {
 // (currently just Notifications); each lands as a slide-up Modal so the
 // member tab bar stays mounted underneath.
 function MemberShell({ onSignOut }: { onSignOut: () => void }) {
-  const [activeTab, setActiveTab] = useState<MemberTabKey>("news");
+  const [activeTab, setActiveTab] = useState<MemberTabKey>("home");
   const [settingsOverlay, setSettingsOverlay] = useState<"none" | "notifications">("none");
+  // Full-screen Events ("Agenda") modal, opened by the Home Agenda shortcut.
+  const [agendaOpen, setAgendaOpen] = useState(false);
   // Bumped each time the already-active tab is re-tapped, so a screen sitting
   // on a sub-view (e.g. News showing an article, Library showing a doc) can
   // pop back to its root. Switching to a *different* tab already resets it by
@@ -167,12 +182,19 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   // True while a tab is showing a detail/sub-view (e.g. News article, Library
   // doc). The floating avatar is hidden on detail pages — main pages only.
   const [detailOpen, setDetailOpen] = useState(false);
+  // Pending deep-link segment for the Trades tab (Tools FFIE → Calculators);
+  // cleared on any manual tab-bar press so the Trades button opens its default.
+  const [tradesSegment, setTradesSegment] = useState<
+    "trades" | "videos" | "calculators" | null
+  >(null);
 
   // Tab-bar press. A different tab → switch (the gate remounts + replays its
   // skeleton). The active tab again → pop that tab to its root via resetSignal.
   // Either way we land on a main page, so clear the detail flag.
   const handleTabSelect = (key: TabKey) => {
     setDetailOpen(false);
+    // A manual tab press always opens the tab's default segment.
+    setTradesSegment(null);
     if (key === activeTab) setResetSignal((n) => n + 1);
     else setActiveTab(key as MemberTabKey);
   };
@@ -189,7 +211,8 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   const handleProfileRowPress = (rowKey: string) => {
     if (rowKey === "signout") return onSignOut();
     if (rowKey === "notifications") setSettingsOverlay("notifications");
-    // Other rows (account, offline, biometric) are still stubs.
+    // Other Profile rows (region, interests, edit-profile, change-password)
+    // are still stubs; the notification toggles are handled in-screen now.
   };
 
   return (
@@ -200,13 +223,61 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
       onSignIn={handleSignIn}
     >
       <View style={{ flex: 1, backgroundColor: themes[themeName].surface.default }}>
+        {/* Status bar: light over the navy AppHeader / Home hero; dark over a
+            white detail view (open article, doc). */}
+        <StatusBar style={detailOpen ? "dark" : "light"} />
+
+        {/* Persistent branded header on every tab except Home and Profile (each
+            renders its own navy hero) and while a detail view is open (it brings
+            its own back-button bar). */}
+        {activeTab !== "home" && activeTab !== "profile" && !detailOpen ? (
+          <AppHeader
+            title={TAB_TITLE[activeTab]}
+            variant="member"
+            hasUnread
+            onPressNotifications={() => setSettingsOverlay("notifications")}
+            onPressSearch={() => {
+              // TODO: open global search when the search surface lands.
+            }}
+            // Profile has its own tab + navy hero now, so the header's profile
+            // action always navigates there (this header never renders ON the
+            // profile tab — see the guard above).
+            onPressProfile={() => setActiveTab("profile")}
+          />
+        ) : null}
+
         <View style={{ flex: 1 }}>
           {/* Each tab opens on a brief skeleton that mirrors its layout, then
               swaps in the real screen. Keyed on activeTab so switching tabs
               remounts the gate and replays the loading phase. */}
-          <TabSkeletonGate key={activeTab} skeleton={skeletonForTab(activeTab, themeName)}>
+          <TabSkeletonGate
+            key={activeTab}
+            skeleton={skeletonForTab(activeTab, themeName)}
+          >
             {renderMemberTab(activeTab, {
               onProfileRowPress: handleProfileRowPress,
+              onOpenProfile: () => setActiveTab("profile"),
+              onOpenSearch: () => {
+                // TODO: open global search when the search surface lands.
+              },
+              onHomeNavigate: (target) => {
+                // Agenda opens the full-screen Events modal (not a tab).
+                if (target === "agenda") return setAgendaOpen(true);
+                // "tools" deep-links to the Trades tab's Calculators segment.
+                setTradesSegment(target === "tools" ? "calculators" : null);
+                // Map each Home card to the tab that hosts its destination.
+                const map: Partial<Record<HomeNavTarget, MemberTabKey>> = {
+                  docs: "library",
+                  tools: "discover", // Trades tab → Calculators segment
+                  trades: "discover",
+                  partners: "partners",
+                  "find-pro": "partners",
+                  news: "news",
+                };
+                const next = map[target];
+                if (next) setActiveTab(next);
+              },
+              tradesSegment,
               resetSignal,
               onDetailChange: setDetailOpen,
             })}
@@ -219,16 +290,9 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
           themeName={themeName}
         />
 
-        {/* Floating account avatar — top-right, on every member *main* page
-            (hidden on detail views like an open article). Members get the plain
-            user glyph; tapping it opens the personal Profile / settings page. */}
-        {detailOpen ? null : (
-          <AdhererButton
-            themeName={themeName}
-            variant="member"
-            onPress={() => setActiveTab("profile")}
-          />
-        )}
+        {/* The account avatar that used to float here is now the profile
+            action in AppHeader (non-Home tabs) and the tappable identity block
+            on the Home hero — so the floating disc is retired. */}
 
         {/* Notifications settings — slide-up Modal. Fresh SafeAreaProvider
             so the inset doesn't compound through the native modal host
@@ -243,6 +307,23 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
             <NotificationsScreen onBack={() => setSettingsOverlay("none")} />
           </SafeAreaProvider>
         </Modal>
+
+        {/* Full-screen Agenda (Events) modal — opened by the Home "Agenda"
+            shortcut. Fresh SafeAreaProvider per the inset-compounding fix.
+            Members are never locked, so no upsell CTAs are wired here. */}
+        <Modal
+          visible={agendaOpen}
+          animationType="slide"
+          presentationStyle="fullScreen"
+          onRequestClose={() => setAgendaOpen(false)}
+        >
+          <SafeAreaProvider>
+            <AgendaModalScreen
+              themeName={themeName}
+              onClose={() => setAgendaOpen(false)}
+            />
+          </SafeAreaProvider>
+        </Modal>
       </View>
     </RequireRole>
   );
@@ -252,11 +333,25 @@ function renderMemberTab(
   tab: MemberTabKey,
   actions: {
     onProfileRowPress: (rowKey: string) => void;
+    onOpenProfile: () => void;
+    onOpenSearch: () => void;
+    onHomeNavigate: (target: HomeNavTarget) => void;
+    tradesSegment: "trades" | "videos" | "calculators" | null;
     resetSignal: number;
     onDetailChange: (isDetail: boolean) => void;
   }
 ) {
   switch (tab) {
+    case "home":
+      return (
+        <HomeScreen
+          themeName={themeName}
+          onOpenNotifications={() => actions.onProfileRowPress("notifications")}
+          onOpenProfile={actions.onOpenProfile}
+          onOpenSearch={actions.onOpenSearch}
+          onNavigate={actions.onHomeNavigate}
+        />
+      );
     case "library":
       return (
         <DocLibraryScreen
@@ -281,9 +376,15 @@ function renderMemberTab(
     case "partners":
       return <PartnersScreen themeName={themeName} />;
     case "discover":
-      // Trades (Métiers) — careers, training, external resources. Public and
+      // Trades — careers, training, external resources. Public and
       // self-contained, now part of the member nav too (Julien).
-      return <DiscoverScreen themeName={themeName} resetSignal={actions.resetSignal} />;
+      return (
+        <DiscoverScreen
+          themeName={themeName}
+          resetSignal={actions.resetSignal}
+          initialSegment={actions.tradesSegment ?? undefined}
+        />
+      );
     case "profile":
       return <ProfileScreen themeName={themeName} onRowPress={actions.onProfileRowPress} />;
   }
@@ -294,25 +395,34 @@ function renderMemberTab(
 // needed here (the access check in tabs.tsx is for symmetry / future use).
 // Tab state lives here so it survives the role debug switcher round-tripping.
 function GuestShell() {
-  const [activeTab, setActiveTab] = useState<GuestTabKey>("news");
+  const [activeTab, setActiveTab] = useState<GuestTabKey>("home");
   const [applicationOpen, setApplicationOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
-  // The "Adhérer" CTA now floats top-right on every guest page and opens the
+  // The "Join" CTA now floats top-right on every guest page and opens the
   // federation directory (BecomeMemberScreen) as a slide-up modal, rather than
   // owning a bottom-tab slot.
   const [becomeMemberOpen, setBecomeMemberOpen] = useState(false);
+  // Full-screen Events ("Agenda") modal, opened by the Home Agenda shortcut.
+  const [agendaOpen, setAgendaOpen] = useState(false);
   // Re-tapping the active tab pops it to root (e.g. News showing an article);
   // switching tabs already resets by remounting the gate.
   const [resetSignal, setResetSignal] = useState(0);
   // True while a tab is showing a detail/sub-view (News article, Library doc).
   // The floating avatar is hidden on detail pages — main pages only.
   const [detailOpen, setDetailOpen] = useState(false);
+  // Pending deep-link segment for the Trades tab (Tools FFIE → Calculators);
+  // cleared on any manual tab-bar press. See MemberShell for the rationale.
+  const [tradesSegment, setTradesSegment] = useState<
+    "trades" | "videos" | "calculators" | null
+  >(null);
   const { setRole } = useRole();
   const { setActiveTab: publishActiveTab } = useActiveTab();
 
   const handleTabSelect = (key: TabKey) => {
     // Any tab-bar press lands on a main page (switch or pop-to-root).
     setDetailOpen(false);
+    // A manual tab press always opens the tab's default segment.
+    setTradesSegment(null);
     if (key === activeTab) setResetSignal((n) => n + 1);
     else setActiveTab(key as GuestTabKey);
   };
@@ -327,7 +437,7 @@ function GuestShell() {
 
   // From any guest surface, applying or signing in promotes the session.
   // v1 mock:
-  //   - The floating "Adhérer" CTA and News / member-only upsells both open
+  //   - The floating "Join" CTA and News / member-only upsells both open
   //     the federation directory (BecomeMemberScreen) as a modal — the soft
   //     funnel step before the form.
   //   - The application form opens as a slide-up modal (openApplication).
@@ -342,7 +452,7 @@ function GuestShell() {
     // can strand a modal over the member News page.
     //
     // Two entry paths share this handler, and they differ in modal depth:
-    //   - From the directory (avatar → Adhérer → "Se connecter"): the sign-in
+    //   - From the directory (avatar → Join → "Sign in"): the sign-in
     //     popup is NESTED inside the directory modal. iOS cannot dismiss a
     //     presenting modal (the directory) while its presented child (sign-in)
     //     is still up — doing both in the same tick rips the child's view
@@ -351,8 +461,8 @@ function GuestShell() {
     //     parent, THEN (after that too has slid away) promote the role.
     //   - From News etc. (no directory open): only the sign-in modal is up, so
     //     there's nothing to stagger — dismiss it and promote after one slide.
-    // Both shells open on News, so the brief guest→member swap underneath the
-    // closing modal is invisible — the user simply lands on News, logged in.
+    // Both shells open on Home, so the brief guest→member swap underneath the
+    // closing modal is invisible — the user simply lands on Home, logged in.
     setSignInOpen(false);
     if (becomeMemberOpen) {
       setTimeout(() => setBecomeMemberOpen(false), MODAL_DISMISS_MS);
@@ -364,15 +474,57 @@ function GuestShell() {
 
   return (
     <View style={{ flex: 1, backgroundColor: themes[themeName].surface.default }}>
+      {/* Status bar: light over the navy AppHeader / Home hero; dark over a
+          white detail view (open article, doc). */}
+      <StatusBar style={detailOpen ? "dark" : "light"} />
+
+      {/* Persistent branded header on every tab except Home (its own hero) and
+          while a detail view is open. */}
+      {activeTab !== "home" && !detailOpen ? (
+        <AppHeader
+          title={TAB_TITLE[activeTab]}
+          variant="guest"
+          onPressSearch={() => {
+            // TODO: open global search when the search surface lands.
+          }}
+          onPressJoin={() => setBecomeMemberOpen(true)}
+        />
+      ) : null}
+
       <View style={{ flex: 1 }}>
         {/* Brief layout-matched skeleton on each tab open, then the real
             screen. Keyed on activeTab so a tab switch replays the loading
             phase. */}
-        <TabSkeletonGate key={activeTab} skeleton={skeletonForTab(activeTab, themeName)}>
+        <TabSkeletonGate
+          key={activeTab}
+          skeleton={skeletonForTab(activeTab, themeName)}
+        >
           {renderGuestTab(activeTab, {
             onApply: goToJoin,
             onSignIn: openSignIn,
             onStartApplication: openApplication,
+            onOpenSearch: () => {
+              // TODO: open global search when the search surface lands.
+            },
+            onHomeNavigate: (target) => {
+              // Guests: "find-pro" opens the federation directory (the join
+              // funnel); "agenda" opens the full-screen Events modal; the rest
+              // map to the matching guest tab.
+              if (target === "find-pro") return goToJoin();
+              if (target === "agenda") return setAgendaOpen(true);
+              // "tools" deep-links to the Trades tab's Calculators segment.
+              setTradesSegment(target === "tools" ? "calculators" : null);
+              const map: Partial<Record<HomeNavTarget, GuestTabKey>> = {
+                docs: "library",
+                tools: "discover", // Trades tab → Calculators segment
+                trades: "discover",
+                partners: "partners",
+                news: "news",
+              };
+              const next = map[target];
+              if (next) setActiveTab(next);
+            },
+            tradesSegment,
             resetSignal,
             onDetailChange: setDetailOpen,
           })}
@@ -385,22 +537,14 @@ function GuestShell() {
         themeName={themeName}
       />
 
-      {/* Floating account avatar — top-right, on every guest *main* page (hidden
-          on detail views like an open article). Guests get the user-plus glyph;
-          tapping it opens the federation directory (map + departmental list)
-          with a "Se connecter" login button pinned at its bottom. */}
-      {detailOpen ? null : (
-        <AdhererButton
-          themeName={themeName}
-          variant="guest"
-          onPress={() => setBecomeMemberOpen(true)}
-        />
-      )}
+      {/* The account avatar that used to float here is now the join action in
+          AppHeader (non-Home tabs) and the "Join the FFIE" CTA on the Home hero
+          — so the floating disc is retired. */}
 
-      {/* Federation directory ("Adhérer") — slide-up Modal over the guest
+      {/* Federation directory ("Join") — slide-up Modal over the guest
           shell, so the tab bar stays mounted underneath. Fresh
           SafeAreaProvider per the inset-compounding fix used elsewhere. The
-          bottom "Se connecter" CTA opens the email → OTP sign-in popup, nested
+          bottom "Sign in" CTA opens the email → OTP sign-in popup, nested
           inside this modal so it presents *on top of* the map + list (a sibling
           modal at the root can't present while this one is up on iOS). */}
       <Modal
@@ -416,23 +560,31 @@ function GuestShell() {
             onLogin={openSignIn}
           />
           {/* Nested sign-in: pops up over the directory; cancelling returns to
-              it. A verified code calls authenticate() (promotes to member). */}
+              it. A successful login calls authenticate() (promotes to member).
+              "Join the FFIE" just closes the login — the directory underneath
+              is already the join funnel. */}
           <SignInFlow
             visible={signInOpen}
             onClose={() => setSignInOpen(false)}
             onAuthenticated={authenticate}
+            onJoin={() => setSignInOpen(false)}
           />
         </SafeAreaProvider>
       </Modal>
 
-      {/* "I already have an account" from News etc. (no directory open) → email
-          → OTP. Only mounted when the directory is closed, so it never competes
-          with the nested instance above for the same signInOpen state. */}
+      {/* "I already have an account" from News etc. (no directory open) →
+          login. Only mounted when the directory is closed, so it never competes
+          with the nested instance above for the same signInOpen state.
+          "Join the FFIE" dismisses login, then opens the join directory. */}
       {becomeMemberOpen ? null : (
         <SignInFlow
           visible={signInOpen}
           onClose={() => setSignInOpen(false)}
           onAuthenticated={authenticate}
+          onJoin={() => {
+            setSignInOpen(false);
+            setTimeout(() => setBecomeMemberOpen(true), MODAL_DISMISS_MS);
+          }}
         />
       )}
 
@@ -452,6 +604,33 @@ function GuestShell() {
           />
         </SafeAreaProvider>
       </Modal>
+
+      {/* Full-screen Agenda (Events) modal — opened by the Home "Agenda"
+          shortcut. A guest tapping a member-only event hits the upsell inside
+          the modal; its CTAs close THIS modal first, then (after the slide)
+          open the join / sign-in funnel, so two full-screen modals never fight
+          on iOS — the same staggered-dismiss pattern used above. */}
+      <Modal
+        visible={agendaOpen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setAgendaOpen(false)}
+      >
+        <SafeAreaProvider>
+          <AgendaModalScreen
+            themeName={themeName}
+            onClose={() => setAgendaOpen(false)}
+            onApply={() => {
+              setAgendaOpen(false);
+              setTimeout(goToJoin, MODAL_DISMISS_MS);
+            }}
+            onSignIn={() => {
+              setAgendaOpen(false);
+              setTimeout(openSignIn, MODAL_DISMISS_MS);
+            }}
+          />
+        </SafeAreaProvider>
+      </Modal>
     </View>
   );
 }
@@ -462,15 +641,35 @@ function renderGuestTab(
     onApply: () => void;
     onSignIn: () => void;
     onStartApplication: () => void;
+    onOpenSearch: () => void;
+    onHomeNavigate: (target: HomeNavTarget) => void;
+    tradesSegment: "trades" | "videos" | "calculators" | null;
     resetSignal: number;
     onDetailChange: (isDetail: boolean) => void;
   }
 ) {
   switch (tab) {
+    case "home":
+      // Guests get the welcome hero; "Join the FFIE" opens the federation
+      // directory (the same soft-funnel step as the floating CTA elsewhere).
+      return (
+        <HomeScreen
+          themeName={themeName}
+          onJoin={actions.onApply}
+          onOpenSearch={actions.onOpenSearch}
+          onNavigate={actions.onHomeNavigate}
+        />
+      );
     case "discover":
       // The Trades tab is fully public (P6) and self-contained — careers,
       // training, and external resource links only.
-      return <DiscoverScreen themeName={themeName} resetSignal={actions.resetSignal} />;
+      return (
+        <DiscoverScreen
+          themeName={themeName}
+          resetSignal={actions.resetSignal}
+          initialSegment={actions.tradesSegment ?? undefined}
+        />
+      );
     case "news":
       // Guests can hit member-only articles → forward the upsell CTAs so the
       // News teaser routes to Join / sign-in just like the rest of the shell.
@@ -486,7 +685,7 @@ function renderGuestTab(
     case "partners":
       return <PartnersScreen themeName={themeName} />;
     case "library":
-      // Bibliothèque is now part of the guest experience too — non-members
+      // Library is now part of the guest experience too — non-members
       // browse the same document directory (v1 mock: full access).
       return (
         <DocLibraryScreen
@@ -495,9 +694,9 @@ function renderGuestTab(
           offline={offline}
           resetSignal={actions.resetSignal}
           onDetailChange={actions.onDetailChange}
-          // A guest tapping a locked doc gets the upsell; "Demander l'adhésion"
-          // opens the federation directory (map + departmental list), "J'ai déjà
-          // un compte" opens sign-in — same funnel as the News teaser.
+          // A guest tapping a locked doc gets the upsell; "Request membership"
+          // opens the federation directory (map + departmental list), "I already
+          // have an account" opens sign-in — same funnel as the News teaser.
           onApply={actions.onApply}
           onSignIn={actions.onSignIn}
           onDocPress={() => {

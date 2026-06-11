@@ -22,7 +22,7 @@ import { FFIELogo } from "@/components/ui/FFIELogo";
 
 // Kept for the accessibilityLabel so screen-reader users still hear the
 // federation identity even though the text isn't on-screen.
-const FEDERATION = "Fédération Française des Intégrateurs Électriciens";
+const FEDERATION = "French Federation of Electrical Integrators";
 
 // How long the logo stays visible after the enter animation finishes,
 // before we emit onReady and let the OnboardingFlow advance.
