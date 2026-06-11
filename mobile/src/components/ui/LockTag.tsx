@@ -1,9 +1,10 @@
-// LockTag — member-only indicator: a lock glyph + "Members" label. Mirrors
-// the FFIE site's "Members-only content" badge. Shown only to viewers
-// who can't access member content (guests), per the News/Library convention.
+// LockTag — indicateur réservé aux adhérents : un cadenas + le libellé « Adhérents ».
+// Reflète le badge « Contenu réservé aux adhérents » du site FFIE. Affiché uniquement
+// aux visiteurs qui ne peuvent pas accéder au contenu adhérent (invités), selon la
+// convention Actualités/Bibliothèque.
 //
-// Icon + word (never colour alone, P4) so the lock reads for everyone. Shared
-// by News cards and the Library list so both look identical.
+// Icône + mot (jamais la couleur seule, P4) pour que le cadenas soit lisible par tous.
+// Partagé par les cartes d'Actualités et la liste de la Bibliothèque pour qu'elles soient identiques.
 
 import React from "react";
 import { Text, View } from "react-native";
@@ -14,7 +15,7 @@ import { ralewayFamily } from "@/theme/fonts";
 export function LockTag({
   themeName,
   small = false,
-  label = "Members",
+  label = "Adhérents",
 }: {
   themeName: ThemeName;
   small?: boolean;

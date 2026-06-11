@@ -1,9 +1,10 @@
-// News article reader. iOS-style: a slim back/share bar, a category chip,
-// the headline (Sora display), a meta line, and the body. The share action
-// covers Julien's "screen-share the article in a client meeting" behaviour.
+// Lecteur d'article d'actualité. Style iOS : une barre fine retour/partage, une
+// puce de catégorie, le titre (display Sora), une ligne de méta, et le corps.
+// L'action de partage couvre le comportement de Julien « partager l'écran de
+// l'article lors d'une réunion client ».
 //
-// Stateless beyond the Share call — the parent (NewsScreen) owns which
-// article is open and the back transition.
+// Sans état au-delà de l'appel à Share — le parent (NewsScreen) détient quel
+// article est ouvert et la transition de retour.
 
 import React from "react";
 import { ChevronLeft, ChevronRight, FileText, Download, Share2 } from "lucide-react-native";
@@ -41,13 +42,13 @@ export function NewsArticleScreen({
         message: `${article.title}\n\nvia FFIE`,
       });
     } catch {
-      // User dismissed the share sheet — no-op.
+      // L'utilisateur a fermé la feuille de partage — sans effet.
     }
   };
 
-  // Open an in-article link in the native in-app browser (page sheet, slides
-  // up from the bottom), matching the Partners directory. Keeps the reader in
-  // the app — dismissing returns straight to the article.
+  // Ouvre un lien dans l'article dans le navigateur intégré natif (page sheet,
+  // glisse vers le haut depuis le bas), comme l'annuaire Partenaires. Garde le
+  // lecteur dans l'app — la fermeture revient directement à l'article.
   const openInBrowser = (url: string) => {
     WebBrowser.openBrowserAsync(url, {
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
@@ -59,7 +60,7 @@ export function NewsArticleScreen({
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Slim nav bar: back + share */}
+      {/* Barre de navigation fine : retour + partage */}
       <View
         style={{
           flexDirection: "row",
@@ -71,7 +72,7 @@ export function NewsArticleScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to news"
+          accessibilityLabel="Retour aux actualités"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -84,12 +85,12 @@ export function NewsArticleScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>News</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Actualités</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Share this article"
+          accessibilityLabel="Partager cet article"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -105,7 +106,7 @@ export function NewsArticleScreen({
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {/* Hero image — seeded placeholder (swap for real CMS image later) */}
+        {/* Image hero — espace réservé avec graine (remplacer par une vraie image CMS plus tard) */}
         <RemoteImage
           seed={`ffie-news-${article.id}`}
           uri={article.imageUrl}
@@ -114,11 +115,11 @@ export function NewsArticleScreen({
           pixelWidth={1000}
           pixelHeight={600}
           themeName={themeName}
-          accessibilityLabel={`Illustration for ${article.title}`}
+          accessibilityLabel={`Illustration pour ${article.title}`}
         />
 
         <View style={{ paddingHorizontal: GUTTER }}>
-        {/* Category chip */}
+        {/* Puce de catégorie */}
         <View style={{ flexDirection: "row", marginTop: 16, marginBottom: 12 }}>
           <View
             style={{
@@ -143,7 +144,7 @@ export function NewsArticleScreen({
           </View>
         </View>
 
-        {/* Headline */}
+        {/* Titre */}
         <Text
           accessibilityRole="header"
           style={{
@@ -158,14 +159,14 @@ export function NewsArticleScreen({
           {article.title}
         </Text>
 
-        {/* Meta */}
+        {/* Méta */}
         <Text style={{ color: t.text.muted, fontSize: 13, marginTop: 10, marginBottom: 20 }}>
           {article.date}
         </Text>
 
-        {/* Body. The first block renders as a larger "lead" line. Each block is
-            a plain string paragraph, or a rich line with bold / link spans;
-            link spans with a url open it on tap. */}
+        {/* Corps. Le premier bloc se rend comme une ligne « chapô » plus grande.
+            Chaque bloc est un paragraphe en chaîne simple, ou une ligne riche avec
+            des segments en gras / liens ; les segments de lien avec une url l'ouvrent au toucher. */}
         {article.body.map((block, i) => {
           const lead = i === 0;
           return (
@@ -206,9 +207,10 @@ export function NewsArticleScreen({
           );
         })}
 
-        {/* Associated documents (NEWS-02). The real FFIE files the article
-            references, surfaced as a tappable list rather than only inline
-            links. Opens in the in-app browser for now (download = FFIE-DOC-03). */}
+        {/* Documents associés (NEWS-02). Les vrais fichiers FFIE référencés par
+            l'article, présentés sous forme de liste touchable plutôt que de
+            simples liens en ligne. S'ouvrent dans le navigateur intégré pour
+            l'instant (téléchargement = FFIE-DOC-03). */}
         {article.attachments && article.attachments.length > 0 ? (
           <View style={{ marginTop: 28 }}>
             <Text
@@ -223,7 +225,7 @@ export function NewsArticleScreen({
                 marginBottom: 12,
               }}
             >
-              Related documents
+              Documents associés
             </Text>
             <View
               style={{
@@ -238,8 +240,8 @@ export function NewsArticleScreen({
                 <Pressable
                   key={doc.url}
                   accessibilityRole="button"
-                  accessibilityLabel={`Open document: ${doc.label}`}
-                  accessibilityHint="Opens the document in the app"
+                  accessibilityLabel={`Ouvrir le document : ${doc.label}`}
+                  accessibilityHint="Ouvre le document dans l'app"
                   onPress={() => openInBrowser(doc.url)}
                   style={({ pressed }) => ({
                     flexDirection: "row",
@@ -285,8 +287,8 @@ export function NewsArticleScreen({
           </View>
         ) : null}
 
-        {/* Previous / next article navigation. Previous is disabled on the
-            first article, next on the last. */}
+        {/* Navigation article précédent / suivant. Précédent est désactivé sur le
+            premier article, suivant sur le dernier. */}
         <View
           style={{
             marginTop: 28,
@@ -307,9 +309,9 @@ export function NewsArticleScreen({
 }
 
 // ---------------------------------------------------------------------------
-// ArticleNavButton — bottom-of-article "previous / next" control. Shows the
-// target article's title with a back/forward arrow. Disabled (no target) on
-// the first article (prev) and the last article (next).
+// ArticleNavButton — le contrôle « précédent / suivant » en bas de l'article.
+// Affiche le titre de l'article cible avec une flèche arrière/avant. Désactivé
+// (pas de cible) sur le premier article (précédent) et le dernier article (suivant).
 // ---------------------------------------------------------------------------
 function ArticleNavButton({
   dir,
@@ -325,7 +327,7 @@ function ArticleNavButton({
   const t = themes[themeName];
   const disabled = !article || !onNavigate;
   const Icon = dir === "prev" ? ChevronLeft : ChevronRight;
-  const caption = dir === "prev" ? "Previous" : "Next";
+  const caption = dir === "prev" ? "Précédent" : "Suivant";
   const alignText = dir === "prev" ? "left" : "right";
 
   return (
@@ -335,10 +337,10 @@ function ArticleNavButton({
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       accessibilityLabel={
-        article ? `${caption} article: ${article.title}` : `${caption} article, unavailable`
+        article ? `Article ${caption.toLowerCase()} : ${article.title}` : `Article ${caption.toLowerCase()}, indisponible`
       }
       style={({ pressed }) => ({
-        flex: 1, // split the row into two equal halves
+        flex: 1, // diviser la rangée en deux moitiés égales
         flexDirection: "row",
         alignItems: "center",
         columnGap: 8,

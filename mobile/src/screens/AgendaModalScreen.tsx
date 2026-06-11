@@ -1,21 +1,24 @@
-// AgendaModalScreen — the full-screen "Agenda" events window, opened as a
-// slide-up modal from the Home "Agenda" quick-access card (both roles).
+// AgendaModalScreen — la fenêtre plein écran des événements « Agenda », ouverte comme
+// une modale qui glisse depuis le haut, depuis la carte d'accès rapide « Agenda » de
+// l'Accueil (les deux rôles).
 //
-// It surfaces the same events content as the News tab's "Events" segment
-// (EventsView: week calendar + event list), but as a dedicated full-screen
-// surface with its own large title and a close button — a faster path to the
-// agenda than tab → segment.
+// Elle présente le même contenu d'événements que le segment « Événements » de l'onglet
+// Actualités (EventsView : calendrier hebdomadaire + liste d'événements), mais comme une
+// surface plein écran dédiée avec son propre grand titre et un bouton de fermeture — un
+// chemin plus rapide vers l'agenda que onglet → segment.
 //
-// Sub-navigation is a tiny internal state machine rather than a nested
-// NavigationContainer: tapping an event swaps in EventDetailScreen; a guest
-// tapping a member-only event swaps in the membership upsell (MemberOnlyPrompt).
-// Both transitions are instant cuts (the modal's own slide covers the entrance),
-// so there is no decorative motion to gate for reduced-motion (P5).
+// La sous-navigation est une petite machine à états interne plutôt qu'un
+// NavigationContainer imbriqué : taper un événement bascule sur EventDetailScreen ; un
+// invité tapant un événement réservé aux adhérents bascule sur l'incitation à l'adhésion
+// (MemberOnlyPrompt). Les deux transitions sont des coupes instantanées (le glissement
+// propre de la modale couvre l'entrée), donc il n'y a aucun mouvement décoratif à
+// encadrer pour le mouvement réduit (P5).
 //
-// Locked handling differs by role: members never hit the locked path; for guests
-// the upsell CTAs (onApply / onSignIn) are handed back to the shell, which closes
-// THIS modal first and then opens the join / sign-in funnel (the staggered
-// dismiss pattern used elsewhere, so two full-screen modals never fight on iOS).
+// La gestion du verrouillage diffère selon le rôle : les adhérents n'empruntent jamais le
+// chemin verrouillé ; pour les invités, les CTA de l'incitation (onApply / onSignIn) sont
+// renvoyés au shell, qui ferme d'abord CETTE modale puis ouvre l'entonnoir d'adhésion /
+// de connexion (le motif de fermeture échelonnée utilisé ailleurs, pour que deux modales
+// plein écran ne se disputent jamais sur iOS).
 
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -39,15 +42,15 @@ export function AgendaModalScreen({
   onSignIn,
 }: {
   themeName?: ThemeName;
-  /** Dismiss the whole agenda modal. */
+  /** Ferme toute la modale agenda. */
   onClose: () => void;
-  /** Guest only: a member-only event's "request membership" CTA. */
+  /** Invité uniquement : le CTA « demander l'adhésion » d'un événement réservé aux adhérents. */
   onApply?: () => void;
-  /** Guest only: a member-only event's "I already have an account" CTA. */
+  /** Invité uniquement : le CTA « J'ai déjà un compte » d'un événement réservé aux adhérents. */
   onSignIn?: () => void;
 }) {
   const [view, setView] = useState<AgendaView>({ type: "list" });
-  // Called unconditionally (hooks rule) — only read on the list view.
+  // Appelé inconditionnellement (règle des hooks) — lu uniquement sur la vue liste.
   const c = useGroupedColors(themeName);
 
   if (view.type === "detail") {
@@ -61,8 +64,9 @@ export function AgendaModalScreen({
   }
 
   if (view.type === "locked") {
-    // Guest upsell for a member-only event. Back returns to the list; the CTAs
-    // hand off to the shell (which closes this modal, then opens the funnel).
+    // Incitation invité pour un événement réservé aux adhérents. Retour revient à la
+    // liste ; les CTA passent la main au shell (qui ferme cette modale, puis ouvre
+    // l'entonnoir).
     return (
       <MemberOnlyPrompt
         themeName={themeName}
@@ -91,8 +95,8 @@ export function AgendaModalScreen({
   );
 }
 
-// iOS-style modal close: a grey filled disc with an X, sitting in the large
-// title's trailing slot. hitSlop lifts the 30pt disc to a ≥44pt target.
+// Fermeture de modale style iOS : un disque gris plein avec un X, placé dans
+// l'emplacement de fin du grand titre. hitSlop élève le disque de 30 pt à une cible ≥ 44 pt.
 function CloseButton({
   themeName,
   onPress,
@@ -106,8 +110,8 @@ function CloseButton({
       onPress={onPress}
       hitSlop={10}
       accessibilityRole="button"
-      accessibilityLabel="Close"
-      accessibilityHint="Closes the agenda"
+      accessibilityLabel="Fermer"
+      accessibilityHint="Ferme l'agenda"
       style={({ pressed }) => ({
         width: 30,
         height: 30,

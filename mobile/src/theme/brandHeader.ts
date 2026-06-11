@@ -1,21 +1,25 @@
-// The FFIE brand "header surface" — the deep brand color that sits behind the
-// logo lockup on the Home hero, the persistent AppHeader bar, and the Profile
-// identity hero (plus their overscroll backstops and loading skeletons).
+// La « surface d'en-tête » de marque FFIE — la couleur de marque profonde qui se
+// place derrière le bloc-marque sur le héros de l'Accueil, la barre AppHeader
+// persistante et le héros d'identité du Profil (ainsi que leurs cales de
+// surdéfilement et leurs squelettes de chargement).
 //
-// Defined ONCE here so every header-matched surface stays in lockstep: changing
-// the brand header color is a one-line edit. White text/icons sit on top, so
-// the chosen shade must keep them legible (large text / icons ≥ 3:1).
+// Définie UNE SEULE fois ici pour que chaque surface alignée sur l'en-tête reste
+// synchronisée : changer la couleur d'en-tête de marque est une modification
+// d'une ligne. Du texte/des icônes blancs reposent dessus, donc la teinte
+// choisie doit les garder lisibles (grand texte / icônes ≥ 3:1).
 
 import { primitives } from "@tokens";
 
 /**
- * Brand header background — FFIE operational teal at [700] (#027489).
+ * Fond de l'en-tête de marque — sarcelle opérationnel FFIE au [700] (#027489).
  *
- * ONE teal for the whole interactive system: this is the SAME value as the
- * light theme's `action.primary.bg` and `brand.accent`, so the header, the
- * primary buttons, the segmented toggles and the filter controls all read as a
- * single brand teal rather than two near-misses. It was teal[600] (#0094A9) —
- * one shade brighter — but that only clears ~3.6:1 against white (AA-large
- * only); [700] lands ~5.4:1, so the white header text/icons pass AA at any size.
+ * UN SEUL sarcelle pour tout le système interactif : c'est la MÊME valeur que
+ * `action.primary.bg` et `brand.accent` du thème clair, si bien que l'en-tête,
+ * les boutons principaux, les bascules segmentées et les contrôles de filtre se
+ * lisent tous comme un unique sarcelle de marque plutôt que comme deux teintes
+ * presque identiques. C'était teal[600] (#0094A9) — une teinte plus claire —
+ * mais celui-ci n'atteint que ~3,6:1 sur blanc (AA-grand uniquement) ; le [700]
+ * atteint ~5,4:1, donc le texte/les icônes blancs de l'en-tête passent le AA à
+ * toute taille.
  */
 export const HEADER_SURFACE = primitives.colors.brand.teal[700]; // #027489

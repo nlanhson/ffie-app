@@ -1,11 +1,12 @@
-// Video category reader — pushed when a tile on the Videos segment of the
-// Trades tab is tapped. Clones an FFIE video page (e.g. "Artificial
-// intelligence"): a slim back/share bar, the category title, then each film as
-// a title + an inline YouTube player (YouTubeEmbed) that plays IN the app — no
-// redirect to the website (FFIE-VIDEO-01, captions on by default).
+// Lecteur de catégorie de vidéos — affiché quand une tuile du segment Vidéos de
+// l'onglet Métiers est tapée. Clone une page vidéo FFIE (p. ex. « Intelligence
+// artificielle ») : une barre fine retour/partage, le titre de la catégorie, puis chaque
+// film sous forme d'un titre + un lecteur YouTube intégré (YouTubeEmbed) qui se lit DANS
+// l'app — aucune redirection vers le site (FFIE-VIDEO-01, sous-titres activés par
+// défaut).
 //
-// Stateless beyond the Share call — the parent (DiscoverScreen's stack) owns
-// which category is open and the back transition.
+// Sans état au-delà de l'appel à Share — le parent (la pile de DiscoverScreen) décide
+// quelle catégorie est ouverte et gère la transition de retour.
 
 import React from "react";
 import { ChevronLeft, Share2 } from "lucide-react-native";
@@ -33,13 +34,13 @@ export function VideoCategoryScreen({
     try {
       await Share.share({ title: category.title, message: `${category.title}\n\nvia FFIE` });
     } catch {
-      // User dismissed the share sheet — no-op.
+      // L'utilisateur a fermé la feuille de partage — aucune action.
     }
   };
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Slim nav bar: back + share (mirrors the News / course readers). */}
+      {/* Barre de nav fine : retour + partage (à l'image des lecteurs Actualités / cours). */}
       <View
         style={{
           flexDirection: "row",
@@ -51,7 +52,7 @@ export function VideoCategoryScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to videos"
+          accessibilityLabel="Retour aux vidéos"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -64,12 +65,12 @@ export function VideoCategoryScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Videos</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Vidéos</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Share this video"
+          accessibilityLabel="Partager cette vidéo"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -85,7 +86,7 @@ export function VideoCategoryScreen({
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-        {/* Category title. */}
+        {/* Titre de la catégorie. */}
         <View style={{ paddingHorizontal: GUTTER, paddingTop: 4, paddingBottom: 18 }}>
           <Text
             accessibilityRole="header"
@@ -102,7 +103,7 @@ export function VideoCategoryScreen({
           </Text>
         </View>
 
-        {/* One title + inline player per film. */}
+        {/* Un titre + un lecteur intégré par film. */}
         <View style={{ paddingHorizontal: GUTTER, rowGap: 28 }}>
           {category.videos.map((video) => (
             <View key={video.youtubeId} style={{ rowGap: 12 }}>
@@ -122,7 +123,7 @@ export function VideoCategoryScreen({
               ) : null}
               <YouTubeEmbed
                 youtubeId={video.youtubeId}
-                accessibilityLabel={`Video: ${video.title ?? category.title}`}
+                accessibilityLabel={`Vidéo : ${video.title ?? category.title}`}
               />
             </View>
           ))}

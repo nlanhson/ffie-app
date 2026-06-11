@@ -1,11 +1,12 @@
-// MemberOnlyPrompt — upsell surface shown when a guest taps a member-only
-// route. Per the access-model tech requirement: gated routes redirect to a
-// login + apply CTA, never a 403.
+// MemberOnlyPrompt — surface d'incitation affichée lorsqu'un invité touche une
+// route réservée aux adhérents. Selon l'exigence technique du modèle d'accès :
+// les routes protégées redirigent vers un CTA de connexion + adhésion, jamais
+// vers un 403.
 //
-// "Request membership" (primary) redirects to the Become-a-member page (the
-// federation directory) via onApply; "I already have an account" (secondary) is the
-// sign-in affordance for existing members who reached this surface by mistake.
-// Both callbacks are wired by the caller (App.tsx).
+// « Demander l'adhésion » (principal) redirige vers la page Devenir adhérent
+// (l'annuaire de la fédération) via onApply ; « J'ai déjà un compte » (secondaire)
+// est l'option de connexion pour les adhérents existants arrivés ici par erreur.
+// Les deux callbacks sont câblés par l'appelant (App.tsx).
 
 import React from "react";
 import { ChevronLeft, Lock } from "lucide-react-native";
@@ -25,10 +26,11 @@ export function MemberOnlyPrompt({
   themeName?: ThemeName;
   onApply?: () => void;
   onSignIn?: () => void;
-  /** When provided, renders a slim back affordance (e.g. returning to News). */
+  /** Si fourni, affiche une fine option de retour (ex. revenir aux Actualités). */
   onBack?: () => void;
-  /** Optional context — the title of the gated item the user tapped (e.g. a
-   *  locked document). Shown as a chip so they know what's behind the wall. */
+  /** Contexte facultatif — le titre de l'élément protégé que l'utilisateur a touché
+   *  (ex. un document verrouillé). Affiché sous forme de pastille pour qu'il sache
+   *  ce qui se trouve derrière le mur. */
   documentTitle?: string;
 }) {
   const t = themes[themeName];
@@ -38,7 +40,7 @@ export function MemberOnlyPrompt({
       {onBack ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Retour"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -52,7 +54,7 @@ export function MemberOnlyPrompt({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Back</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Retour</Text>
         </Pressable>
       ) : null}
       <ScrollView
@@ -94,7 +96,7 @@ export function MemberOnlyPrompt({
               maxWidth: 320,
             }}
           >
-            FFIE members only
+            Réservé aux adhérents FFIE
           </Text>
 
           <Text
@@ -107,10 +109,10 @@ export function MemberOnlyPrompt({
               maxWidth: 320,
             }}
           >
-            This content is part of the offering reserved for FFIE members. Request membership of the federation, or sign in if you already have an account.
+            Ce contenu fait partie de l'offre réservée aux adhérents FFIE. Demandez l'adhésion à la fédération, ou connectez-vous si vous avez déjà un compte.
           </Text>
 
-          {/* Context chip — the gated item the user tapped (e.g. the document). */}
+          {/* Pastille de contexte — l'élément protégé que l'utilisateur a touché (ex. le document). */}
           {documentTitle ? (
             <View
               style={{
@@ -138,7 +140,7 @@ export function MemberOnlyPrompt({
           ) : null}
         </View>
 
-        {/* Spacer pushes actions to bottom for one-handed reach. */}
+        {/* L'espaceur pousse les actions vers le bas pour une portée à une main. */}
         <View style={{ flex: 1 }} />
 
         {/* Actions */}
@@ -148,9 +150,9 @@ export function MemberOnlyPrompt({
             size="lg"
             fullWidth
             onPress={onApply ?? (() => {})}
-            accessibilityLabel="Request FFIE membership"
+            accessibilityLabel="Demander l'adhésion à la FFIE"
           >
-            Request membership
+            Demander l'adhésion
           </Button>
           <Button
             themeName={themeName}
@@ -158,9 +160,9 @@ export function MemberOnlyPrompt({
             size="md"
             fullWidth
             onPress={onSignIn ?? (() => {})}
-            accessibilityHint="If you already have an FFIE member account"
+            accessibilityHint="Si vous avez déjà un compte adhérent FFIE"
           >
-            I already have an account
+            J'ai déjà un compte
           </Button>
         </View>
       </ScrollView>

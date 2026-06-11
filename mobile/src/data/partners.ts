@@ -1,28 +1,33 @@
-// Partners content — the curated, segmented showcase the federation approved
-// for the Partners tab. It replaces the old flat "Nos partenaires" directory
-// with the FFIE's own framing of who it works with, split into three segments:
+// Contenu Partenaires — la vitrine soignée et segmentée que la fédération a
+// validée pour l'onglet Partenaires. Elle remplace l'ancien annuaire à plat
+// « Nos partenaires » par la propre présentation FFIE de ses interlocuteurs,
+// répartie en trois segments :
 //
-//   - Ecosystem  · the commercial chain a member deals with day to day
-//                  (distributors, manufacturers) plus the member building
-//                  federation (FFB).
-//   - Lab_FFIE   · the quality & compliance bodies, plus a short blurb about
-//                  what the Lab_FFIE is.
-//   - Partners   · the institutional partners.
+//   - Écosystème · la chaîne commerciale avec laquelle un adhérent traite au
+//                  quotidien (distributeurs, fabricants) ainsi que la fédération
+//                  du bâtiment à laquelle il adhère (FFB).
+//   - Lab_FFIE   · les organismes de qualité et de conformité, accompagnés d'un
+//                  court texte présentant ce qu'est le Lab_FFIE.
+//   - Partenaires · les partenaires institutionnels.
 //
-// Each entry renders as a grouped-list row: a brand "logo" tile, the partner
-// name, a one-line descriptor, and a chevron that opens the partner's official
-// site in the in-app browser. The Partners screen is data-driven — to change
-// what's listed (or add a segment / section), edit this file, not the screen.
+// Chaque entrée s'affiche comme une ligne de liste groupée : une tuile « logo »
+// de marque, le nom du partenaire, un descriptif d'une ligne et un chevron qui
+// ouvre le site officiel du partenaire dans le navigateur in-app. L'écran
+// Partenaires est piloté par les données — pour changer ce qui est listé (ou
+// ajouter un segment / une section), modifiez ce fichier, pas l'écran.
 //
-// Logos: we don't ship the partners' real logo files yet, so the leading tile
-// is a colored chip carrying the brand wordmark, tinted with each brand's own
-// recognizable identity color (an explicit stand-in, not an invented logo).
-// Swap `PartnerLogo` for a bundled image source when real assets arrive.
+// Logos : nous n'embarquons pas encore les vrais fichiers de logo des
+// partenaires, donc la tuile de tête est une pastille colorée portant le
+// wordmark de la marque, teintée de la couleur d'identité reconnaissable de
+// chaque marque (un substitut explicite, pas un logo inventé). Remplacez
+// `PartnerLogo` par une source d'image embarquée quand les vrais visuels
+// arriveront.
 
 export type PartnerTabKey = "ecosystem" | "lab" | "partners";
 
-// A brand "logo" chip: a tinted tile with the brand wordmark. `outlined` adds a
-// hairline border so light/white chips (Sonepar, FFB) still read on a white card.
+// Une pastille « logo » de marque : une tuile teintée portant le wordmark de la
+// marque. `outlined` ajoute un filet de bordure pour que les pastilles claires/
+// blanches (Sonepar, FFB) restent lisibles sur une carte blanche.
 export type PartnerLogo = {
   bg: string;
   fg: string;
@@ -35,19 +40,20 @@ export type PartnerEntry = {
   name: string;
   descriptor: string;
   logo: PartnerLogo;
-  // Official website. Opened in the native in-app browser when the row is
-  // tapped. Omit for an entry with no site (the row then isn't tappable).
+  // Site officiel. Ouvert dans le navigateur in-app natif quand on appuie sur la
+  // ligne. À omettre pour une entrée sans site (la ligne n'est alors pas
+  // cliquable).
   url?: string;
 };
 
-// A titled run of rows inside a segment (e.g. "Distributors"). The title is the
-// uppercase grouped-table section header.
+// Une série de lignes titrée au sein d'un segment (ex. « Distributeurs »). Le
+// titre est l'en-tête de section de la table groupée, en majuscules.
 export type PartnerGroup = {
   header: string;
   entries: PartnerEntry[];
 };
 
-// Optional explanatory card rendered under a segment's groups (Lab_FFIE blurb).
+// Carte explicative optionnelle affichée sous les groupes d'un segment (texte Lab_FFIE).
 export type PartnerNote = {
   title: string;
   body: string;
@@ -63,60 +69,60 @@ export type PartnerTab = {
 export const PARTNER_TABS: PartnerTab[] = [
   {
     key: "ecosystem",
-    label: "Ecosystem",
+    label: "Écosystème",
     groups: [
       {
-        header: "Distributors",
+        header: "Distributeurs",
         entries: [
           {
             id: "rexel",
             name: "Rexel",
-            descriptor: "Order material & tracking delivery",
+            descriptor: "Commande de matériel et suivi de livraison",
             logo: { bg: "#15294E", fg: "#FFFFFF", text: "Rexel" },
             url: "https://www.rexel.fr/",
           },
           {
             id: "sonepar",
             name: "Sonepar",
-            descriptor: "Catalogue & Pro Solutions",
+            descriptor: "Catalogue et Solutions Pro",
             logo: { bg: "#FFFFFF", fg: "#0098D8", text: "Sonepar", outlined: true },
             url: "https://www.sonepar.fr/",
           },
         ],
       },
       {
-        header: "Manufacturers",
+        header: "Fabricants",
         entries: [
           {
             id: "schneider",
             name: "Schneider Electric",
-            descriptor: "Technical configurators & docs",
+            descriptor: "Configurateurs techniques et documentation",
             logo: { bg: "#161616", fg: "#3DCD58", text: "Schneider" },
             url: "https://www.se.com/fr/fr/",
           },
           {
             id: "legrand",
             name: "Legrand",
-            descriptor: "Products, Software & BIM",
+            descriptor: "Produits, logiciels et BIM",
             logo: { bg: "#E2001A", fg: "#FFFFFF", text: "Legrand" },
             url: "https://www.legrand.fr/",
           },
           {
             id: "hager",
             name: "Hager",
-            descriptor: "Electric & Home Automation Tables",
+            descriptor: "Tableaux électriques et domotique",
             logo: { bg: "#004A99", fg: "#FFFFFF", text: "hager" },
             url: "https://www.hager.fr/",
           },
         ],
       },
       {
-        header: "Member federation",
+        header: "Fédération d'adhésion",
         entries: [
           {
             id: "ffb",
             name: "FFB",
-            descriptor: "French Building Federation",
+            descriptor: "Fédération Française du Bâtiment",
             logo: { bg: "#FFFFFF", fg: "#14387F", text: "FFB", outlined: true },
             url: "https://www.ffbatiment.fr/",
           },
@@ -129,19 +135,19 @@ export const PARTNER_TABS: PartnerTab[] = [
     label: "Lab_FFIE",
     groups: [
       {
-        header: "Quality & compliance",
+        header: "Qualité et conformité",
         entries: [
           {
             id: "consuel",
             name: "CONSUEL",
-            descriptor: "Compliance of facilities",
+            descriptor: "Conformité des installations",
             logo: { bg: "#1B2A52", fg: "#FFFFFF", text: "Consuel" },
             url: "https://www.consuel.com/",
           },
           {
             id: "qualifelec",
             name: "QUALIFELEC",
-            descriptor: "Qualification electrical companies",
+            descriptor: "Qualification des entreprises d'électricité",
             logo: { bg: "#E2001A", fg: "#FFFFFF", text: "Qualifelec" },
             url: "https://www.qualifelec.fr/",
           },
@@ -149,35 +155,35 @@ export const PARTNER_TABS: PartnerTab[] = [
       },
     ],
     note: {
-      title: "About the Lab_FFIE",
-      body: "Space dedicated to innovations, experiments and collaborative projects carried out by the federation and its partners.",
+      title: "À propos du Lab_FFIE",
+      body: "Espace dédié aux innovations, expérimentations et projets collaboratifs menés par la fédération et ses partenaires.",
     },
   },
   {
     key: "partners",
-    label: "Partners",
+    label: "Partenaires",
     groups: [
       {
-        header: "Institutional partners",
+        header: "Partenaires institutionnels",
         entries: [
           {
             id: "afnor",
             name: "AFNOR",
-            descriptor: "French standardization",
+            descriptor: "Normalisation française",
             logo: { bg: "#2C2C2C", fg: "#FFFFFF", text: "Afnor" },
             url: "https://www.afnor.org/",
           },
           {
             id: "oppbtp",
             name: "OPPBTP",
-            descriptor: "Prevention & safety BTP",
+            descriptor: "Prévention et sécurité BTP",
             logo: { bg: "#0072BC", fg: "#FFFFFF", text: "OPP BTP" },
             url: "https://www.preventionbtp.fr/",
           },
           {
             id: "probtp",
             name: "PRO BTP",
-            descriptor: "Social protection of construction",
+            descriptor: "Protection sociale du bâtiment",
             logo: { bg: "#009640", fg: "#FFFFFF", text: "PRO BTP" },
             url: "https://www.probtp.com/",
           },

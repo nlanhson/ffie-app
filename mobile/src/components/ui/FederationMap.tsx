@@ -1,33 +1,34 @@
-// Federation map — a platform-split abstraction so each OS uses a *keyless*
-// native map, and the screen above never has to care which engine is underneath.
+// Carte des fédérations — une abstraction scindée par plateforme pour que chaque OS utilise
+// une carte native *sans clé*, et que l'écran au-dessus n'ait jamais à se soucier du moteur sous-jacent.
 //
-//   • iOS     → react-native-maps (Apple Maps). No API key required.
-//   • Android → MapLibre + OpenStreetMap raster tiles. No Google key required.
+//   • iOS     → react-native-maps (Apple Maps). Aucune clé d'API requise.
+//   • Android → MapLibre + tuiles raster OpenStreetMap. Aucune clé Google requise.
 //
-// Why the split: react-native-maps on Android is Google Maps under the hood,
-// which needs a *billed* Google Maps API key. MapLibre renders OSM tiles with no
-// key, so the Android map works on every build out of the box. iOS already gets
-// Apple Maps for free, so it keeps the module it always used.
+// Pourquoi la scission : react-native-maps sur Android, c'est Google Maps sous le capot,
+// qui nécessite une clé d'API Google Maps *facturée*. MapLibre rend les tuiles OSM sans
+// clé, donc la carte Android fonctionne sur chaque build d'emblée. iOS obtient déjà Apple
+// Maps gratuitement, il garde donc le module qu'il a toujours utilisé.
 //
-// IMPORTANT — why the native libraries are loaded with `require()` behind a
-// guard rather than a top-level `import`:
-//   MapLibre's components touch the `MLRNCameraModule` TurboModule the moment
-//   their JS evaluates. A static top-level import therefore *crashes the whole
-//   app at startup* ("[runtime not ready]: ... 'MLRNCameraModule' could not be
-//   found") on any binary that doesn't contain the native module — a stale
-//   install, Expo Go, or simply before a native rebuild. To make that
-//   impossible, we (a) only ever evaluate MapLibre on Android, (b) only when
-//   `TurboModuleRegistry.get` confirms the native module is actually linked into
-//   the running binary, and (c) fall back to a plain placeholder otherwise. The
-//   map still REQUIRES a native build to render — but a missing module now
-//   degrades to a placeholder instead of taking the entire app down.
+// IMPORTANT — pourquoi les bibliothèques natives sont chargées avec `require()` derrière une
+// garde plutôt qu'un `import` de haut niveau :
+//   Les composants de MapLibre touchent le TurboModule `MLRNCameraModule` dès que
+//   leur JS s'évalue. Un import statique de haut niveau *plante donc toute
+//   l'application au démarrage* (« [runtime not ready]: ... 'MLRNCameraModule' could not be
+//   found ») sur tout binaire qui ne contient pas le module natif — une installation
+//   périmée, Expo Go, ou simplement avant une reconstruction native. Pour rendre cela
+//   impossible, on (a) n'évalue MapLibre que sur Android, (b) uniquement quand
+//   `TurboModuleRegistry.get` confirme que le module natif est réellement lié dans le
+//   binaire en cours d'exécution, et (c) on se replie sinon sur un simple espace réservé. La
+//   carte EXIGE toujours un build natif pour s'afficher — mais un module manquant se
+//   dégrade désormais en espace réservé au lieu de mettre toute l'application à terre.
 //
-// Type-only imports below are erased at compile time, so they never trigger the
-// native module — only the `require()`s inside the factories do.
+// Les imports de type ci-dessous sont effacés à la compilation, ils ne déclenchent donc
+// jamais le module natif — seuls les `require()` à l'intérieur des fabriques le font.
 //
-// NOTE: OpenStreetMap's public tile server is fine for low-traffic apps but its
-// usage policy discourages heavy/bulk use. If usage grows, point OSM_STYLE at a
-// proper tile provider (MapTiler / Stadia free tier, or self-hosted).
+// NOTE : le serveur de tuiles public d'OpenStreetMap convient aux applications à faible
+// trafic mais sa politique d'utilisation décourage un usage lourd/en masse. Si l'usage
+// croît, pointer OSM_STYLE vers un vrai fournisseur de tuiles (offre gratuite MapTiler /
+// Stadia, ou auto-hébergé).
 
 import React from "react";
 import {
@@ -45,7 +46,7 @@ import type {
 } from "@maplibre/maplibre-react-native";
 import { themes } from "@tokens";
 
-/** The slice of react-native-maps' region shape the screen drives the map with. */
+/** La portion de la forme de région de react-native-maps avec laquelle l'écran pilote la carte. */
 export type MapRegion = {
   latitude: number;
   longitude: number;
@@ -61,7 +62,7 @@ export type FederationPin = {
   description: string;
 };
 
-/** Imperative handle — intentionally matches `MapView.animateToRegion`. */
+/** Handle impératif — correspond volontairement à `MapView.animateToRegion`. */
 export type FederationMapHandle = {
   animateToRegion: (region: MapRegion, duration: number) => void;
 };
@@ -78,8 +79,8 @@ type MapComponent = React.ForwardRefExoticComponent<
   Props & React.RefAttributes<FederationMapHandle>
 >;
 
-// ─── Fallback — shown only when no native map engine is available ───────────
-// (e.g. running JS against a binary that wasn't rebuilt with the map module).
+// ─── Repli — affiché uniquement quand aucun moteur de carte natif n'est disponible ───
+// (par ex. en exécutant le JS contre un binaire non reconstruit avec le module de carte).
 
 const FallbackMap = React.forwardRef<FederationMapHandle, Props>(
   function FallbackMap({ style, accessibilityLabel }, ref) {
@@ -105,7 +106,7 @@ const FallbackMap = React.forwardRef<FederationMapHandle, Props>(
   },
 );
 
-// ─── iOS: Apple Maps via react-native-maps ──────────────────────────────────
+// ─── iOS : Apple Maps via react-native-maps ─────────────────────────────────
 
 function createAppleMap(): MapComponent {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -148,10 +149,10 @@ function createAppleMap(): MapComponent {
   });
 }
 
-// ─── Android: MapLibre + OpenStreetMap raster tiles ─────────────────────────
+// ─── Android : MapLibre + tuiles raster OpenStreetMap ───────────────────────
 
-// Minimal MapLibre style: one OSM raster source + layer. Cast through unknown
-// because an inline literal widens "raster"/8 away from the spec's literals.
+// Style MapLibre minimal : une source + une couche raster OSM. Cast via unknown
+// car un littéral en ligne élargit « raster »/8 au-delà des littéraux de la spec.
 const OSM_STYLE = {
   version: 8,
   sources: {
@@ -166,9 +167,9 @@ const OSM_STYLE = {
   layers: [{ id: "osm", type: "raster", source: "osm" }],
 } as unknown as StyleSpecification;
 
-// react-native-maps thinks in (center, latitudeDelta); MapLibre thinks in
-// (center, zoom). At the equator a full 360° span is zoom 0, halving the span
-// each level — good enough for our country/region framing.
+// react-native-maps raisonne en (centre, latitudeDelta) ; MapLibre raisonne en
+// (centre, zoom). À l'équateur, une étendue complète de 360° est le zoom 0, l'étendue
+// étant divisée par deux à chaque niveau — suffisant pour notre cadrage pays/région.
 const regionToZoom = (region: MapRegion) =>
   Math.log2(360 / region.longitudeDelta);
 
@@ -191,7 +192,7 @@ function createMapLibreMap(): MapComponent {
         animateToRegion: (region, duration) => {
           const center: [number, number] = [region.longitude, region.latitude];
           const zoom = regionToZoom(region);
-          // duration 0 (reduced motion) → snap, otherwise ease like Apple Maps.
+          // durée 0 (mouvement réduit) → transition instantanée, sinon adoucissement comme Apple Maps.
           if (duration > 0) cameraRef.current?.easeTo({ center, zoom, duration });
           else cameraRef.current?.jumpTo({ center, zoom });
         },
@@ -199,8 +200,8 @@ function createMapLibreMap(): MapComponent {
       [],
     );
 
-    // One GeoJSON point per pin, rendered as GPU circles — scales to hundreds of
-    // pins without the per-marker native views a Marker-per-pin would create.
+    // Un point GeoJSON par épingle, rendu en cercles GPU — passe à l'échelle de centaines
+    // d'épingles sans les vues natives par marqueur qu'un Marker-par-épingle créerait.
     const data = React.useMemo<GeoJSON.FeatureCollection>(
       () => ({
         type: "FeatureCollection",
@@ -254,9 +255,9 @@ function createMapLibreMap(): MapComponent {
   });
 }
 
-// Choose the implementation once, defensively. MapLibre is only touched on
-// Android AND only when its TurboModule is actually present in the binary —
-// `.get()` (unlike `.getEnforcing()`) returns null instead of throwing.
+// Choisir l'implémentation une fois, défensivement. MapLibre n'est touché que sur
+// Android ET uniquement quand son TurboModule est réellement présent dans le binaire —
+// `.get()` (contrairement à `.getEnforcing()`) renvoie null au lieu de lever une exception.
 function pickImplementation(): MapComponent {
   if (Platform.OS === "ios") return createAppleMap();
   if (

@@ -1,21 +1,25 @@
-// Document detail — the member-only reader for a Library document.
+// Détail d'un document — le lecteur réservé aux adhérents pour un document de la
+// Bibliothèque.
 //
-// This is where the spec'd offline + share behaviours live:
-//   - FFIE-DOC-03 (member): download a document "to keep locally". Surfaced
-//     here as a "Saved for offline" toggle. Guests can browse the Library list
-//     (GUEST_TABS), but tapping a member-only doc routes them to the upsell
-//     (MemberOnlyPrompt) instead of here — so this detail is only reached for
-//     docs the viewer may open (every doc for members; the public doc for all).
-//   - PERSONAS #8: "Share-to-WhatsApp / share-to-Mail must be one tap from
-//     any document." → the share action in the nav bar.
+// C'est ici que vivent les comportements hors ligne + partage prévus au cahier des
+// charges :
+//   - FFIE-DOC-03 (adhérent) : télécharger un document « pour le garder en local ».
+//     Présenté ici comme un interrupteur « Enregistré hors ligne ». Les invités
+//     peuvent parcourir la liste de la Bibliothèque (GUEST_TABS), mais taper un
+//     document réservé aux adhérents les redirige vers l'incitation (MemberOnlyPrompt)
+//     plutôt qu'ici — donc ce détail n'est atteint que pour les documents que le
+//     visiteur peut ouvrir (tous les documents pour les adhérents ; le document public
+//     pour tous).
+//   - PERSONAS n° 8 : « Le partage vers WhatsApp / le partage vers Mail doit être à un
+//     tap de n'importe quel document. » → l'action de partage dans la barre de nav.
 //
-// "Open the document" opens a real PDF (doc.sourceUrl) in the in-app
-// PdfViewerScreen — an embedded react-native-webview reader with the app's own
-// chrome (FFIE-DOC-02: "opened in the application"). Documents that only have an
-// HTML detail page (no public file URL) open in the in-app browser instead — the
-// expo-web-browser PAGE_SHEET pattern used across the app, the right tool for a
-// web page. Once the backend syncs real member-doc file URLs they'll all route
-// through the embedded reader.
+// « Ouvrir le document » ouvre un vrai PDF (doc.sourceUrl) dans le PdfViewerScreen
+// intégré — un lecteur react-native-webview embarqué avec le chrome de l'app
+// (FFIE-DOC-02 : « ouvert dans l'application »). Les documents qui n'ont qu'une page de
+// détail HTML (pas d'URL de fichier publique) s'ouvrent plutôt dans le navigateur
+// intégré — le motif PAGE_SHEET d'expo-web-browser utilisé partout dans l'app, le bon
+// outil pour une page web. Une fois que le backend synchronisera les vraies URL de
+// fichiers réservés aux adhérents, tout passera par le lecteur intégré.
 
 import React, { useState } from "react";
 import { ChevronLeft, FileText, Share2, WifiOff } from "lucide-react-native";
@@ -41,27 +45,28 @@ export function DocDetailScreen({
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
 
-  // Mock offline state — seeded from the doc's saved flag. In production this
-  // reflects the real local-cache state and the toggle triggers the
-  // download / eviction.
+  // État hors ligne fictif — initialisé depuis l'indicateur saved du document. En
+  // production cela reflète le véritable état du cache local et l'interrupteur déclenche
+  // le téléchargement / la suppression.
   const [savedOffline, setSavedOffline] = useState(doc.saved);
-  // Real cover image — drops to the FileText placeholder if it can't be fetched.
+  // Vraie image de couverture — bascule sur le repli FileText si elle ne peut pas être
+  // récupérée.
   const [coverFailed, setCoverFailed] = useState(false);
-  // Embedded PDF reader open over the detail (real-PDF docs only).
+  // Lecteur PDF intégré ouvert par-dessus le détail (documents PDF réels uniquement).
   const [pdfOpen, setPdfOpen] = useState(false);
 
   const share = async () => {
     try {
       await Share.share({ title: doc.title, message: `${doc.title}\n\nvia FFIE` });
     } catch {
-      // dismissed — no-op
+      // annulé — aucune action
     }
   };
 
-  // A real PDF opens in the embedded reader; an HTML-only detail page opens in
-  // the in-app browser (the right tool for a web page).
+  // Un vrai PDF s'ouvre dans le lecteur intégré ; une page de détail uniquement HTML
+  // s'ouvre dans le navigateur intégré (le bon outil pour une page web).
   const hasPdf = !!doc.sourceUrl;
-  const openLabel = hasPdf ? "Open the document (PDF)" : "View on ffie.fr";
+  const openLabel = hasPdf ? "Ouvrir le document (PDF)" : "Voir sur ffie.fr";
   const openDocument = () => {
     if (hasPdf) {
       setPdfOpen(true);
@@ -70,11 +75,11 @@ export function DocDetailScreen({
     WebBrowser.openBrowserAsync(doc.detailUrl, {
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
     }).catch(() => {
-      // browser unavailable — no-op
+      // navigateur indisponible — aucune action
     });
   };
 
-  // Embedded reader replaces the detail while open (home-rolled nav pattern).
+  // Le lecteur intégré remplace le détail tant qu'il est ouvert (motif de nav maison).
   if (pdfOpen && doc.sourceUrl) {
     return (
       <PdfViewerScreen
@@ -91,7 +96,7 @@ export function DocDetailScreen({
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Slim nav bar: back + share */}
+      {/* Barre de nav fine : retour + partage */}
       <View
         style={{
           flexDirection: "row",
@@ -103,7 +108,7 @@ export function DocDetailScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to library"
+          accessibilityLabel="Retour à la bibliothèque"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -116,12 +121,12 @@ export function DocDetailScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Library</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Bibliothèque</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Share this document"
+          accessibilityLabel="Partager ce document"
           onPress={share}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -137,7 +142,7 @@ export function DocDetailScreen({
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {/* Preview — the real FFIE cover, with an honest placeholder fallback */}
+        {/* Aperçu — la vraie couverture FFIE, avec un repli honnête en cas d'absence */}
         <View style={{ paddingHorizontal: GUTTER, marginBottom: 20 }}>
           <View
             style={{
@@ -158,7 +163,7 @@ export function DocDetailScreen({
                 onError={() => setCoverFailed(true)}
                 resizeMode="contain"
                 style={StyleSheet.absoluteFill}
-                accessibilityLabel={`Cover: ${doc.title}`}
+                accessibilityLabel={`Couverture : ${doc.title}`}
               />
             ) : (
               <>
@@ -174,13 +179,13 @@ export function DocDetailScreen({
                 >
                   <FileText size={28} color="#FFFFFF" />
                 </View>
-                <Text style={{ color: t.text.muted, fontSize: 12 }}>FFIE document preview</Text>
+                <Text style={{ color: t.text.muted, fontSize: 12 }}>Aperçu du document FFIE</Text>
               </>
             )}
           </View>
         </View>
 
-        {/* Title + meta */}
+        {/* Titre + méta */}
         <View style={{ paddingHorizontal: GUTTER, marginBottom: 20 }}>
           <Text
             accessibilityRole="header"
@@ -201,17 +206,17 @@ export function DocDetailScreen({
           </View>
         </View>
 
-        {/* Offline — the FFIE-DOC-03 control (member only) */}
+        {/* Hors ligne — le contrôle FFIE-DOC-03 (adhérents uniquement) */}
         <InsetGroup
-          header="Offline"
-          footer="Saved documents open without an internet connection."
+          header="Hors ligne"
+          footer="Les documents enregistrés s'ouvrent sans connexion internet."
           themeName={themeName}
         >
           <InsetRow
             icon={WifiOff}
             iconBg={t.brand.accent}
-            title="Saved offline"
-            subtitle={savedOffline ? "Available offline" : "Download to keep on this device"}
+            title="Enregistré hors ligne"
+            subtitle={savedOffline ? "Disponible sans internet" : "Télécharger pour garder sur cet appareil"}
             themeName={themeName}
             isLast
             showChevron={false}
@@ -220,7 +225,7 @@ export function DocDetailScreen({
                 value={savedOffline}
                 onValueChange={setSavedOffline}
                 trackColor={{ true: t.brand.accent, false: t.border.default }}
-                accessibilityLabel="Save this document for offline access"
+                accessibilityLabel="Enregistrer ce document pour un accès hors ligne"
               />
             }
           />
@@ -238,7 +243,7 @@ export function DocDetailScreen({
           <InsetRow
             icon={Share2}
             iconBg="#5B6577"
-            title="Share"
+            title="Partager"
             themeName={themeName}
             isLast
             showChevron={false}
@@ -246,11 +251,11 @@ export function DocDetailScreen({
           />
         </InsetGroup>
 
-        {/* Details */}
-        <InsetGroup header="Details" themeName={themeName}>
+        {/* Détails */}
+        <InsetGroup header="Détails" themeName={themeName}>
           <InsetRow title="Format" value="PDF" themeName={themeName} showChevron={false} />
           <InsetRow
-            title="Family"
+            title="Famille"
             value={doc.family}
             themeName={themeName}
             showChevron={false}
@@ -258,7 +263,7 @@ export function DocDetailScreen({
           />
           {doc.categories.length > 0 ? (
             <InsetRow
-              title={doc.categories.length > 1 ? "Categories" : "Category"}
+              title={doc.categories.length > 1 ? "Catégories" : "Catégorie"}
               subtitle={doc.categories.join(" · ")}
               themeName={themeName}
               showChevron={false}

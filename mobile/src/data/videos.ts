@@ -1,18 +1,22 @@
-// Content for the Videos segment of the Trades tab — a clone of the FFIE
-// "Videos" page (ffie.fr/les-metiers-de-lelectricite/videos): an intro, four
-// themed video categories, and the federation's YouTube channel.
+// Contenu de la section Vidéos de l'onglet Métiers — un clone de la page
+// « Vidéos » de la FFIE (ffie.fr/les-metiers-de-lelectricite/videos) : une
+// intro, quatre catégories de vidéos thématiques et la chaîne YouTube de la
+// fédération.
 //
-// Each category links to its FFIE video page, where the YouTube films play; we
-// open it in the native in-app browser (page sheet), like the Partners links.
-// The known YouTube IDs are recorded too — they're the hook for a future
-// native in-app player (FFIE-VIDEO-01, captions required) without re-scraping.
+// Chaque catégorie renvoie vers sa page vidéo FFIE, où jouent les films
+// YouTube ; on l'ouvre dans le navigateur in-app natif (page sheet), comme les
+// liens Partenaires. Les identifiants YouTube connus sont aussi enregistrés —
+// ils servent d'amorce à un futur lecteur in-app natif (FFIE-VIDEO-01,
+// sous-titres requis) sans avoir à re-scraper.
 //
-// IMAGES are FFIE's real page assets (full ffie.fr URLs). `alt` is the contract
-// each image must meet; the seed is a placeholder fallback if a URL 404s.
+// Les IMAGES sont les vrais visuels de la page FFIE (URLs ffie.fr complètes).
+// `alt` est le contrat que chaque image doit respecter ; le seed est un repli
+// par défaut si une URL renvoie une 404.
 
-// One film within a category. `title`/`description` come from the FFIE video
-// page; they're filled in per-film as we build each category's screen. A film
-// without them still plays — it just shows no caption text.
+// Un film au sein d'une catégorie. `title`/`description` proviennent de la page
+// vidéo FFIE ; ils sont renseignés film par film à mesure qu'on construit
+// l'écran de chaque catégorie. Un film sans ces champs joue quand même — il
+// n'affiche simplement aucun texte de légende.
 export type VideoItem = {
   youtubeId: string;
   title?: string;
@@ -22,21 +26,21 @@ export type VideoItem = {
 export type VideoCategory = {
   id: string;
   title: string;
-  /** Real FFIE thumbnail (full URL); falls back to the seeded placeholder. */
+  /** Vraie vignette FFIE (URL complète) ; repli sur le placeholder seedé. */
   imageUrl: string;
   seed: string;
-  /** The FFIE video page for this theme (used for Share + as a fallback). */
+  /** La page vidéo FFIE de ce thème (utilisée pour le Partage + comme repli). */
   url: string;
-  /** The films in this category, in page order. */
+  /** Les films de cette catégorie, dans l'ordre de la page. */
   videos: VideoItem[];
   alt: string;
 };
 
-// A film's YouTube thumbnail URL (hqdefault always exists for a valid id).
+// L'URL de la vignette YouTube d'un film (hqdefault existe toujours pour un id valide).
 export const youtubeThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 
 export const VIDEOS_INTRO =
-  "Discover the electrical trades! The trades of the sector in pictures; check out our YouTube channel too to see everything.";
+  "Découvrez les métiers de l'électricité ! Les métiers de la filière en images ; consultez aussi notre chaîne YouTube pour tout voir.";
 
 export const YOUTUBE_CHANNEL_URL =
   "https://www.youtube.com/channel/UCtGdYMwterw35bjXRXm2zXw";
@@ -47,31 +51,31 @@ const IMG_BASE = "https://www.ffie.fr/fileadmin/user_upload";
 export const VIDEO_CATEGORIES: VideoCategory[] = [
   {
     id: "ai",
-    title: "Artificial intelligence",
+    title: "L'intelligence artificielle",
     imageUrl: `${IMG_BASE}/csm_Ai2310_c9c4d19e56.png`,
     seed: "ffie-video-ai",
     url: `${VIDEO_BASE}/lintelligence-artificielle`,
-    alt: "Abstract visual evoking artificial intelligence in the electrical field",
+    alt: "Visuel abstrait évoquant l'intelligence artificielle dans le domaine électrique",
     videos: [
       {
         youtubeId: "4jQJT9gOluo",
-        title: "Artificial intelligence serving electrical professionals",
+        title: "L'intelligence artificielle au service des professionnels de l'électricité",
         description:
-          "A motion design produced for the FFIE 2020 Meetings: an introduction to AI to signal the importance of its everyday presence and the inevitable evolution of the trades in the electrical sector.",
+          "Un motion design réalisé pour les Rencontres FFIE 2020 : une introduction à l'IA pour souligner l'importance de sa présence au quotidien et l'évolution inévitable des métiers de la filière électrique.",
       },
     ],
   },
   {
     id: "smart-city",
-    title: "The smart city",
+    title: "La smart city",
     imageUrl: `${IMG_BASE}/AdobeStock_181088041.jpeg`,
     seed: "ffie-video-smartcity",
     url: `${VIDEO_BASE}/la-smart-city`,
-    alt: "View of a connected city at night, crossed by glowing lines",
+    alt: "Vue d'une ville connectée la nuit, traversée de lignes lumineuses",
     videos: [
       {
         youtubeId: "0AD84IGyGaM",
-        title: "The Smart City, a reality within reach of electrical installers.",
+        title: "La Smart City, une réalité à la portée des installateurs électriciens.",
       },
     ],
   },
@@ -81,33 +85,33 @@ export const VIDEO_CATEGORIES: VideoCategory[] = [
     imageUrl: `${IMG_BASE}/AdobeStock_73920809.jpeg`,
     seed: "ffie-video-poe",
     url: `${VIDEO_BASE}/poe-power-over-ethernet`,
-    alt: "Ethernet network cables and connectors powering equipment",
+    alt: "Câbles et connecteurs réseau Ethernet alimentant des équipements",
     videos: [
       {
         youtubeId: "cU5UACxCd5o",
-        title: "Power over Ethernet, what if it changed your everyday work?",
+        title: "Le Power over Ethernet, et s'il changeait votre quotidien ?",
       },
     ],
   },
   {
     id: "temoignages",
-    title: "Testimonials",
+    title: "Témoignages",
     imageUrl: `${IMG_BASE}/AdobeStock_372453660_Preview.jpeg`,
     seed: "ffie-video-temoignages",
     url: `${VIDEO_BASE}/les-temoignages`,
-    alt: "Portraits of electrical professionals sharing their career paths",
+    alt: "Portraits de professionnels de l'électricité partageant leur parcours",
     videos: [
-      { youtubeId: "zKP5j27P1Ng", title: "Calasys employee testimonial — Florian Saliou" },
-      { youtubeId: "hyo0hi0OWbc", title: "CESI apprentice testimonial — Youssef Bendouche" },
-      { youtubeId: "Hk0Ah__hoig", title: "CFA Delépine apprentice testimonial — Bamba Losseny" },
-      { youtubeId: "kaURqyLrpno", title: "Company owner testimonial — Pascal Texereau" },
-      { youtubeId: "D3bFUpwXo4U", title: "Young Calasys employee testimonial — Travis Lombert" },
-      { youtubeId: "R63mJWdWAv0", title: "CESI apprentice testimonial — Naurine Crevel" },
-      { youtubeId: "LSCm4FSDPk0", title: "Company owner testimonial — Alexis Delepoulle" },
+      { youtubeId: "zKP5j27P1Ng", title: "Témoignage salarié Calasys — Florian Saliou" },
+      { youtubeId: "hyo0hi0OWbc", title: "Témoignage apprenti CESI — Youssef Bendouche" },
+      { youtubeId: "Hk0Ah__hoig", title: "Témoignage apprenti CFA Delépine — Bamba Losseny" },
+      { youtubeId: "kaURqyLrpno", title: "Témoignage chef d'entreprise — Pascal Texereau" },
+      { youtubeId: "D3bFUpwXo4U", title: "Témoignage jeune salarié Calasys — Travis Lombert" },
+      { youtubeId: "R63mJWdWAv0", title: "Témoignage apprentie CESI — Naurine Crevel" },
+      { youtubeId: "LSCm4FSDPk0", title: "Témoignage chef d'entreprise — Alexis Delepoulle" },
       {
         youtubeId: "u3vNh911ExM",
         title:
-          "Vox pop: what do students think about their future in the electrical trades?",
+          "Micro-trottoir : que pensent les élèves de leur avenir dans les métiers de l'électricité ?",
       },
     ],
   },

@@ -1,12 +1,12 @@
-// FFIE StatusPill — React Native port of
+// FFIE StatusPill — portage React Native de
 // /Users/du-mac/FFIE/design-system-preview/src/components/ui/StatusPill.tsx
-// Same public API. Reads identical tokens from the canonical tokens.ts.
+// Même API publique. Lit des tokens identiques depuis le tokens.ts canonique.
 //
-// Differences from web:
-//   - <View> / <Text> / <Pressable> instead of <span> / <button>
-//   - Animated.View for rotation (no CSS keyframes)
-//   - No SVG dichromacy filter (that was a preview-only audit tool)
-//   - No focus ring CSS — RN handles focus via Pressable + accessibility props
+// Différences avec le web :
+//   - <View> / <Text> / <Pressable> au lieu de <span> / <button>
+//   - Animated.View pour la rotation (pas de keyframes CSS)
+//   - Pas de filtre de dichromatie SVG (c'était un outil d'audit réservé à la préview)
+//   - Pas de CSS d'anneau de focus — RN gère le focus via Pressable + props d'accessibilité
 
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -61,16 +61,16 @@ const ICON_BY_NAME: Record<StatusName, LucideIcon> = {
   fresh: CheckCircle2,
 };
 
-// Canonical labels — same source of truth as web.
+// Libellés canoniques — même source de vérité que le web.
 const LABEL_BY_NAME: Record<StatusName, string> = {
-  success: "Success",
-  warning: "Warning",
-  danger: "Error",
+  success: "Réussi",
+  warning: "Avertissement",
+  danger: "Erreur",
   info: "Info",
-  offline: "Offline",
-  syncing: "Syncing…",
-  stale: "Outdated",
-  fresh: "Up to date",
+  offline: "Hors ligne",
+  syncing: "Synchronisation…",
+  stale: "Obsolète",
+  fresh: "À jour",
 };
 
 function resolveFeedbackName(name: StatusName): Exclude<StatusName, "fresh"> {
@@ -113,7 +113,7 @@ export const StatusPill = forwardRef<View, StatusPillProps>(function StatusPill(
   const isSyncing = name === "syncing";
   const displayLabel = label ?? LABEL_BY_NAME[name];
 
-  // Rotation animation for syncing icon — Animated, looped, motion.duration.loop.
+  // Animation de rotation pour l'icône de synchronisation — Animated, en boucle, motion.duration.loop.
   const spin = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (!isSyncing) return;
@@ -174,8 +174,8 @@ export const StatusPill = forwardRef<View, StatusPillProps>(function StatusPill(
   );
 
   if (isTappable) {
-    // Hit-slop pushes the 32pt visible target to a 44pt accessible target
-    // (WCAG 2.5.5) — same contract as the web Button + StatusPill specs.
+    // Le hit-slop pousse la cible visible de 32pt à une cible accessible de 44pt
+    // (WCAG 2.5.5) — même contrat que les specs web Button + StatusPill.
     return (
       <Pressable
         ref={ref as React.Ref<View>}

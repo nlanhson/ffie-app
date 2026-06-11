@@ -1,12 +1,12 @@
-// SavedBadge — the document library's two-state offline indicator.
+// SavedBadge — l'indicateur hors-ligne à deux états de la bibliothèque de documents.
 //
-// Scope: the visible surface of FFIE-DOC-03 ("download documents to keep
-// locally") + Principle 2 (offline-first). Deliberately just two states —
-// saved / not saved — not a richer cache taxonomy (out of scope).
+// Portée : la surface visible de FFIE-DOC-03 (« télécharger des documents pour les garder
+// en local ») + Principe 2 (hors-ligne d'abord). Volontairement seulement deux états —
+// enregistré / non enregistré — pas une taxonomie de cache plus riche (hors périmètre).
 //
-// Accessibility (Principle 4): status is carried by ICON + TEXT, never colour
-// alone. "Saved" reads as a check on a subtle green; "Not saved" as a download
-// glyph on a neutral surface.
+// Accessibilité (Principe 4) : le statut est porté par ICÔNE + TEXTE, jamais la couleur
+// seule. « Enregistré » se lit comme une coche sur un vert subtil ; « Non enregistré »
+// comme une icône de téléchargement sur une surface neutre.
 
 import React from "react";
 import { Text, View } from "react-native";
@@ -29,19 +29,19 @@ export function SavedBadge({
       ? { height: 24, icon: 14, font: 12, padX: 8 }
       : { height: 20, icon: 12, font: 11, padX: 6 };
 
-  // Saved → subtle success tint; Not saved → neutral surface. Both pair the
-  // colour with an icon + word so the meaning survives without colour.
+  // Enregistré → teinte de réussite subtile ; Non enregistré → surface neutre. Les deux
+  // associent la couleur à une icône + un mot pour que le sens survive sans la couleur.
   const palette = saved
     ? { bg: t.feedback.subtle.success.bg, fg: t.feedback.subtle.success.fg, border: t.feedback.subtle.success.border }
     : { bg: t.surface.subtle, fg: t.text.muted, border: t.border.default };
 
   const Icon = saved ? CheckCircle2 : ArrowDownToLine;
-  const label = saved ? "Saved" : "Not saved";
+  const label = saved ? "Enregistré" : "Non enregistré";
 
   return (
     <View
       accessibilityRole="text"
-      accessibilityLabel={saved ? "Saved offline" : "Not saved offline"}
+      accessibilityLabel={saved ? "Enregistré hors ligne" : "Non enregistré hors ligne"}
       style={{
         height: sz.height,
         paddingHorizontal: sz.padX,

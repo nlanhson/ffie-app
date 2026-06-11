@@ -1,11 +1,12 @@
-// FFBMembershipCard — the institutional "member of the FFB" card that closes
-// the Home "Public space" section. The FFIE is a member of the Fédération
-// Française du Bâtiment (FFB); this surfaces that affiliation and links out to
-// the FFB site (opened by the parent, via the in-app browser).
+// FFBMembershipCard — la carte institutionnelle « membre de la FFB » qui clôt la
+// section « Espace public » de l'Accueil. La FFIE est membre de la Fédération
+// Française du Bâtiment (FFB) ; cette carte met en avant cette affiliation et
+// renvoie vers le site de la FFB (ouvert par le parent, via le navigateur
+// intégré).
 //
-// Full-width white card: the FFB logo in a framed tile, the affiliation line,
-// and a muted descriptor. A faint external-link glyph signals it opens the
-// FFB website rather than an in-app screen.
+// Carte blanche pleine largeur : le logo FFB dans une tuile encadrée, la ligne
+// d'affiliation et un descripteur discret. Un léger glyphe de lien externe
+// signale qu'elle ouvre le site web de la FFB plutôt qu'un écran intégré.
 
 import React from "react";
 import { Pressable, Text, View, type ViewStyle } from "react-native";
@@ -31,8 +32,8 @@ export function FFBMembershipCard({
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel="The FFIE is a member of the FFB, French Building Federation"
-        accessibilityHint="Opens the FFB website"
+        accessibilityLabel="La FFIE est membre de la FFB, Fédération Française du Bâtiment"
+        accessibilityHint="Ouvre le site web de la FFB"
         style={({ pressed }): ViewStyle => ({
           flexDirection: "row",
           alignItems: "center",
@@ -47,9 +48,10 @@ export function FFBMembershipCard({
           ...(CARD_SHADOW as ViewStyle),
         })}
       >
-        {/* The FFB mark renders directly — the logo asset carries its own white
-            field, so on the white card it reads as the logo with no framing box
-            (a hairline tile here would create a card-within-card seam). */}
+        {/* La marque FFB s'affiche directement — l'asset du logo porte son propre
+            fond blanc, si bien que sur la carte blanche il se lit comme le logo
+            sans cadre (une tuile à filet créerait ici une jointure
+            carte-dans-la-carte). */}
         <FFBLogo size={36} />
 
         <View style={{ flex: 1 }}>
@@ -64,7 +66,7 @@ export function FFBMembershipCard({
               letterSpacing: -0.1,
             }}
           >
-            The FFIE is a member of the FFB
+            La FFIE est membre de la FFB
           </Text>
           <Text
             numberOfLines={1}
@@ -75,12 +77,13 @@ export function FFBMembershipCard({
               marginTop: 2,
             }}
           >
-            French Building Federation
+            Fédération Française du Bâtiment
           </Text>
         </View>
 
-        {/* External-link affordance — full strength (no dimming) so it reads
-            clearly as "opens the FFB site" rather than a faint decoration. */}
+        {/* Indice de lien externe — à pleine intensité (sans atténuation) pour
+            qu'il se lise clairement comme « ouvre le site FFB » plutôt que comme
+            une décoration ténue. */}
         <ExternalLink size={18} color={t.text.muted} strokeWidth={2.25} />
       </Pressable>
     </View>

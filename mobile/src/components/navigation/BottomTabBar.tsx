@@ -1,27 +1,27 @@
-// BottomTabBar — home-rolled tab strip.
+// BottomTabBar — bande d'onglets faite maison.
 //
-// Why home-rolled, not react-navigation:
-//   - v1 has 1 main screen per role; bottom tabs are pure chrome
-//   - keeps the design system as the single source of truth (tokens, theme)
-//   - swap-in to react-navigation later is a contract-preserving move:
-//     the same `tabs` + `activeKey` + `onSelect` shape lives behind
-//     a Navigator wrapper.
+// Pourquoi faite maison, pas react-navigation :
+//   - la v1 a 1 écran principal par rôle ; les onglets du bas sont du pur habillage
+//   - garde le design system comme source de vérité unique (tokens, thème)
+//   - basculer vers react-navigation plus tard préserve le contrat :
+//     la même forme `tabs` + `activeKey` + `onSelect` vit derrière
+//     une enveloppe Navigator.
 //
-// Contract:
-//   - tabs: ordered config; the bar renders in this order, equal widths
-//   - activeKey: drives active-state styling
-//   - onSelect: called with the tapped tab's key
+// Contrat :
+//   - tabs : config ordonnée ; la barre rend dans cet ordre, à largeurs égales
+//   - activeKey : pilote le style de l'état actif
+//   - onSelect : appelé avec la clé de l'onglet touché
 //
-// Motion (per emil-design-eng): no entry animation on tabs — they are
-// chrome, not content. The only animation is a 100ms scale-down on press
-// (handled by Pressable's pressed prop). No bouncy active indicator.
+// Mouvement (selon emil-design-eng) : pas d'animation d'entrée sur les onglets — ce sont
+// de l'habillage, pas du contenu. La seule animation est une réduction d'échelle de 100ms
+// à l'appui (gérée par la prop pressed de Pressable). Pas d'indicateur d'actif rebondissant.
 //
-// Accessibility:
-//   - role="tab" + selected state per WCAG
-//   - ≥48pt touch target (height: 56 + safe area inset)
-//   - label is read by VoiceOver even though it's also visible
-//   - active state communicated by color + weight (NOT color alone)
-//     so it survives color-blind users (per accessibility-decisions)
+// Accessibilité :
+//   - role="tab" + état sélectionné selon WCAG
+//   - cible tactile ≥48pt (hauteur : 56 + inset de safe area)
+//   - le libellé est lu par VoiceOver même s'il est aussi visible
+//   - état actif communiqué par couleur + graisse (PAS la couleur seule)
+//     pour qu'il survive aux utilisateurs daltoniens (selon accessibility-decisions)
 
 import React from "react";
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
@@ -46,8 +46,8 @@ export function BottomTabBar({
   const t = themes[themeName];
   const insets = useSafeAreaInsets();
 
-  // Extra breathing room above and below the tab row, on top of the device's
-  // bottom safe-area inset (home indicator).
+  // Espace de respiration supplémentaire au-dessus et en dessous de la rangée d'onglets,
+  // en plus de l'inset de safe area du bas de l'appareil (indicateur d'accueil).
   const VERTICAL_PADDING = 12;
 
   return (
@@ -93,9 +93,9 @@ function TabButton({
   const t = themes[themeName];
   const Icon = tab.icon;
 
-  // iOS tab bars communicate the active tab with the accent TINT. We add a
-  // weight difference on the label as the non-colour signal (WCAG 1.4.1) so
-  // colour-blind users still perceive selection without a Material-style dot.
+  // Les barres d'onglets iOS communiquent l'onglet actif avec la TEINTE d'accent. On ajoute
+  // une différence de graisse sur le libellé comme signal non chromatique (WCAG 1.4.1) pour
+  // que les utilisateurs daltoniens perçoivent encore la sélection sans un point façon Material.
   const fg = isActive ? t.brand.accent : t.text.muted;
   const weight: "600" | "400" = isActive ? "600" : "400";
 
@@ -132,11 +132,11 @@ function TabButton({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: "row",
-    borderTopWidth: StyleSheet.hairlineWidth, // iOS-thin separator
+    borderTopWidth: StyleSheet.hairlineWidth, // séparateur fin façon iOS
   },
   tab: {
     flex: 1,
-    minHeight: 50, // iOS tab-bar height; still ≥44 hit target with hitSlop
+    minHeight: 50, // hauteur de barre d'onglets iOS ; toujours une cible ≥44 avec le hitSlop
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 8,

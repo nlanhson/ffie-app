@@ -1,10 +1,11 @@
-// Application received — the pending-state confirmation.
+// Demande reçue — la confirmation de l'état en attente.
 //
-// Shown right after a successful submit, and again if the user reopens the
-// Join flow while an application is pending (the flow seeds straight to here).
-// Per the lead-capture model there is no instant access: this screen confirms
-// receipt, gives a reference to quote, and sets expectations for the
-// out-of-band FFIE review. No payment, no account yet — just "we have it".
+// Affichée juste après un envoi réussi, et de nouveau si l'utilisateur rouvre le
+// flux Rejoindre alors qu'une demande est en attente (le flux démarre directement
+// ici). Selon le modèle de captation de leads, il n'y a pas d'accès immédiat :
+// cet écran confirme la réception, donne une référence à citer, et fixe les
+// attentes pour l'examen hors ligne par la FFIE. Pas de paiement, pas encore de
+// compte — juste « nous l'avons bien reçue ».
 
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -16,9 +17,9 @@ import { ralewayFamily, displayFamily } from "@/theme/fonts";
 import type { MembershipApplication } from "@/auth/membershipContext";
 
 const STEPS = [
-  "FFIE reviews your application — usually within a few business days.",
-  "We confirm your annual dues based on the size of your company.",
-  "You receive an email to activate your member account.",
+  "La FFIE examine votre demande — généralement sous quelques jours ouvrés.",
+  "Nous confirmons votre cotisation annuelle selon l'effectif de votre entreprise.",
+  "Vous recevez un e-mail pour activer votre compte adhérent.",
 ];
 
 export function ApplicationSubmittedScreen({
@@ -40,7 +41,7 @@ export function ApplicationSubmittedScreen({
       >
         <View style={{ flex: 0.12 }} />
 
-        {/* Hero — clock, not a checkmark: the state is "pending", not "done". */}
+        {/* Hero — une horloge, pas une coche : l'état est « en attente », pas « terminé ». */}
         <View style={{ alignItems: "center" }}>
           <View
             style={{
@@ -68,7 +69,7 @@ export function ApplicationSubmittedScreen({
               lineHeight: 30,
             }}
           >
-            Application submitted
+            Demande envoyée
           </Text>
           <Text
             style={{
@@ -80,11 +81,11 @@ export function ApplicationSubmittedScreen({
               maxWidth: 320,
             }}
           >
-            Your application is awaiting review by FFIE. There's nothing else you need to do for now.
+            Votre demande est en attente d'examen par la FFIE. Vous n'avez rien d'autre à faire pour le moment.
           </Text>
         </View>
 
-        {/* Reference card */}
+        {/* Carte de référence */}
         <View
           style={{
             marginTop: 28,
@@ -95,19 +96,19 @@ export function ApplicationSubmittedScreen({
             borderColor: t.border.subtle,
           }}
         >
-          <DetailRow label="Reference" value={application.reference} themeName={themeName} />
+          <DetailRow label="Référence" value={application.reference} themeName={themeName} />
           <View style={{ height: 1, backgroundColor: t.border.subtle, marginVertical: 12 }} />
-          <DetailRow label="Submitted on" value={application.submittedAt} themeName={themeName} />
+          <DetailRow label="Envoyée le" value={application.submittedAt} themeName={themeName} />
           <View style={{ height: 1, backgroundColor: t.border.subtle, marginVertical: 12 }} />
           <View style={{ flexDirection: "row", alignItems: "center", columnGap: 8 }}>
             <Mail size={16} color={t.text.muted} />
             <Text style={{ flex: 1, fontSize: 13, color: t.text.muted, lineHeight: 18 }}>
-              We'll send updates to {application.email}
+              Nous enverrons les mises à jour à {application.email}
             </Text>
           </View>
         </View>
 
-        {/* What happens next */}
+        {/* Et ensuite */}
         <Text
           style={{
             fontSize: 12,
@@ -120,7 +121,7 @@ export function ApplicationSubmittedScreen({
             marginBottom: 14,
           }}
         >
-          What's next
+          Et ensuite
         </Text>
         <View style={{ rowGap: 14 }}>
           {STEPS.map((step, i) => (
@@ -159,9 +160,9 @@ export function ApplicationSubmittedScreen({
           size="lg"
           fullWidth
           onPress={onDone}
-          accessibilityLabel="Done"
+          accessibilityLabel="Terminé"
         >
-          Done
+          Terminé
         </Button>
       </ScrollView>
     </SafeAreaView>

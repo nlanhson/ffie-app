@@ -1,8 +1,8 @@
-// BecomeMemberSkeleton — loading placeholder for BecomeMemberScreen (Join
-// FFIE). Mirrors it: the 34pt title + subtitle, the search field, the grouped
-// directory card of federation rows (area + name + chevron, hairline-separated),
-// the "showing X of Y" caption, and the eligibility note. Uses the screen's own
-// top-padding constant so the title lands in the same place.
+// BecomeMemberSkeleton — espace réservé de chargement pour BecomeMemberScreen (Adhérer à
+// la FFIE). Le reflète : le titre 34pt + sous-titre, le champ de recherche, la carte
+// d'annuaire groupée de lignes de fédération (zone + nom + chevron, séparées par une fine
+// ligne), la légende « affichage de X sur Y », et la note d'éligibilité. Utilise la propre
+// constante de marge supérieure de l'écran pour que le titre atterrisse au même endroit.
 
 import React from "react";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
@@ -14,8 +14,8 @@ import { SkeletonBlock, SkeletonGroup, SkeletonTextLine } from "@/components/ui/
 const GUTTER = semantics.spacing.gutter.mobile;
 const PAGE_TOP_PADDING = Platform.OS === "android" ? 24 : 12;
 
-// One federation row: area line + federation name line + trailing chevron,
-// hairline inset to the gutter (matching FederationRow — no leading visual).
+// Une ligne de fédération : ligne de zone + ligne de nom de fédération + chevron de fin,
+// fine ligne décalée vers la gouttière (correspond à FederationRow — pas de visuel en tête).
 function FederationRowSkeleton({
   isLast,
   themeName,
@@ -63,7 +63,7 @@ export function BecomeMemberSkeleton({ themeName = "light" }: { themeName?: Them
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 32 }} scrollEnabled={false}>
-          {/* Title + subtitle */}
+          {/* Titre + sous-titre */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: PAGE_TOP_PADDING, paddingBottom: 6 }}>
             <SkeletonTextLine width="55%" height={32} themeName={themeName} />
             <View style={{ marginTop: 10 }}>
@@ -71,12 +71,12 @@ export function BecomeMemberSkeleton({ themeName = "light" }: { themeName?: Them
             </View>
           </View>
 
-          {/* Search field */}
+          {/* Champ de recherche */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 16, marginBottom: 12 }}>
             <SkeletonBlock width="100%" height={38} radius={10} themeName={themeName} />
           </View>
 
-          {/* Directory card */}
+          {/* Carte d'annuaire */}
           <View style={{ marginBottom: 28 }}>
             <View
               style={{
@@ -93,18 +93,18 @@ export function BecomeMemberSkeleton({ themeName = "light" }: { themeName?: Them
               ))}
             </View>
 
-            {/* "Show more" button */}
+            {/* Bouton « Voir plus » */}
             <View style={{ marginTop: 12, marginHorizontal: GUTTER }}>
               <SkeletonBlock width="100%" height={44} radius={primitives.radii.md} themeName={themeName} />
             </View>
 
-            {/* "Showing X of Y" caption */}
+            {/* Légende « Affichage de X sur Y » */}
             <View style={{ marginTop: 10, marginHorizontal: GUTTER + 4 }}>
               <SkeletonTextLine width="60%" height={12} themeName={themeName} />
             </View>
           </View>
 
-          {/* Eligibility note */}
+          {/* Note d'éligibilité */}
           <View style={{ paddingHorizontal: GUTTER }}>
             <SkeletonBlock width="100%" height={92} radius={primitives.radii.md} themeName={themeName} />
           </View>

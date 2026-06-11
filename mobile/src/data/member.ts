@@ -1,27 +1,30 @@
-// Current (signed-in) member — v1 mock identity.
+// Adhérent actuel (connecté) — identité fictive de la v1.
 //
-// There is no auth/profile backend in v1 (see CLAUDE.md → "Auth and
-// membership are mocked UI"). The member persona is Julien Marchand — the
-// same identity ProfileScreen renders — so the app reads coherently wherever
-// the signed-in member is shown (Home hero header, Profile card, …).
+// Il n'y a pas de backend d'authentification/profil en v1 (voir CLAUDE.md →
+// « Auth and membership are mocked UI »). Le persona adhérent est Julien
+// Marchand — la même identité que celle affichée par ProfileScreen — afin que
+// l'app reste cohérente partout où l'adhérent connecté apparaît (en-tête hero
+// de l'accueil, carte du profil, …).
 //
-// The membership number is placeholder data, NOT a real FFIE record (the
-// "no fabricated real-world data" rule covers federation facts like dues and
-// contact details, not the mock account used to preview the member UI). When
-// a real session lands, replace this module with data from the profile API.
+// Le numéro d'adhérent est une donnée fictive, PAS un véritable enregistrement
+// FFIE (la règle « no fabricated real-world data » couvre les faits liés à la
+// fédération comme les cotisations et les coordonnées, pas le compte fictif
+// servant à prévisualiser l'interface adhérent). Quand une vraie session
+// arrivera, remplacer ce module par les données de l'API de profil.
 //
-// The same rule governs the company block + qualifications below: the company
-// name and SIRET are mock account data (the SIRET is intentionally masked,
-// like a "details coming" placeholder), and QUALIFELEC / CONSUEL are the real
-// French electrical-trade certification *types* a member would hold — their
-// "valid" state here is mock account state, not a fabricated federation fact.
+// La même règle régit le bloc entreprise + les qualifications ci-dessous : le
+// nom de l'entreprise et le SIRET sont des données de compte fictives (le SIRET
+// est volontairement masqué, comme un espace réservé « détails à venir »), et
+// QUALIFELEC / CONSUEL sont les véritables *types* de certification des métiers
+// de l'électricité qu'un adhérent pourrait détenir — leur état « valide » ici
+// est un état de compte fictif, pas un fait fabriqué sur la fédération.
 
 export type MemberStatus = "active" | "pending" | "lapsed";
 
-/** A trade certification the member holds (Profile → Qualifications). */
+/** Une certification métier détenue par l'adhérent (Profil → Qualifications). */
 export type MemberQualification = {
   label: string;
-  /** Whether the certification is currently valid (mock account state). */
+  /** Indique si la certification est actuellement valide (état de compte fictif). */
   valid: boolean;
 };
 
@@ -29,25 +32,25 @@ export type MemberProfile = {
   firstName: string;
   lastName: string;
   fullName: string;
-  /** Monogram for avatars when no photo is set. */
+  /** Monogramme pour les avatars lorsqu'aucune photo n'est définie. */
   initials: string;
-  /** Federation membership number, shown as "No. {memberNo}". */
+  /** Numéro d'adhérent à la fédération, affiché sous la forme « N° {memberNo} ». */
   memberNo: string;
   status: MemberStatus;
-  /** Human label for the status pill, e.g. "Active member". */
+  /** Libellé lisible de la pastille de statut, p. ex. « Adhérent actif ». */
   statusLabel: string;
-  /** Job title within the member company (Profile hero). */
+  /** Intitulé de poste au sein de l'entreprise adhérente (hero du profil). */
   jobTitle: string;
-  /** Federation region the member belongs to. */
+  /** Région de la fédération à laquelle l'adhérent appartient. */
   region: string;
-  /** The member's company — mock account data (see header note). */
+  /** L'entreprise de l'adhérent — données de compte fictives (voir la note d'en-tête). */
   company: {
-    /** Registered company name (raison sociale). */
+    /** Raison sociale de l'entreprise. */
     name: string;
-    /** SIRET identifier — masked placeholder until a real session lands. */
+    /** Identifiant SIRET — espace réservé masqué jusqu'à l'arrivée d'une vraie session. */
     siret: string;
   };
-  /** Trade certifications shown in the Profile → Qualifications group. */
+  /** Certifications métier affichées dans le groupe Profil → Qualifications. */
   qualifications: MemberQualification[];
 };
 
@@ -58,8 +61,8 @@ export const currentMember: MemberProfile = {
   initials: "JM",
   memberNo: "04521",
   status: "active",
-  statusLabel: "Active member",
-  jobTitle: "Technical Manager",
+  statusLabel: "Adhérent actif",
+  jobTitle: "Responsable technique",
   region: "Île-de-France",
   company: {
     name: "ELEC PRO SAS",
@@ -67,6 +70,6 @@ export const currentMember: MemberProfile = {
   },
   qualifications: [
     { label: "QUALIFELEC", valid: true },
-    { label: "CONSUEL approved", valid: true },
+    { label: "Agréé CONSUEL", valid: true },
   ],
 };

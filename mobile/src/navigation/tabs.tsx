@@ -1,31 +1,31 @@
-// Tab configuration tables.
+// Tables de configuration des onglets.
 //
-// Bottom-bar order (both roles): Home · News · Docs · Partners · Trades.
-// ("Docs" is the bottom-bar label for the `library` key — the screen itself is
-// still the Library, DocLibraryScreen; only the tab label was shortened.)
+// Ordre de la barre du bas (les deux rôles) : Accueil · Actualités · Documents · Partenaires · Métiers.
+// (« Documents » est le libellé de la barre du bas pour la clé `library` — l'écran
+// reste la Bibliothèque, DocLibraryScreen ; seul le libellé de l'onglet a été raccourci.)
 //
-// Member tabs (Member — Julien):
-//   Home     · the landing surface — first tab, opens here on launch
-//   News     · sector + federation news
-//   Docs     · load-bearing — daily worksite lookups (Library, key "library")
-//   Partners · the federation's partner directory (PartnersScreen). The
-//              "Mission & values" / "Organisation" segments are hidden in
-//              Phase 1 — see SHOW_FEDERATION_SEGMENTS in PartnersScreen.tsx.
-//   Trades   · careers, training, external resources (Trades)
+// Onglets adhérent (Adhérent — Julien) :
+//   Accueil      · la surface d'atterrissage — premier onglet, ouverture ici au lancement
+//   Actualités   · actualités du secteur + de la fédération
+//   Documents    · pilier — consultations quotidiennes sur chantier (Bibliothèque, clé « library »)
+//   Partenaires  · l'annuaire des partenaires de la fédération (PartnersScreen). Les
+//                  segments « Mission & valeurs » / « Organisation » sont masqués en
+//                  Phase 1 — voir SHOW_FEDERATION_SEGMENTS dans PartnersScreen.tsx.
+//   Métiers      · carrières, formations, ressources externes (Métiers)
 //
-// Guest tabs (Non-member company + General public):
-//   Home · News · Docs · Partners · Trades
+// Onglets invité (Entreprise non adhérente + Grand public) :
+//   Accueil · Actualités · Documents · Partenaires · Métiers
 //
-// Home / News / Library / Partners / Trades are shared across both roles. Two
-// things live OUTSIDE the bottom bar as top-right floating avatars
-// (AdhererButton):
-//   - Guests:  "Join" → federation directory (BecomeMemberScreen) modal.
-//   - Members: Profile → the account/settings page (the "profile" tab key is
-//     kept so the avatar can route to it; it just has no bottom-bar entry).
+// Accueil / Actualités / Bibliothèque / Partenaires / Métiers sont partagés entre les
+// deux rôles. Deux éléments vivent EN DEHORS de la barre du bas sous forme d'avatars
+// flottants en haut à droite (AdhererButton) :
+//   - Invités  : « Adhérer » → annuaire des fédérations (BecomeMemberScreen) en modale.
+//   - Adhérents : Profil → la page de compte/réglages (la clé d'onglet « profile » est
+//     conservée pour que l'avatar puisse y router ; elle n'a simplement pas d'entrée dans la barre du bas).
 //
-// Note: the "partners" tab key routes to PartnersScreen; its label reads
-// "Partners", matching the screen's large title and its single visible
-// segment now that the federation segments are hidden.
+// Note : la clé d'onglet « partners » route vers PartnersScreen ; son libellé affiche
+// « Partenaires », ce qui correspond au grand titre de l'écran et à son unique segment
+// visible maintenant que les segments de fédération sont masqués.
 
 import type { ComponentType } from "react";
 import { BookOpen, Compass, Home, Newspaper, Handshake } from "lucide-react-native";
@@ -45,30 +45,30 @@ export type TabConfig<K extends TabKey = TabKey> = {
 };
 
 export const MEMBER_TABS: ReadonlyArray<TabConfig<MemberTabKey>> = [
-  { key: "home", label: "Home", icon: Home, access: "public" },
-  { key: "news", label: "News", icon: Newspaper, access: "public" },
-  { key: "library", label: "Docs", icon: BookOpen, access: "member-only" },
-  { key: "partners", label: "Partners", icon: Handshake, access: "public" },
-  // "discover" tab — labelled "Tools" (the Trades segment is temporarily
-  // removed; it now surfaces Videos + Calculators only). See DiscoverScreen.
-  { key: "discover", label: "Tools", icon: Compass, access: "public" },
-  // Profile is intentionally NOT a bottom-tab — it's reached via the top-right
-  // avatar (the "profile" key still exists for that route).
+  { key: "home", label: "Accueil", icon: Home, access: "public" },
+  { key: "news", label: "Actualités", icon: Newspaper, access: "public" },
+  { key: "library", label: "Documents", icon: BookOpen, access: "member-only" },
+  { key: "partners", label: "Partenaires", icon: Handshake, access: "public" },
+  // Onglet « discover » — libellé « Outils » (le segment Métiers est temporairement
+  // retiré ; il ne propose plus que Vidéos + Calculateurs). Voir DiscoverScreen.
+  { key: "discover", label: "Outils", icon: Compass, access: "public" },
+  // Le Profil n'est volontairement PAS un onglet du bas — on y accède via l'avatar
+  // en haut à droite (la clé « profile » existe toujours pour cette route).
 ];
 
 export const GUEST_TABS: ReadonlyArray<TabConfig<GuestTabKey>> = [
-  { key: "home", label: "Home", icon: Home, access: "public" },
-  { key: "news", label: "News", icon: Newspaper, access: "public" },
-  // Library + Trades are now part of the guest experience too. Library is
-  // marked public here because the guest shell hosts it directly (no
-  // RequireRole gate) — non-members browse the same directory.
-  { key: "library", label: "Docs", icon: BookOpen, access: "public" },
-  { key: "partners", label: "Partners", icon: Handshake, access: "public" },
-  { key: "discover", label: "Tools", icon: Compass, access: "public" },
+  { key: "home", label: "Accueil", icon: Home, access: "public" },
+  { key: "news", label: "Actualités", icon: Newspaper, access: "public" },
+  // La Bibliothèque + les Métiers font désormais aussi partie de l'expérience invité. La
+  // Bibliothèque est marquée publique ici parce que la coquille invité l'héberge
+  // directement (pas de barrière RequireRole) — les non-adhérents parcourent le même annuaire.
+  { key: "library", label: "Documents", icon: BookOpen, access: "public" },
+  { key: "partners", label: "Partenaires", icon: Handshake, access: "public" },
+  { key: "discover", label: "Outils", icon: Compass, access: "public" },
 ];
 
-// Avoid re-typing in renderers that don't care which role's nav they show.
+// Évite de re-typer dans les rendus qui se moquent de la navigation de quel rôle ils affichent.
 export type AnyTabConfig = TabConfig<MemberTabKey> | TabConfig<GuestTabKey>;
 
-// Re-exporting LucideIcon so consumers don't need a second import.
+// Réexport de LucideIcon pour que les consommateurs n'aient pas besoin d'un second import.
 export type { ComponentType, LucideIcon };

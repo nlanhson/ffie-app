@@ -1,17 +1,19 @@
-// Partners tab — the federation's partner showcase, organized into three
-// segments under the persistent app header: Ecosystem, Lab_FFIE and Partners.
-// Each segment is a set of grouped iOS-HIG lists (e.g. Distributors,
-// Manufacturers) of brand rows: a logo chip, the partner name, a one-line
-// descriptor, and a chevron that opens the partner's official site in the
-// native in-app browser (expo-web-browser → SFSafariViewController on iOS /
-// Chrome Custom Tabs on Android, presented as a page sheet). The Lab_FFIE
-// segment closes with an explanatory "About the Lab_FFIE" card.
+// Onglet Partenaires — la vitrine des partenaires de la fédération, organisée en
+// trois segments sous l'en-tête persistant de l'app : Écosystème, Lab_FFIE et
+// Partenaires. Chaque segment est un ensemble de listes groupées iOS-HIG (p. ex.
+// Distributeurs, Fabricants) de lignes de marque : une puce de logo, le nom du
+// partenaire, un descripteur d'une ligne, et un chevron qui ouvre le site
+// officiel du partenaire dans le navigateur intégré natif (expo-web-browser →
+// SFSafariViewController sur iOS / Chrome Custom Tabs sur Android, présenté en
+// page sheet). Le segment Lab_FFIE se termine par une carte explicative « À
+// propos du Lab_FFIE ».
 //
-// The screen is data-driven: the segments, their sections, and every row come
-// from PARTNER_TABS in data/partners.ts. To change what's listed (or add a
-// segment / section), edit that data file, not this screen. The matching
-// loading skeleton lives in components/skeletons/PartnersSkeleton.tsx — keep
-// the two in step when the layout changes.
+// L'écran est piloté par les données : les segments, leurs sections et chaque
+// ligne proviennent de PARTNER_TABS dans data/partners.ts. Pour changer ce qui
+// est listé (ou ajouter un segment / une section), éditez ce fichier de données,
+// pas cet écran. Le squelette de chargement correspondant vit dans
+// components/skeletons/PartnersSkeleton.tsx — gardez les deux en phase quand la
+// disposition change.
 
 import React, { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -30,22 +32,23 @@ import { ralewayFamily } from "@/theme/fonts";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { GUTTER, InsetGroup, useGroupedColors } from "@/components/ui/ios";
 
-// Leading brand-logo chip size. A touch larger than the old monogram (38) so
-// the wordmark reads, matching the mockup's logo tiles.
+// Taille de la puce de logo de marque en tête. Un peu plus grande que l'ancien
+// monogramme (38) pour que le logotype se lise, comme les tuiles de logo de la maquette.
 const TILE = 46;
 
-// Segments for the control, in page order, derived from the data.
+// Segments pour le contrôle, dans l'ordre de la page, dérivés des données.
 const SEGMENT_OPTIONS: { key: PartnerTabKey; label: string }[] = PARTNER_TABS.map(
   (t) => ({ key: t.key, label: t.label }),
 );
 
-// PartnerLogoTile — stands in for a partner's real logo: a tinted tile carrying
-// the brand wordmark, scaled to fit. A hairline border keeps the chip readable
-// against the card: on the light theme it's drawn for light/white chips
-// (logo.outlined) that would otherwise melt into the white card; on the dark /
-// sunlight themes it's drawn for every chip (a light/strong edge) so dark chips
-// separate from the dark or bordered card. Decorative: the row's accessibility
-// label already names the partner, so the tile is hidden from assistive tech.
+// PartnerLogoTile — tient lieu du vrai logo d'un partenaire : une tuile teintée
+// portant le logotype de la marque, mis à l'échelle pour s'ajuster. Une bordure
+// fine garde la puce lisible sur la carte : sur le thème clair, elle est tracée
+// pour les puces claires/blanches (logo.outlined) qui se fondraient sinon dans la
+// carte blanche ; sur les thèmes sombre / sunlight, elle est tracée pour chaque
+// puce (un bord clair/fort) pour que les puces sombres se détachent de la carte
+// sombre ou bordée. Décoratif : le libellé d'accessibilité de la ligne nomme déjà
+// le partenaire, la tuile est donc masquée aux technologies d'assistance.
 function PartnerLogoTile({ logo, themeName }: { logo: PartnerLogo; themeName: ThemeName }) {
   const borderColor =
     themeName === "dark"
@@ -91,10 +94,11 @@ function PartnerLogoTile({ logo, themeName }: { logo: PartnerLogo; themeName: Th
   );
 }
 
-// PartnerRow — one grouped-list row: logo chip + bold name + muted descriptor +
-// chevron. The hairline separator is inset past the chip so it aligns under the
-// text (the iOS grouped-list detail). Tapping opens the partner's site; rows
-// without a URL render the same but aren't tappable (no chevron).
+// PartnerRow — une ligne de liste groupée : puce de logo + nom en gras +
+// descripteur atténué + chevron. Le séparateur fin est décalé au-delà de la puce
+// pour s'aligner sous le texte (le détail des listes groupées iOS). Toucher ouvre
+// le site du partenaire ; les lignes sans URL se rendent de la même façon mais ne
+// sont pas touchables (pas de chevron).
 function PartnerRow({
   entry,
   themeName,
@@ -115,11 +119,11 @@ function PartnerRow({
     <Wrapper
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={`${entry.name}. ${entry.descriptor}`}
-      accessibilityHint={onPress ? "Opens the partner's website in the app" : undefined}
+      accessibilityHint={onPress ? "Ouvre le site web du partenaire dans l'app" : undefined}
       onPress={onPress}
       style={({ pressed }: { pressed: boolean }) => ({
-        // Pressed tint steps a notch darker than the grey card so feedback
-        // survives on grey-on-white elements.
+        // La teinte pressée descend d'un cran plus foncé que la carte grise pour
+        // que le retour survive sur les éléments gris-sur-blanc.
         backgroundColor: pressed && onPress ? t.border.subtle : "transparent",
       })}
     >
@@ -129,7 +133,7 @@ function PartnerRow({
           alignItems: "center",
           columnGap: 12,
           paddingHorizontal: GUTTER,
-          minHeight: 64, // taller than the 48 floor — the chip + two lines need room
+          minHeight: 64, // plus haut que le plancher de 48 — la puce + deux lignes ont besoin de place
           paddingVertical: 12,
         }}
       >
@@ -174,9 +178,10 @@ function PartnerRow({
   );
 }
 
-// AboutCard — the explanatory note under a segment's groups (Lab_FFIE). A
-// teal-tinted, brand-aligned info card (subtle.syncing tokens) so it reads as
-// "informational", distinct from the tappable partner rows above it.
+// AboutCard — la note explicative sous les groupes d'un segment (Lab_FFIE). Une
+// carte d'information teintée de teal, alignée sur la marque (tokens
+// subtle.syncing) pour qu'elle se lise comme « informative », distincte des
+// lignes de partenaires touchables au-dessus.
 function AboutCard({ note, themeName }: { note: PartnerNote; themeName: ThemeName }) {
   const t = themes[themeName];
   const tint = t.feedback.subtle.syncing;
@@ -221,8 +226,8 @@ export function PartnersScreen({ themeName = "light" }: { themeName?: ThemeName 
 
   const activeTab = PARTNER_TABS.find((tt) => tt.key === tab) ?? PARTNER_TABS[0];
 
-  // Open a partner's site in the native in-app browser (page sheet, slides up
-  // from the bottom). Dismissing it returns here automatically.
+  // Ouvre le site d'un partenaire dans le navigateur intégré natif (page sheet,
+  // glisse vers le haut depuis le bas). Sa fermeture revient ici automatiquement.
   const openPartner = (entry: PartnerEntry) => {
     if (!entry.url) return;
     WebBrowser.openBrowserAsync(entry.url, {
@@ -233,14 +238,14 @@ export function PartnersScreen({ themeName = "light" }: { themeName?: ThemeName 
     }).catch(() => {});
   };
 
-  // Switching segment starts fresh at the top.
+  // Changer de segment repart en haut.
   const onChangeTab = (key: PartnerTabKey) => {
     setTab(key);
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   };
 
   return (
-    // Page title lives in the shared AppHeader (shell); content renders beneath.
+    // Le titre de page vit dans l'AppHeader partagé (shell) ; le contenu se rend en dessous.
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <ScrollView
         ref={scrollRef}
@@ -248,11 +253,12 @@ export function PartnersScreen({ themeName = "light" }: { themeName?: ThemeName 
         contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Segment toggle — Ecosystem / Lab_FFIE / Partners. */}
+        {/* Sélecteur de segment — Écosystème / Lab_FFIE / Partenaires. */}
         <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
-          {/* Selected pill uses the exact brand teal of the app header above it
-              (HEADER_SURFACE) so the toggle reads as part of the same branded
-              bar rather than a separate accent. */}
+          {/* La pastille sélectionnée utilise le teal exact de la marque de
+              l'en-tête de l'app au-dessus (HEADER_SURFACE) pour que le sélecteur
+              se lise comme faisant partie de la même barre de marque plutôt que
+              comme un accent séparé. */}
           <SegmentedControl
             themeName={themeName}
             value={tab}
@@ -262,7 +268,7 @@ export function PartnersScreen({ themeName = "light" }: { themeName?: ThemeName 
           />
         </View>
 
-        {/* Each segment's grouped lists, then its optional note card. */}
+        {/* Les listes groupées de chaque segment, puis sa carte de note optionnelle. */}
         {activeTab.groups.map((group) => (
           <InsetGroup key={group.header} header={group.header} themeName={themeName}>
             {group.entries.map((entry, i) => (

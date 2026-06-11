@@ -1,19 +1,21 @@
-// FFIE mobile — root.
-// v0.7: role-aware bottom tab navigation.
+// FFIE mobile — racine.
+// v0.7 : navigation par onglets en bas, adaptée au rôle.
 //
-// Member experience (Julien): Library / News / Partners / Profile.
-// Guests: PublicPlaceholder for now — guest tabs (Discover / News /
-// Partners / Join FFIE) land in the next iteration.
+// Expérience adhérent (Julien) : Bibliothèque / Actualités / Partenaires / Profil.
+// Invités : PublicPlaceholder pour l'instant — les onglets invité (Découvrir /
+// Actualités / Partenaires / Adhérer à la FFIE) arriveront à la prochaine
+// itération.
 //
-// The tab bar is home-rolled (src/components/navigation/BottomTabBar.tsx);
-// the contract is wire-compatible with react-navigation so the swap-in
-// when a router lands is mechanical. Each tab key maps to a screen via
-// renderMemberTab; tab state lives in MainSurface so it persists across
-// re-renders triggered by the role debug switcher.
+// La barre d'onglets est faite maison (src/components/navigation/BottomTabBar.tsx) ;
+// son contrat est compatible avec react-navigation pour que le remplacement,
+// le jour où un routeur arrivera, soit mécanique. Chaque clé d'onglet est
+// associée à un écran via renderMemberTab ; l'état des onglets vit dans
+// MainSurface pour persister entre les re-rendus déclenchés par le commutateur
+// de rôle de débogage.
 //
-// In v1 (mock auth) the role is seeded by the path-selection tap and
-// can be cycled live via RoleDebugSwitcher (top-right chip). Set
-// ENABLE_ROLE_DEBUG = false to hide for real launch.
+// En v1 (auth simulée), le rôle est initialisé par le choix de parcours et
+// peut être cyclé en direct via RoleDebugSwitcher (puce en haut à droite).
+// Mettre ENABLE_ROLE_DEBUG = false pour le masquer en production.
 
 import React, { useEffect, useState } from "react";
 import { Modal, View } from "react-native";
@@ -51,46 +53,52 @@ import {
   type TabKey,
 } from "@/navigation/tabs";
 
-// These will become user-controlled via a Settings screen later. For now they
-// default to Julien's expected starting state (mobile, online, comfortable).
+// Ces valeurs deviendront contrôlables par l'utilisateur via un écran Réglages
+// plus tard. Pour l'instant, elles correspondent à l'état de départ attendu de
+// Julien (mobile, en ligne, confortable).
 const themeName: ThemeName = "light";
 const density: DensityMode = "comfortable";
 const offline = false;
 
-// v1 prototype flag — keep ON for client preview, OFF for production builds.
+// Indicateur prototype v1 — laisser ON pour l'aperçu client, OFF pour les
+// builds de production.
 const ENABLE_ROLE_DEBUG = false;
 
-// iOS fullScreen modal slide-dismiss runs ~0.5s. When a flow ends by swapping
-// the whole app surface (guest → member), wait the dismissal out before the
-// swap so a closing modal never strands over the next screen.
+// La fermeture par glissement d'un modal plein écran iOS dure ~0,5 s. Quand un
+// parcours se termine en remplaçant toute la surface de l'app (invité →
+// adhérent), on attend la fin de la fermeture avant le remplacement pour qu'un
+// modal en train de se fermer ne reste jamais bloqué par-dessus l'écran suivant.
 const MODAL_DISMISS_MS = 500;
 
-// Page title shown in the persistent AppHeader (navy branded bar) on each main
-// tab. Home is excluded — it renders its own richer hero (HomeHeader) instead.
+// Titre de page affiché dans l'AppHeader persistant (bandeau de marque bleu
+// marine) sur chaque onglet principal. Accueil est exclu — il affiche son
+// propre en-tête plus riche (HomeHeader) à la place.
 const TAB_TITLE: Record<TabKey, string> = {
-  home: "Home",
-  news: "News",
-  library: "Library",
-  partners: "Partners",
-  discover: "Tools",
-  profile: "Profile",
+  home: "Accueil",
+  news: "Actualités",
+  library: "Bibliothèque",
+  partners: "Partenaires",
+  discover: "Outils",
+  profile: "Profil",
 };
 
 type AppState =
   | { phase: "onboarding"; skipSplash?: boolean }
   | { phase: "main"; result: OnboardingResult };
 
-// The global Raleway-400 default for <Text> is installed in
-// src/theme/installGlobalFont (imported first in index.ts). The old
-// Text.defaultProps approach is a no-op under React 19, so it lived here
-// before and silently stopped working — see that file's header.
+// La police par défaut globale Raleway-400 pour <Text> est installée dans
+// src/theme/installGlobalFont (importée en premier dans index.ts). L'ancienne
+// approche Text.defaultProps est sans effet sous React 19 ; elle vivait ici
+// auparavant et a silencieusement cessé de fonctionner — voir l'en-tête de ce
+// fichier.
 
 export default function App() {
   const [fontsLoaded] = useFonts(FONTS);
 
   if (!fontsLoaded) {
-    // Hold the native splash / a blank canvas until the font files are in
-    // memory — first paint should be Raleway, never the system fallback.
+    // Maintient le splash natif / un canevas vide jusqu'à ce que les fichiers
+    // de police soient en mémoire — le premier rendu doit être Raleway, jamais
+    // la police système de repli.
     return null;
   }
 
@@ -117,18 +125,20 @@ function AppRoot() {
     setAppState({ phase: "main", result });
   };
 
-  // Sign out is a full logout: clear the (mock) session role AND return to the
-  // login / path-selection screen. Dropping the role alone left the app in the
-  // "main" phase, which falls through to the guest shell (News) as a public
-  // user — the bug this fixes. skipSplash sends the user straight to the login
-  // screen instead of replaying the launch splash on an explicit logout.
+  // La déconnexion est complète : on efface le rôle de session (simulé) ET on
+  // revient à l'écran de connexion / choix de parcours. Supprimer le rôle seul
+  // laissait l'app en phase "main", qui retombe sur le shell invité
+  // (Actualités) en tant qu'utilisateur public — c'est le bug que cela corrige.
+  // skipSplash envoie l'utilisateur directement à l'écran de connexion au lieu
+  // de rejouer le splash de lancement lors d'une déconnexion explicite.
   const handleSignOut = () => {
     setRole("guest-public");
     setAppState({ phase: "onboarding", skipSplash: true });
   };
 
-  // skipSplash only exists on the onboarding variant; read it through a
-  // narrowing ternary so it stays type-safe even while onboarding is bypassed.
+  // skipSplash n'existe que sur la variante onboarding ; on le lit via un
+  // ternaire de réduction de type pour rester sûr au niveau des types même
+  // quand l'onboarding est contourné.
   const skipSplash = appState.phase === "onboarding" ? appState.skipSplash : false;
 
   return (
@@ -152,9 +162,11 @@ function AppRoot() {
   );
 }
 
-// MainSurface: the live role decides which top-level surface renders.
-//   - Member/Admin → MemberShell (Home / News / Library / Partners / Trades)
-//   - Guest → GuestShell (Home / News / Library / Partners / Trades)
+// MainSurface : le rôle actif décide quelle surface de premier niveau s'affiche.
+//   - Adhérent/Admin → MemberShell (Accueil / Actualités / Bibliothèque /
+//     Partenaires / Métiers)
+//   - Invité → GuestShell (Accueil / Actualités / Bibliothèque / Partenaires /
+//     Métiers)
 function MainSurface({ onSignOut }: { onSignOut: () => void }) {
   const { role } = useRole();
 
@@ -165,56 +177,65 @@ function MainSurface({ onSignOut }: { onSignOut: () => void }) {
   return <GuestShell />;
 }
 
-// MemberShell — the persistent chrome for Julien: content + bottom tab bar.
-// Tab state lives here so it survives the role debug switcher round-tripping.
-// `settingsOverlay` tracks Profile-row presses that route to sub-screens
-// (currently just Notifications); each lands as a slide-up Modal so the
-// member tab bar stays mounted underneath.
+// MemberShell — l'habillage persistant pour Julien : contenu + barre d'onglets
+// en bas. L'état des onglets vit ici pour survivre aux allers-retours du
+// commutateur de rôle de débogage. `settingsOverlay` suit les appuis sur les
+// rangées du Profil qui routent vers des sous-écrans (pour l'instant juste les
+// Notifications) ; chacun arrive sous forme de Modal qui monte par le bas pour
+// que la barre d'onglets adhérent reste montée en dessous.
 function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<MemberTabKey>("home");
   const [settingsOverlay, setSettingsOverlay] = useState<"none" | "notifications">("none");
-  // Full-screen Events ("Agenda") modal, opened by the Home Agenda shortcut.
+  // Modal Événements ("Agenda") plein écran, ouvert par le raccourci Agenda de
+  // l'Accueil.
   const [agendaOpen, setAgendaOpen] = useState(false);
-  // Bumped each time the already-active tab is re-tapped, so a screen sitting
-  // on a sub-view (e.g. News showing an article, Library showing a doc) can
-  // pop back to its root. Switching to a *different* tab already resets it by
-  // remounting the gate; this covers the same-tab case.
+  // Incrémenté à chaque fois que l'onglet déjà actif est ré-appuyé, pour qu'un
+  // écran posé sur une sous-vue (p. ex. Actualités affichant un article,
+  // Bibliothèque affichant un document) puisse revenir à sa racine. Passer à un
+  // onglet *différent* le réinitialise déjà en remontant le gate ; ceci couvre
+  // le cas du même onglet.
   const [resetSignal, setResetSignal] = useState(0);
-  // True while a tab is showing a detail/sub-view (e.g. News article, Library
-  // doc). The floating avatar is hidden on detail pages — main pages only.
+  // Vrai tant qu'un onglet affiche une vue détail/sous-vue (p. ex. article
+  // Actualités, document Bibliothèque). L'avatar flottant est masqué sur les
+  // pages de détail — uniquement les pages principales.
   const [detailOpen, setDetailOpen] = useState(false);
-  // Pending deep-link segment for the Discover tab (Tools FFIE → Tools,
-  // Our trades → Trades); cleared on any manual tab-bar press so the tab
-  // button opens its default (Trades).
+  // Segment de lien profond en attente pour l'onglet Découvrir (Outils FFIE →
+  // Outils, Nos métiers → Métiers) ; effacé à tout appui manuel sur la barre
+  // d'onglets pour que le bouton de l'onglet ouvre son défaut (Métiers).
   const [tradesSegment, setTradesSegment] = useState<
     "trades" | "tools" | "videos" | null
   >(null);
 
-  // Tab-bar press. A different tab → switch (the gate remounts + replays its
-  // skeleton). The active tab again → pop that tab to its root via resetSignal.
-  // Either way we land on a main page, so clear the detail flag.
+  // Appui sur la barre d'onglets. Un onglet différent → on bascule (le gate se
+  // remonte + rejoue son squelette). De nouveau l'onglet actif → on ramène cet
+  // onglet à sa racine via resetSignal. Dans les deux cas on atterrit sur une
+  // page principale, donc on efface l'indicateur de détail.
   const handleTabSelect = (key: TabKey) => {
     setDetailOpen(false);
-    // A manual tab press always opens the tab's default segment.
+    // Un appui manuel sur un onglet ouvre toujours le segment par défaut de
+    // l'onglet.
     setTradesSegment(null);
     if (key === activeTab) setResetSignal((n) => n + 1);
     else setActiveTab(key as MemberTabKey);
   };
 
   const handleSignIn = () => {
-    // Real flow: open the SignInFlow (LoginScreen) modal. For v1 mock the
-    // role debug switcher is the path back to "member".
+    // Parcours réel : ouvrir le modal SignInFlow (LoginScreen). Pour la
+    // simulation v1, le commutateur de rôle de débogage est le chemin de retour
+    // vers "member".
   };
   const handleApply = () => {
-    // Real flow: navigate to the Become-a-member tab + open the application
-    // form. For v1 mock this is a no-op stub.
+    // Parcours réel : naviguer vers l'onglet Devenir adhérent + ouvrir le
+    // formulaire de candidature. Pour la simulation v1, ceci est un stub sans
+    // effet.
   };
 
   const handleProfileRowPress = (rowKey: string) => {
     if (rowKey === "signout") return onSignOut();
     if (rowKey === "notifications") setSettingsOverlay("notifications");
-    // Other Profile rows (region, interests, edit-profile, change-password)
-    // are still stubs; the notification toggles are handled in-screen now.
+    // Les autres rangées du Profil (région, centres d'intérêt, modifier le
+    // profil, changer le mot de passe) sont encore des stubs ; les bascules de
+    // notification sont désormais gérées dans l'écran lui-même.
   };
 
   return (
@@ -225,13 +246,14 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
       onSignIn={handleSignIn}
     >
       <View style={{ flex: 1, backgroundColor: themes[themeName].surface.default }}>
-        {/* Status bar: light over the navy AppHeader / Home hero; dark over a
-            white detail view (open article, doc). */}
+        {/* Barre d'état : claire par-dessus l'AppHeader bleu marine / l'en-tête
+            Accueil ; sombre par-dessus une vue détail blanche (article ou
+            document ouvert). */}
         <StatusBar style={detailOpen ? "dark" : "light"} />
 
-        {/* Persistent branded header on every tab except Home and Profile (each
-            renders its own navy hero) and while a detail view is open (it brings
-            its own back-button bar). */}
+        {/* En-tête de marque persistant sur chaque onglet sauf Accueil et
+            Profil (chacun affiche son propre en-tête bleu marine) et tant qu'une
+            vue détail est ouverte (elle apporte sa propre barre de retour). */}
         {activeTab !== "home" && activeTab !== "profile" && !detailOpen ? (
           <AppHeader
             title={TAB_TITLE[activeTab]}
@@ -239,19 +261,22 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
             hasUnread
             onPressNotifications={() => setSettingsOverlay("notifications")}
             onPressSearch={() => {
-              // TODO: open global search when the search surface lands.
+              // TODO : ouvrir la recherche globale quand la surface de recherche
+              // arrivera.
             }}
-            // Profile has its own tab + navy hero now, so the header's profile
-            // action always navigates there (this header never renders ON the
-            // profile tab — see the guard above).
+            // Le Profil a désormais son propre onglet + en-tête bleu marine,
+            // donc l'action profil de l'en-tête y navigue toujours (cet en-tête
+            // ne s'affiche jamais SUR l'onglet profil — voir la garde
+            // ci-dessus).
             onPressProfile={() => setActiveTab("profile")}
           />
         ) : null}
 
         <View style={{ flex: 1 }}>
-          {/* Each tab opens on a brief skeleton that mirrors its layout, then
-              swaps in the real screen. Keyed on activeTab so switching tabs
-              remounts the gate and replays the loading phase. */}
+          {/* Chaque onglet s'ouvre sur un bref squelette qui reflète sa mise en
+              page, puis bascule sur l'écran réel. Clé sur activeTab pour que le
+              changement d'onglet remonte le gate et rejoue la phase de
+              chargement. */}
           <TabSkeletonGate
             key={activeTab}
             skeleton={skeletonForTab(activeTab, themeName)}
@@ -260,21 +285,23 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
               onProfileRowPress: handleProfileRowPress,
               onOpenProfile: () => setActiveTab("profile"),
               onOpenSearch: () => {
-                // TODO: open global search when the search surface lands.
+                // TODO : ouvrir la recherche globale quand la surface de
+                // recherche arrivera.
               },
               onHomeNavigate: (target) => {
-                // Agenda opens the full-screen Events modal (not a tab).
+                // Agenda ouvre le modal Événements plein écran (pas un onglet).
                 if (target === "agenda") return setAgendaOpen(true);
-                // "tools" opens the Tools segment (calculators live there);
-                // "trades" opens the careers segment.
+                // "tools" ouvre le segment Outils (les calculateurs y vivent) ;
+                // "trades" ouvre le segment carrières.
                 setTradesSegment(
                   target === "tools" ? "tools" : target === "trades" ? "trades" : null,
                 );
-                // Map each Home card to the tab that hosts its destination.
+                // Associe chaque carte de l'Accueil à l'onglet qui héberge sa
+                // destination.
                 const map: Partial<Record<HomeNavTarget, MemberTabKey>> = {
                   docs: "library",
-                  tools: "discover", // Discover tab → Tools segment
-                  trades: "discover", // Discover tab → Trades segment
+                  tools: "discover", // Onglet Découvrir → segment Outils
+                  trades: "discover", // Onglet Découvrir → segment Métiers
                   partners: "partners",
                   "find-pro": "partners",
                   news: "news",
@@ -295,18 +322,21 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
           themeName={themeName}
         />
 
-        {/* The account avatar that used to float here is now the profile
-            action in AppHeader (non-Home tabs) and the tappable identity block
-            on the Home hero — so the floating disc is retired. */}
+        {/* L'avatar de compte qui flottait ici est désormais l'action profil
+            dans l'AppHeader (onglets hors Accueil) et le bloc d'identité
+            cliquable sur l'en-tête Accueil — le disque flottant est donc
+            retiré. */}
 
-        {/* Floating Claude-powered assistant — corner FAB → chat panel. Mounted
-            here (over the tab set, under the full-screen Modals) so it rides on
-            top of every member tab. Mockup only; see AssistantChatWidget. */}
+        {/* Assistant flottant propulsé par Claude — FAB d'angle → panneau de
+            discussion. Monté ici (par-dessus le jeu d'onglets, sous les Modals
+            plein écran) pour qu'il chevauche chaque onglet adhérent. Maquette
+            uniquement ; voir AssistantChatWidget. */}
         <AssistantChatWidget />
 
-        {/* Notifications settings — slide-up Modal. Fresh SafeAreaProvider
-            so the inset doesn't compound through the native modal host
-            view (see OnboardingFlow for the same fix). */}
+        {/* Réglages des notifications — Modal qui monte par le bas.
+            SafeAreaProvider neuf pour que l'inset ne se cumule pas à travers la
+            vue hôte du modal natif (voir OnboardingFlow pour le même
+            correctif). */}
         <Modal
           visible={settingsOverlay === "notifications"}
           animationType="slide"
@@ -318,9 +348,10 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
           </SafeAreaProvider>
         </Modal>
 
-        {/* Full-screen Agenda (Events) modal — opened by the Home "Agenda"
-            shortcut. Fresh SafeAreaProvider per the inset-compounding fix.
-            Members are never locked, so no upsell CTAs are wired here. */}
+        {/* Modal Agenda (Événements) plein écran — ouvert par le raccourci
+            "Agenda" de l'Accueil. SafeAreaProvider neuf selon le correctif de
+            cumul d'inset. Les adhérents ne sont jamais verrouillés, donc aucun
+            CTA d'upsell n'est branché ici. */}
         <Modal
           visible={agendaOpen}
           animationType="slide"
@@ -371,7 +402,8 @@ function renderMemberTab(
           resetSignal={actions.resetSignal}
           onDetailChange={actions.onDetailChange}
           onDocPress={() => {
-            // TODO: navigate to Doc Detail (Screen 2) when it lands.
+            // TODO : naviguer vers le Détail du document (Écran 2) quand il
+            // arrivera.
           }}
         />
       );
@@ -386,8 +418,8 @@ function renderMemberTab(
     case "partners":
       return <PartnersScreen themeName={themeName} />;
     case "discover":
-      // Trades — careers, training, external resources. Public and
-      // self-contained, now part of the member nav too (Julien).
+      // Métiers — carrières, formation, ressources externes. Public et
+      // autonome, désormais aussi présent dans la nav adhérent (Julien).
       return (
         <DiscoverScreen
           themeName={themeName}
@@ -400,28 +432,34 @@ function renderMemberTab(
   }
 }
 
-// GuestShell — the persistent chrome for Karim + Léa: content + bottom tab
-// bar. Every guest tab is public-access, so no RequireRole wrapper is
-// needed here (the access check in tabs.tsx is for symmetry / future use).
-// Tab state lives here so it survives the role debug switcher round-tripping.
+// GuestShell — l'habillage persistant pour Karim + Léa : contenu + barre
+// d'onglets en bas. Chaque onglet invité est en accès public, donc aucun
+// wrapper RequireRole n'est nécessaire ici (la vérification d'accès dans
+// tabs.tsx est là par symétrie / pour un usage futur). L'état des onglets vit
+// ici pour survivre aux allers-retours du commutateur de rôle de débogage.
 function GuestShell() {
   const [activeTab, setActiveTab] = useState<GuestTabKey>("home");
   const [applicationOpen, setApplicationOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
-  // The "Join" CTA now floats top-right on every guest page and opens the
-  // federation directory (BecomeMemberScreen) as a slide-up modal, rather than
-  // owning a bottom-tab slot.
+  // Le CTA "Adhérer" flotte désormais en haut à droite de chaque page invité et
+  // ouvre l'annuaire des fédérations (BecomeMemberScreen) sous forme de modal
+  // qui monte par le bas, plutôt que d'occuper un emplacement de la barre
+  // d'onglets.
   const [becomeMemberOpen, setBecomeMemberOpen] = useState(false);
-  // Full-screen Events ("Agenda") modal, opened by the Home Agenda shortcut.
+  // Modal Événements ("Agenda") plein écran, ouvert par le raccourci Agenda de
+  // l'Accueil.
   const [agendaOpen, setAgendaOpen] = useState(false);
-  // Re-tapping the active tab pops it to root (e.g. News showing an article);
-  // switching tabs already resets by remounting the gate.
+  // Ré-appuyer sur l'onglet actif le ramène à sa racine (p. ex. Actualités
+  // affichant un article) ; changer d'onglet le réinitialise déjà en remontant
+  // le gate.
   const [resetSignal, setResetSignal] = useState(0);
-  // True while a tab is showing a detail/sub-view (News article, Library doc).
-  // The floating avatar is hidden on detail pages — main pages only.
+  // Vrai tant qu'un onglet affiche une vue détail/sous-vue (article Actualités,
+  // document Bibliothèque). L'avatar flottant est masqué sur les pages de
+  // détail — uniquement les pages principales.
   const [detailOpen, setDetailOpen] = useState(false);
-  // Pending deep-link segment for the Trades tab (Tools FFIE → Calculators);
-  // cleared on any manual tab-bar press. See MemberShell for the rationale.
+  // Segment de lien profond en attente pour l'onglet Métiers (Outils FFIE →
+  // Calculateurs) ; effacé à tout appui manuel sur la barre d'onglets. Voir
+  // MemberShell pour la justification.
   const [tradesSegment, setTradesSegment] = useState<
     "trades" | "tools" | "videos" | null
   >(null);
@@ -429,50 +467,60 @@ function GuestShell() {
   const { setActiveTab: publishActiveTab } = useActiveTab();
 
   const handleTabSelect = (key: TabKey) => {
-    // Any tab-bar press lands on a main page (switch or pop-to-root).
+    // Tout appui sur la barre d'onglets atterrit sur une page principale
+    // (bascule ou retour à la racine).
     setDetailOpen(false);
-    // A manual tab press always opens the tab's default segment.
+    // Un appui manuel sur un onglet ouvre toujours le segment par défaut de
+    // l'onglet.
     setTradesSegment(null);
     if (key === activeTab) setResetSignal((n) => n + 1);
     else setActiveTab(key as GuestTabKey);
   };
 
-  // Publish the active guest tab so the floating debug switcher can scope
-  // itself to a surface (the membership Reset chip only shows on Join-FFIE).
-  // Clear it on unmount (e.g. when the role flips to member).
+  // Publie l'onglet invité actif pour que le commutateur de débogage flottant
+  // puisse se cantonner à une surface (la puce Réinitialiser de l'adhésion ne
+  // s'affiche que sur Adhérer-FFIE). On l'efface au démontage (p. ex. quand le
+  // rôle bascule vers adhérent).
   useEffect(() => {
     publishActiveTab(activeTab);
     return () => publishActiveTab(null);
   }, [activeTab, publishActiveTab]);
 
-  // From any guest surface, applying or signing in promotes the session.
-  // v1 mock:
-  //   - The floating "Join" CTA and News / member-only upsells both open
-  //     the federation directory (BecomeMemberScreen) as a modal — the soft
-  //     funnel step before the form.
-  //   - The application form opens as a slide-up modal (openApplication).
-  //   - "I already have an account" opens the email → OTP sign-in flow;
-  //     a verified code promotes the session to member.
+  // Depuis n'importe quelle surface invité, candidater ou se connecter promeut
+  // la session.
+  // Simulation v1 :
+  //   - Le CTA flottant "Adhérer" et les upsells Actualités / réservés aux
+  //     adhérents ouvrent tous l'annuaire des fédérations (BecomeMemberScreen)
+  //     sous forme de modal — l'étape d'entonnoir douce avant le formulaire.
+  //   - Le formulaire de candidature s'ouvre en modal montant par le bas
+  //     (openApplication).
+  //   - "J'ai déjà un compte" ouvre le parcours de connexion e-mail → OTP ;
+  //     un code vérifié promeut la session vers adhérent.
   const goToJoin = () => setBecomeMemberOpen(true);
   const openApplication = () => setApplicationOpen(true);
   const openSignIn = () => setSignInOpen(true);
   const authenticate = () => {
-    // Dismiss the modals FIRST, then promote to member once they've slid away.
-    // Flipping the role immediately unmounts the guest shell mid-dismiss, which
-    // can strand a modal over the member News page.
+    // On ferme D'ABORD les modals, puis on promeut vers adhérent une fois qu'ils
+    // ont glissé hors champ. Basculer le rôle immédiatement démonte le shell
+    // invité en pleine fermeture, ce qui peut laisser un modal bloqué par-dessus
+    // la page Actualités adhérent.
     //
-    // Two entry paths share this handler, and they differ in modal depth:
-    //   - From the directory (avatar → Join → "Sign in"): the sign-in
-    //     popup is NESTED inside the directory modal. iOS cannot dismiss a
-    //     presenting modal (the directory) while its presented child (sign-in)
-    //     is still up — doing both in the same tick rips the child's view
-    //     controller out mid-dismiss and leaves a BLACK SCREEN. So we dismiss
-    //     the child, wait for it to finish sliding away, THEN dismiss the
-    //     parent, THEN (after that too has slid away) promote the role.
-    //   - From News etc. (no directory open): only the sign-in modal is up, so
-    //     there's nothing to stagger — dismiss it and promote after one slide.
-    // Both shells open on Home, so the brief guest→member swap underneath the
-    // closing modal is invisible — the user simply lands on Home, logged in.
+    // Deux chemins d'entrée partagent ce gestionnaire, et ils diffèrent par leur
+    // profondeur de modal :
+    //   - Depuis l'annuaire (avatar → Adhérer → "Se connecter") : la popup de
+    //     connexion est IMBRIQUÉE dans le modal de l'annuaire. iOS ne peut pas
+    //     fermer un modal présentateur (l'annuaire) tant que son enfant présenté
+    //     (la connexion) est encore affiché — faire les deux dans le même tick
+    //     arrache le contrôleur de vue de l'enfant en pleine fermeture et laisse
+    //     un ÉCRAN NOIR. On ferme donc l'enfant, on attend qu'il finisse de
+    //     glisser hors champ, PUIS on ferme le parent, PUIS (après qu'il a lui
+    //     aussi glissé hors champ) on promeut le rôle.
+    //   - Depuis Actualités, etc. (aucun annuaire ouvert) : seul le modal de
+    //     connexion est affiché, donc rien à échelonner — on le ferme et on
+    //     promeut après un seul glissement.
+    // Les deux shells s'ouvrent sur Accueil, donc le bref échange
+    // invité→adhérent sous le modal qui se ferme est invisible — l'utilisateur
+    // atterrit simplement sur Accueil, connecté.
     setSignInOpen(false);
     if (becomeMemberOpen) {
       setTimeout(() => setBecomeMemberOpen(false), MODAL_DISMISS_MS);
@@ -484,27 +532,29 @@ function GuestShell() {
 
   return (
     <View style={{ flex: 1, backgroundColor: themes[themeName].surface.default }}>
-      {/* Status bar: light over the navy AppHeader / Home hero; dark over a
-          white detail view (open article, doc). */}
+      {/* Barre d'état : claire par-dessus l'AppHeader bleu marine / l'en-tête
+          Accueil ; sombre par-dessus une vue détail blanche (article ou
+          document ouvert). */}
       <StatusBar style={detailOpen ? "dark" : "light"} />
 
-      {/* Persistent branded header on every tab except Home (its own hero) and
-          while a detail view is open. */}
+      {/* En-tête de marque persistant sur chaque onglet sauf Accueil (son
+          propre en-tête) et tant qu'une vue détail est ouverte. */}
       {activeTab !== "home" && !detailOpen ? (
         <AppHeader
           title={TAB_TITLE[activeTab]}
           variant="guest"
           onPressSearch={() => {
-            // TODO: open global search when the search surface lands.
+            // TODO : ouvrir la recherche globale quand la surface de recherche
+            // arrivera.
           }}
           onPressJoin={() => setBecomeMemberOpen(true)}
         />
       ) : null}
 
       <View style={{ flex: 1 }}>
-        {/* Brief layout-matched skeleton on each tab open, then the real
-            screen. Keyed on activeTab so a tab switch replays the loading
-            phase. */}
+        {/* Bref squelette adapté à la mise en page à chaque ouverture d'onglet,
+            puis l'écran réel. Clé sur activeTab pour qu'un changement d'onglet
+            rejoue la phase de chargement. */}
         <TabSkeletonGate
           key={activeTab}
           skeleton={skeletonForTab(activeTab, themeName)}
@@ -514,23 +564,25 @@ function GuestShell() {
             onSignIn: openSignIn,
             onStartApplication: openApplication,
             onOpenSearch: () => {
-              // TODO: open global search when the search surface lands.
+              // TODO : ouvrir la recherche globale quand la surface de recherche
+              // arrivera.
             },
             onHomeNavigate: (target) => {
-              // Guests: "find-pro" opens the federation directory (the join
-              // funnel); "agenda" opens the full-screen Events modal; the rest
-              // map to the matching guest tab.
+              // Invités : "find-pro" ouvre l'annuaire des fédérations
+              // (l'entonnoir d'adhésion) ; "agenda" ouvre le modal Événements
+              // plein écran ; le reste est associé à l'onglet invité
+              // correspondant.
               if (target === "find-pro") return goToJoin();
               if (target === "agenda") return setAgendaOpen(true);
-              // "tools" opens the Tools segment (calculators live there);
-              // "trades" opens the careers segment.
+              // "tools" ouvre le segment Outils (les calculateurs y vivent) ;
+              // "trades" ouvre le segment carrières.
               setTradesSegment(
                 target === "tools" ? "tools" : target === "trades" ? "trades" : null,
               );
               const map: Partial<Record<HomeNavTarget, GuestTabKey>> = {
                 docs: "library",
-                tools: "discover", // Discover tab → Tools segment
-                trades: "discover", // Discover tab → Trades segment
+                tools: "discover", // Onglet Découvrir → segment Outils
+                trades: "discover", // Onglet Découvrir → segment Métiers
                 partners: "partners",
                 news: "news",
               };
@@ -550,20 +602,22 @@ function GuestShell() {
         themeName={themeName}
       />
 
-      {/* The account avatar that used to float here is now the join action in
-          AppHeader (non-Home tabs) and the "Join the FFIE" CTA on the Home hero
-          — so the floating disc is retired. */}
+      {/* L'avatar de compte qui flottait ici est désormais l'action d'adhésion
+          dans l'AppHeader (onglets hors Accueil) et le CTA "Adhérer à la FFIE"
+          sur l'en-tête Accueil — le disque flottant est donc retiré. */}
 
-      {/* Floating Claude-powered assistant — same corner widget as the member
-          shell, available to public/company guests too. Mockup only. */}
+      {/* Assistant flottant propulsé par Claude — même widget d'angle que le
+          shell adhérent, disponible aussi pour les invités public/entreprise.
+          Maquette uniquement. */}
       <AssistantChatWidget />
 
-      {/* Federation directory ("Join") — slide-up Modal over the guest
-          shell, so the tab bar stays mounted underneath. Fresh
-          SafeAreaProvider per the inset-compounding fix used elsewhere. The
-          bottom "Sign in" CTA opens the email → OTP sign-in popup, nested
-          inside this modal so it presents *on top of* the map + list (a sibling
-          modal at the root can't present while this one is up on iOS). */}
+      {/* Annuaire des fédérations ("Adhérer") — Modal qui monte par le bas
+          par-dessus le shell invité, pour que la barre d'onglets reste montée en
+          dessous. SafeAreaProvider neuf selon le correctif de cumul d'inset
+          utilisé ailleurs. Le CTA "Se connecter" en bas ouvre la popup de
+          connexion e-mail → OTP, imbriquée dans ce modal pour qu'elle s'affiche
+          *par-dessus* la carte + la liste (un modal frère à la racine ne peut
+          pas s'afficher tant que celui-ci est ouvert sur iOS). */}
       <Modal
         visible={becomeMemberOpen}
         animationType="slide"
@@ -576,10 +630,10 @@ function GuestShell() {
             onClose={() => setBecomeMemberOpen(false)}
             onLogin={openSignIn}
           />
-          {/* Nested sign-in: pops up over the directory; cancelling returns to
-              it. A successful login calls authenticate() (promotes to member).
-              "Join the FFIE" just closes the login — the directory underneath
-              is already the join funnel. */}
+          {/* Connexion imbriquée : surgit par-dessus l'annuaire ; annuler y
+              ramène. Une connexion réussie appelle authenticate() (promeut vers
+              adhérent). "Adhérer à la FFIE" ferme simplement la connexion —
+              l'annuaire en dessous est déjà l'entonnoir d'adhésion. */}
           <SignInFlow
             visible={signInOpen}
             onClose={() => setSignInOpen(false)}
@@ -589,10 +643,11 @@ function GuestShell() {
         </SafeAreaProvider>
       </Modal>
 
-      {/* "I already have an account" from News etc. (no directory open) →
-          login. Only mounted when the directory is closed, so it never competes
-          with the nested instance above for the same signInOpen state.
-          "Join the FFIE" dismisses login, then opens the join directory. */}
+      {/* "J'ai déjà un compte" depuis Actualités, etc. (aucun annuaire ouvert)
+          → connexion. Monté uniquement quand l'annuaire est fermé, pour ne
+          jamais entrer en conflit avec l'instance imbriquée ci-dessus sur le
+          même état signInOpen. "Adhérer à la FFIE" ferme la connexion, puis
+          ouvre l'annuaire d'adhésion. */}
       {becomeMemberOpen ? null : (
         <SignInFlow
           visible={signInOpen}
@@ -605,9 +660,10 @@ function GuestShell() {
         />
       )}
 
-      {/* Membership application — slide-up Modal over the guest shell, so the
-          tab bar stays mounted underneath. Fresh SafeAreaProvider per the same
-          inset-compounding fix used elsewhere. */}
+      {/* Candidature d'adhésion — Modal qui monte par le bas par-dessus le
+          shell invité, pour que la barre d'onglets reste montée en dessous.
+          SafeAreaProvider neuf selon le même correctif de cumul d'inset utilisé
+          ailleurs. */}
       <Modal
         visible={applicationOpen}
         animationType="slide"
@@ -622,11 +678,13 @@ function GuestShell() {
         </SafeAreaProvider>
       </Modal>
 
-      {/* Full-screen Agenda (Events) modal — opened by the Home "Agenda"
-          shortcut. A guest tapping a member-only event hits the upsell inside
-          the modal; its CTAs close THIS modal first, then (after the slide)
-          open the join / sign-in funnel, so two full-screen modals never fight
-          on iOS — the same staggered-dismiss pattern used above. */}
+      {/* Modal Agenda (Événements) plein écran — ouvert par le raccourci
+          "Agenda" de l'Accueil. Un invité qui touche un événement réservé aux
+          adhérents tombe sur l'upsell à l'intérieur du modal ; ses CTA ferment
+          D'ABORD CE modal, puis (après le glissement) ouvrent l'entonnoir
+          d'adhésion / connexion, pour que deux modals plein écran ne se
+          disputent jamais sur iOS — le même motif de fermeture échelonnée
+          utilisé ci-dessus. */}
       <Modal
         visible={agendaOpen}
         animationType="slide"
@@ -667,8 +725,9 @@ function renderGuestTab(
 ) {
   switch (tab) {
     case "home":
-      // Guests get the welcome hero; "Join the FFIE" opens the federation
-      // directory (the same soft-funnel step as the floating CTA elsewhere).
+      // Les invités voient l'en-tête de bienvenue ; "Adhérer à la FFIE" ouvre
+      // l'annuaire des fédérations (la même étape d'entonnoir douce que le CTA
+      // flottant ailleurs).
       return (
         <HomeScreen
           themeName={themeName}
@@ -678,8 +737,8 @@ function renderGuestTab(
         />
       );
     case "discover":
-      // The Trades tab is fully public (P6) and self-contained — careers,
-      // training, and external resource links only.
+      // L'onglet Métiers est entièrement public (P6) et autonome — uniquement
+      // carrières, formation et liens vers des ressources externes.
       return (
         <DiscoverScreen
           themeName={themeName}
@@ -688,8 +747,9 @@ function renderGuestTab(
         />
       );
     case "news":
-      // Guests can hit member-only articles → forward the upsell CTAs so the
-      // News teaser routes to Join / sign-in just like the rest of the shell.
+      // Les invités peuvent tomber sur des articles réservés aux adhérents → on
+      // transmet les CTA d'upsell pour que le teaser Actualités route vers
+      // Adhérer / connexion comme le reste du shell.
       return (
         <NewsScreen
           themeName={themeName}
@@ -702,8 +762,9 @@ function renderGuestTab(
     case "partners":
       return <PartnersScreen themeName={themeName} />;
     case "library":
-      // Library is now part of the guest experience too — non-members
-      // browse the same document directory (v1 mock: full access).
+      // La Bibliothèque fait désormais aussi partie de l'expérience invité —
+      // les non-adhérents parcourent le même annuaire de documents (simulation
+      // v1 : accès complet).
       return (
         <DocLibraryScreen
           themeName={themeName}
@@ -711,13 +772,15 @@ function renderGuestTab(
           offline={offline}
           resetSignal={actions.resetSignal}
           onDetailChange={actions.onDetailChange}
-          // A guest tapping a locked doc gets the upsell; "Request membership"
-          // opens the federation directory (map + departmental list), "I already
-          // have an account" opens sign-in — same funnel as the News teaser.
+          // Un invité qui touche un document verrouillé obtient l'upsell ;
+          // "Demander l'adhésion" ouvre l'annuaire des fédérations (carte +
+          // liste départementale), "J'ai déjà un compte" ouvre la connexion —
+          // même entonnoir que le teaser Actualités.
           onApply={actions.onApply}
           onSignIn={actions.onSignIn}
           onDocPress={() => {
-            // TODO: navigate to Doc Detail (Screen 2) when it lands.
+            // TODO : naviguer vers le Détail du document (Écran 2) quand il
+            // arrivera.
           }}
         />
       );

@@ -1,13 +1,14 @@
-// QuickAccessGrid — the "Quick access" 2×2 block at the top of the Home hub.
+// QuickAccessGrid — le bloc « Accès rapide » 2×2 en haut du hub Accueil.
 //
-// Four shortcut cards (Documentation / Tools FFIE / Partners / Agenda) that
-// jump straight to the load-bearing surfaces. Each is a raised white card with
-// a thin outline icon, a bold title, and a muted one-line descriptor. Cards
-// route via the shared `onNavigate` target union (resolved to a tab/action by
-// the shell) so this stays a presentational, data-driven block.
+// Quatre cartes de raccourci (Documents / Outils FFIE / Partenaires / Agenda)
+// qui mènent directement aux surfaces porteuses. Chacune est une carte blanche
+// surélevée avec une icône fine, un titre en gras et un descripteur discret sur
+// une ligne. Les cartes naviguent via l'union de cibles partagée `onNavigate`
+// (résolue en onglet/action par le shell) : ce bloc reste donc présentationnel
+// et piloté par les données.
 //
-// To change the shortcuts, edit SHORTCUTS below — order is row-major (top-left,
-// top-right, bottom-left, bottom-right).
+// Pour modifier les raccourcis, éditez SHORTCUTS ci-dessous — l'ordre suit les
+// lignes (haut-gauche, haut-droite, bas-gauche, bas-droite).
 
 import React from "react";
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
@@ -35,10 +36,10 @@ type Shortcut = {
 };
 
 const SHORTCUTS: ReadonlyArray<Shortcut> = [
-  { key: "docs", icon: FileText, title: "Documentation", subtitle: "Standards & Guides", target: "docs" },
-  { key: "tools", icon: Wrench, title: "Tools FFIE", subtitle: "Calculations & aids", target: "tools" },
-  { key: "partners", icon: Landmark, title: "Partners", subtitle: "Ecosystem & Lab", target: "partners" },
-  { key: "agenda", icon: CalendarDays, title: "Agenda", subtitle: "Events", target: "agenda" },
+  { key: "docs", icon: FileText, title: "Documents", subtitle: "Normes & guides", target: "docs" },
+  { key: "tools", icon: Wrench, title: "Outils FFIE", subtitle: "Calculs & aides", target: "tools" },
+  { key: "partners", icon: Landmark, title: "Partenaires", subtitle: "Écosystème & Lab", target: "partners" },
+  { key: "agenda", icon: CalendarDays, title: "Agenda", subtitle: "Événements", target: "agenda" },
 ];
 
 export function QuickAccessGrid({
@@ -48,8 +49,9 @@ export function QuickAccessGrid({
   themeName?: ThemeName;
   onNavigate?: (target: HomeNavTarget) => void;
 }) {
-  // Render row-major in pairs so each row stretches its two cards to equal
-  // height regardless of how the descriptor wraps.
+  // Rendu par paires (ligne par ligne) pour que chaque ligne étire ses deux
+  // cartes à la même hauteur, quelle que soit la façon dont le descripteur se
+  // répartit sur plusieurs lignes.
   const rows: Shortcut[][] = [SHORTCUTS.slice(0, 2), SHORTCUTS.slice(2, 4)];
 
   return (
@@ -101,11 +103,12 @@ function ShortcutCard({
         ...(CARD_SHADOW as ViewStyle),
       })}
     >
-      {/* Icon sits in a rounded-square tile with a border + faint brand tint —
-          the same treatment as the Public Space cards, adapted to the white
-          card (navy glyph on a light navy wash instead of white-on-gradient).
-          The glyph is dimmed (alpha < 1) so the dark navy stroke doesn't
-          over-pull the eye against the pale tile. */}
+      {/* L'icône occupe une tuile carrée à coins arrondis avec une bordure +
+          une légère teinte de marque — le même traitement que les cartes de
+          l'Espace public, adapté à la carte blanche (glyphe marine sur un voile
+          marine clair plutôt que blanc-sur-dégradé). Le glyphe est atténué
+          (alpha < 1) pour que le tracé marine foncé n'attire pas trop l'œil sur
+          la tuile pâle. */}
       <View
         style={[
           styles.iconTile,
@@ -144,8 +147,9 @@ function ShortcutCard({
   );
 }
 
-// Token colour at reduced alpha — lets the navy icon tile read as a faint
-// brand wash + border on the white card (tokens carry no alpha variants).
+// Couleur de token à alpha réduit — permet à la tuile d'icône marine de se lire
+// comme un léger voile de marque + bordure sur la carte blanche (les tokens
+// n'ont pas de variantes alpha).
 function tint(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.slice(0, 2), 16);

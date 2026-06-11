@@ -1,21 +1,24 @@
-// AssistantChatWidget — the floating "Assistant IA FFIE" chat box (Epic: AI
-// help). A corner FAB expands into a Claude-branded chat panel: a coral header,
-// three mode tabs (Technical / Docs / Writing), a greeting message, an input
-// row, and the Anthropic attribution footer.
+// AssistantChatWidget — la boîte de discussion flottante « Assistant IA FFIE »
+// (Epic : aide IA). Un FAB de coin se déploie en un panneau de discussion aux
+// couleurs de Claude : un en-tête corail, trois onglets de mode (Technique /
+// Documents / Rédaction), un message d'accueil, une rangée de saisie et le pied
+// d'attribution Anthropic.
 //
-// MOCKUP ONLY (v1). Like SignInFlow and the membership flows, nothing here
-// talks to a backend: the tabs toggle local state, the input is editable but
-// the send button is a no-op, and the greeting is static copy. Wiring this to a
-// real Claude endpoint is deliberately out of scope until instructed.
+// MAQUETTE SEULEMENT (v1). Comme SignInFlow et les parcours d'adhésion, rien ici
+// ne dialogue avec un backend : les onglets basculent un état local, la saisie
+// est éditable mais le bouton d'envoi ne fait rien, et le message d'accueil est
+// un texte statique. Brancher ceci à un véritable endpoint Claude est
+// délibérément hors périmètre jusqu'à instruction contraire.
 //
-// COLOUR NOTE: this widget is intentionally OUTSIDE the FFIE design system. It
-// carries Claude/Anthropic's own brand colours (the coral terracotta + paper
-// cream below) because it represents a third-party assistant — the same reason
-// partner/brand marks aren't recoloured to the app's navy+teal. Those external
-// brand hex values live in the CLAUDE constant here rather than in tokens.ts
-// (which is the single source of truth for *FFIE's* palette, not Anthropic's).
-// Everything structural (radii, motion, safe-area, reduced-motion) still comes
-// from the design system / shared hooks.
+// NOTE COULEUR : ce widget est volontairement EN DEHORS du design system FFIE. Il
+// porte les couleurs de marque propres à Claude/Anthropic (le corail terracotta
+// + le crème papier ci-dessous) parce qu'il représente un assistant tiers — la
+// même raison pour laquelle les marques partenaires ne sont pas recolorées au
+// marine+sarcelle de l'app. Ces valeurs hexadécimales de marque externes vivent
+// dans la constante CLAUDE ici plutôt que dans tokens.ts (qui est la source de
+// vérité unique pour la palette de *la FFIE*, pas celle d'Anthropic). Tout ce qui
+// est structurel (rayons, mouvement, zone sûre, mouvement réduit) provient
+// toujours du design system / des hooks partagés.
 
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -45,46 +48,51 @@ import { GUTTER } from "@/components/ui/ios";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 // ---------------------------------------------------------------------------
-// Claude / Anthropic brand palette (external — see COLOUR NOTE above).
+// Palette de marque Claude / Anthropic (externe — voir NOTE COULEUR ci-dessus).
 // ---------------------------------------------------------------------------
 const CLAUDE = {
-  // The Claude "coral" terracotta, used for the header gradient, the FAB, and
-  // the send button. Two stops give the header its diagonal sheen.
+  // Le « corail » terracotta de Claude, utilisé pour le dégradé de l'en-tête, le
+  // FAB et le bouton d'envoi. Deux arrêts donnent à l'en-tête son éclat diagonal.
   coral: "#D97757",
   coralDeep: "#BD5D3A",
   coralPressed: "#A94E2F",
-  // Anthropic "ivory" paper — the assistant bubble + panel canvas tint.
+  // Le papier « ivoire » d'Anthropic — la teinte de la bulle d'assistant + du
+  // canevas du panneau.
   paper: "#F4F1EA",
   paperBorder: "#E6E0D4",
-  // Near-black ink used for the selected tab pill + primary text.
+  // Encre quasi noire utilisée pour la pastille d'onglet sélectionnée + le texte
+  // principal.
   ink: "#1F1E1D",
   inkMuted: "#6B6862",
-  // Panel surface.
+  // Surface du panneau.
   surface: "#FFFFFF",
   hairline: "#ECE9E2",
   onCoral: "#FFFFFF",
   onCoralMuted: "rgba(255,255,255,0.82)",
 } as const;
 
-// Mode tabs across the top of the conversation. Mock-only: selecting one just
-// swaps the local highlight (a real build would steer the system prompt).
+// Onglets de mode en haut de la conversation. Maquette seulement : en
+// sélectionner un ne change que la surbrillance locale (une vraie version
+// piloterait le prompt système).
 type ModeKey = "technical" | "docs" | "writing";
 const MODES: { key: ModeKey; label: string; icon: LucideIcon }[] = [
-  { key: "technical", label: "Technical", icon: Zap },
-  { key: "docs", label: "Docs", icon: FileText },
-  { key: "writing", label: "Writing", icon: PenLine },
+  { key: "technical", label: "Technique", icon: Zap },
+  { key: "docs", label: "Documents", icon: FileText },
+  { key: "writing", label: "Rédaction", icon: PenLine },
 ];
 
-// The bottom tab bar's height above the safe-area inset (BottomTabBar:
-// minHeight 50 + 12 top + 12 bottom padding ≈ 74). The widget is mounted as a
-// full-bleed sibling of the tab bar, so its children are positioned in DEVICE
-// coordinates — we add this + the inset by hand to clear the navigation row.
+// La hauteur de la barre d'onglets inférieure au-dessus de la marge de zone sûre
+// (BottomTabBar : minHeight 50 + 12 de padding haut + 12 de padding bas ≈ 74).
+// Le widget est monté comme un frère pleine largeur de la barre d'onglets, donc
+// ses enfants sont positionnés en coordonnées APPAREIL — on ajoute ceci + la
+// marge à la main pour dégager la rangée de navigation.
 const TAB_BAR_HEIGHT = 74;
-// Gap between the tab bar and the FAB.
+// Écart entre la barre d'onglets et le FAB.
 export const ASSISTANT_FAB_GAP = 16;
-// FAB diameter. Exported so the screens' "back to top" buttons match it exactly
-// (they stack above this FAB and must read as the same control) — single source
-// of truth so the two sizes can't drift apart.
+// Diamètre du FAB. Exporté pour que les boutons « retour en haut » des écrans le
+// reproduisent exactement (ils s'empilent au-dessus de ce FAB et doivent se lire
+// comme le même contrôle) — source de vérité unique pour que les deux tailles ne
+// puissent pas diverger.
 export const ASSISTANT_FAB_SIZE = 50;
 
 export function AssistantChatWidget() {
@@ -96,8 +104,9 @@ export function AssistantChatWidget() {
   const [mode, setMode] = useState<ModeKey>("technical");
   const [draft, setDraft] = useState("");
 
-  // Panel enter/exit: fade + a small rise/scale anchored to the FAB corner.
-  // Reduced motion collapses both to an instant cut (vestibular safety, P5).
+  // Entrée/sortie du panneau : fondu + une petite montée/mise à l'échelle ancrée
+  // au coin du FAB. Le mouvement réduit ramène les deux à une coupure instantanée
+  // (sécurité vestibulaire, P5).
   const anim = useRef(new Animated.Value(0)).current;
   const [mounted, setMounted] = useState(false);
 
@@ -131,24 +140,25 @@ export function AssistantChatWidget() {
     }
   }, [open, reducedMotion, anim]);
 
-  // Announce open/close for screen-reader users (the panel is a transient
-  // surface, not a routed screen).
+  // Annonce l'ouverture/la fermeture pour les utilisateurs de lecteur d'écran
+  // (le panneau est une surface transitoire, pas un écran routé).
   const toggle = (next: boolean) => {
     setOpen(next);
     AccessibilityInfo.announceForAccessibility?.(
-      next ? "FFIE assistant opened" : "FFIE assistant closed",
+      next ? "Assistant FFIE ouvert" : "Assistant FFIE fermé",
     );
   };
 
-  // Vertical anchoring (device coordinates, measured from the screen bottom):
-  //   - FAB sits one gap above the tab bar.
-  //   - Panel floats just above the FAB so the corner launcher stays visible.
+  // Ancrage vertical (coordonnées appareil, mesurées depuis le bas de l'écran) :
+  //   - le FAB se place à un écart au-dessus de la barre d'onglets.
+  //   - le panneau flotte juste au-dessus du FAB pour que le lanceur de coin
+  //     reste visible.
   const fabBottom = insets.bottom + TAB_BAR_HEIGHT + ASSISTANT_FAB_GAP;
   const panelBottom = fabBottom + ASSISTANT_FAB_SIZE + 10;
 
-  // Panel geometry: full-width minus gutters, capped so it reads as a corner
-  // box on tablets; height capped to the room above the FAB (never under the
-  // status bar / notch).
+  // Géométrie du panneau : pleine largeur moins les marges, plafonnée pour qu'il
+  // se lise comme une boîte de coin sur tablette ; hauteur plafonnée à l'espace
+  // au-dessus du FAB (jamais sous la barre d'état / l'encoche).
   const panelWidth = Math.min(width - GUTTER * 2, 360);
   const panelHeight = Math.min(520, height - panelBottom - insets.top - 16);
 
@@ -156,11 +166,11 @@ export function AssistantChatWidget() {
   const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] });
 
   return (
-    // Full-bleed, non-interactive layer so the FAB + panel float over whatever
-    // tab is mounted. pointerEvents="box-none" lets touches pass through the
-    // empty area to the screen beneath.
+    // Couche pleine largeur, non interactive, pour que le FAB + le panneau
+    // flottent par-dessus l'onglet monté, quel qu'il soit. pointerEvents="box-none"
+    // laisse les touchers traverser la zone vide jusqu'à l'écran en dessous.
     <View pointerEvents="box-none" style={{ position: "absolute", inset: 0 }}>
-      {/* Chat panel (only mounted while open / animating out) */}
+      {/* Panneau de discussion (monté uniquement à l'ouverture / pendant la sortie animée) */}
       {mounted ? (
         <Animated.View
           accessibilityViewIsModal
@@ -175,7 +185,7 @@ export function AssistantChatWidget() {
             overflow: "hidden",
             opacity: anim,
             transform: [{ translateY }, { scale }],
-            // Elevated card — soft, large shadow to read as a floating sheet.
+            // Carte surélevée — ombre douce et large pour se lire comme une feuille flottante.
             shadowColor: "#000",
             shadowOpacity: 0.22,
             shadowOffset: { width: 0, height: 10 },
@@ -188,11 +198,11 @@ export function AssistantChatWidget() {
           <Header onClose={() => toggle(false)} />
           <ModeTabs mode={mode} onSelect={setMode} />
 
-          {/* Conversation canvas — paper-tinted, with the static greeting. */}
+          {/* Canevas de conversation — teinté papier, avec le message d'accueil statique. */}
           <View style={{ flex: 1, backgroundColor: CLAUDE.paper, padding: 14 }}>
             <AssistantBubble>
-              Hello! Hello! I'm the FFIE's AI assistant. How can I help you? (NF C
-              15-100, IRVE, construction site…)
+              Bonjour ! Je suis l'assistant IA de la FFIE. Comment puis-je vous
+              aider ? (NF C 15-100, IRVE, chantier…)
             </AssistantBubble>
           </View>
 
@@ -202,7 +212,7 @@ export function AssistantChatWidget() {
             onSend={() => setDraft("")}
           />
 
-          {/* Attribution footer — required while the assistant is Claude-backed. */}
+          {/* Pied d'attribution — requis tant que l'assistant repose sur Claude. */}
           <View
             style={{
               paddingVertical: 8,
@@ -219,17 +229,18 @@ export function AssistantChatWidget() {
                 fontFamily: ralewayFamily("500"),
               }}
             >
-              Claude · Anthropic — professional use FFIE
+              Claude · Anthropic — usage professionnel FFIE
             </Text>
           </View>
         </Animated.View>
       ) : null}
 
-      {/* The corner FAB — toggles the panel. Hidden (behind the panel) visually
-          while open, but kept mounted so its press target stays consistent. */}
+      {/* Le FAB de coin — bascule le panneau. Masqué (derrière le panneau)
+          visuellement quand il est ouvert, mais maintenu monté pour que sa cible
+          d'appui reste cohérente. */}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={open ? "Close FFIE assistant" : "Open FFIE assistant"}
+        accessibilityLabel={open ? "Fermer l'assistant FFIE" : "Ouvrir l'assistant FFIE"}
         accessibilityState={{ expanded: open }}
         onPress={() => toggle(!open)}
         style={({ pressed }) => ({
@@ -260,8 +271,8 @@ export function AssistantChatWidget() {
 }
 
 // ---------------------------------------------------------------------------
-// Header — coral gradient bar: sparkle badge, title + Anthropic attribution,
-// and the close affordance.
+// Header — barre à dégradé corail : badge étincelle, titre + attribution
+// Anthropic, et l'indice de fermeture.
 // ---------------------------------------------------------------------------
 function Header({ onClose }: { onClose: () => void }) {
   return (
@@ -277,7 +288,7 @@ function Header({ onClose }: { onClose: () => void }) {
         columnGap: 11,
       }}
     >
-      {/* Sparkle badge in a translucent disc. */}
+      {/* Badge étincelle dans un disque translucide. */}
       <View
         style={{
           width: 34,
@@ -311,13 +322,13 @@ function Header({ onClose }: { onClose: () => void }) {
             fontFamily: ralewayFamily("500"),
           }}
         >
-          Powered by Claude · Anthropic
+          Propulsé par Claude · Anthropic
         </Text>
       </View>
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Close assistant"
+        accessibilityLabel="Fermer l'assistant"
         onPress={onClose}
         hitSlop={10}
         style={({ pressed }) => ({
@@ -336,9 +347,10 @@ function Header({ onClose }: { onClose: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
-// ModeTabs — the three assistant modes. Selected = solid ink pill (white icon +
-// label); unselected = paper pill with a hairline. State is exposed to
-// assistive tech, and the icon backs up the colour change (never colour alone).
+// ModeTabs — les trois modes de l'assistant. Sélectionné = pastille d'encre
+// pleine (icône + étiquette blanches) ; non sélectionné = pastille papier avec
+// un filet. L'état est exposé aux technologies d'assistance, et l'icône appuie le
+// changement de couleur (jamais la couleur seule).
 // ---------------------------------------------------------------------------
 function ModeTabs({
   mode,
@@ -409,8 +421,8 @@ function ModeTabs({
 }
 
 // ---------------------------------------------------------------------------
-// AssistantBubble — a single message from the assistant: paper-on-paper card
-// with a subtle border, left-aligned.
+// AssistantBubble — un seul message de l'assistant : carte papier-sur-papier
+// avec une bordure subtile, alignée à gauche.
 // ---------------------------------------------------------------------------
 function AssistantBubble({ children }: { children: React.ReactNode }) {
   return (
@@ -442,8 +454,9 @@ function AssistantBubble({ children }: { children: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------------------
-// Composer — the input row: pill text field + coral send button. Editable for
-// realism, but send is a no-op in the mockup (just clears the draft).
+// Composer — la rangée de saisie : champ texte en pastille + bouton d'envoi
+// corail. Éditable pour le réalisme, mais l'envoi ne fait rien dans la maquette
+// (il vide simplement le brouillon).
 // ---------------------------------------------------------------------------
 function Composer({
   value,
@@ -482,7 +495,7 @@ function Composer({
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          placeholder="Ask your question…"
+          placeholder="Posez votre question…"
           placeholderTextColor={CLAUDE.inkMuted}
           returnKeyType="send"
           onSubmitEditing={onSend}
@@ -497,7 +510,7 @@ function Composer({
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Send message"
+        accessibilityLabel="Envoyer le message"
         onPress={onSend}
         style={({ pressed }) => ({
           width: 42,

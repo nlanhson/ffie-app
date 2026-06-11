@@ -1,19 +1,23 @@
-// Profile settings sheets — the editors behind the Profile tab's actionable
-// rows (Region displayed, Interests, Edit profile, Change password).
+// Feuilles de réglages du profil — les éditeurs derrière les lignes actionnables
+// de l'onglet Profil (Région affichée, Centres d'intérêt, Modifier le profil,
+// Changer le mot de passe).
 //
-// v1 is mocked UI with no profile/auth backend (see CLAUDE.md → "Auth and
-// membership are mocked UI"). These sheets are therefore fully FUNCTIONAL but
-// LOCAL: they validate and animate, and their results are held in ProfileScreen
-// state for the session — they don't call a server. Each sheet says so in a
-// footnote so the TestFlight tester isn't misled.
+// La v1 est une UI simulée sans backend de profil/auth (voir CLAUDE.md →
+// « Auth and membership are mocked UI »). Ces feuilles sont donc pleinement
+// FONCTIONNELLES mais LOCALES : elles valident et animent, et leurs résultats
+// sont conservés dans l'état de ProfileScreen pour la session — elles n'appellent
+// pas de serveur. Chaque feuille le précise dans une note de bas de page pour ne
+// pas tromper le testeur TestFlight.
 //
-// All four share one scaffold (SettingsSheet): a full-screen slide-up Modal with
-// its own fresh SafeAreaProvider (the inset-compounding fix used app-wide), an
-// iOS-style Cancel / Title / Save nav bar, and a scrolling body. Lists reuse the
-// shared InsetGroup / InsetRow primitives; forms use a small labelled Field.
+// Les quatre partagent une même ossature (SettingsSheet) : un Modal plein écran
+// qui glisse vers le haut avec son propre SafeAreaProvider neuf (le correctif de
+// compounding d'inset utilisé dans toute l'app), une barre de navigation façon
+// iOS Annuler / Titre / Enregistrer, et un corps défilant. Les listes réutilisent
+// les primitives partagées InsetGroup / InsetRow ; les formulaires utilisent un
+// petit Field étiqueté.
 //
-// Reduced motion (P5): the slide animation collapses to an instant present when
-// the OS "Reduce Motion" setting is on.
+// Mouvement réduit (P5) : l'animation de glissement se réduit à une présentation
+// instantanée quand le réglage « Réduire les animations » de l'OS est activé.
 
 import React, { useEffect, useState } from "react";
 import {
@@ -42,14 +46,14 @@ import {
 } from "@/components/ui/ios";
 
 // ---------------------------------------------------------------------------
-// SettingsSheet — shared scaffold (Modal + nav bar + scrolling body).
+// SettingsSheet — ossature partagée (Modal + barre de navigation + corps défilant).
 // ---------------------------------------------------------------------------
 function SettingsSheet({
   visible,
   title,
   onClose,
   onSave,
-  saveLabel = "Save",
+  saveLabel = "Enregistrer",
   saveDisabled = false,
   themeName,
   children,
@@ -57,7 +61,7 @@ function SettingsSheet({
   visible: boolean;
   title: string;
   onClose: () => void;
-  /** Omit for tap-to-apply lists (e.g. the region picker) — no Save button. */
+  /** À omettre pour les listes à application immédiate (ex. le sélecteur de région) — pas de bouton Enregistrer. */
   onSave?: () => void;
   saveLabel?: string;
   saveDisabled?: boolean;
@@ -75,8 +79,9 @@ function SettingsSheet({
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
-      {/* Fresh provider per overlay so the top inset isn't double-counted
-          through the native modal host (the app-wide inset-compounding fix). */}
+      {/* Provider neuf par surcouche pour que l'inset du haut ne soit pas compté
+          en double à travers l'hôte de modal natif (le correctif de compounding
+          d'inset utilisé dans toute l'app). */}
       <SafeAreaProvider>
         <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
           <StatusBar style={themeName === "dark" ? "light" : "dark"} />
@@ -84,16 +89,16 @@ function SettingsSheet({
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={{ flex: 1 }}
           >
-            {/* Nav bar — Cancel · Title · Save, balanced side columns. */}
+            {/* Barre de navigation — Annuler · Titre · Enregistrer, colonnes latérales équilibrées. */}
             <View style={styles.navBar}>
               <Pressable
                 onPress={onClose}
                 hitSlop={10}
                 accessibilityRole="button"
-                accessibilityLabel="Cancel"
+                accessibilityLabel="Annuler"
                 style={styles.navSide}
               >
-                <Text style={[styles.navAction, { color: t.text.muted }]}>Cancel</Text>
+                <Text style={[styles.navAction, { color: t.text.muted }]}>Annuler</Text>
               </Pressable>
               <Text
                 style={[styles.navTitle, { color: t.text.body }]}
@@ -142,7 +147,7 @@ function SettingsSheet({
 }
 
 // ---------------------------------------------------------------------------
-// Field — a labelled text input for the form sheets.
+// Field — un champ de saisie étiqueté pour les feuilles de formulaire.
 // ---------------------------------------------------------------------------
 function Field({
   label,
@@ -198,8 +203,8 @@ function Field({
   );
 }
 
-// A short explanatory footnote under a form/list, clarifying the local-only
-// (mock) behaviour so the preview build reads honestly.
+// Une courte note de bas de page explicative sous un formulaire/une liste,
+// précisant le comportement local uniquement (simulé) pour que l'aperçu reste honnête.
 function Footnote({ children, themeName }: { children: string; themeName: ThemeName }) {
   const t = themes[themeName];
   return (
@@ -208,7 +213,7 @@ function Footnote({ children, themeName }: { children: string; themeName: ThemeN
 }
 
 // ---------------------------------------------------------------------------
-// EditProfileSheet — name / job title / company.
+// EditProfileSheet — nom / intitulé de poste / entreprise.
 // ---------------------------------------------------------------------------
 export type EditableProfile = {
   fullName: string;
@@ -233,8 +238,8 @@ export function EditProfileSheet({
   const [jobTitle, setJobTitle] = useState(initial.jobTitle);
   const [companyName, setCompanyName] = useState(initial.companyName);
 
-  // Re-seed the draft each time the sheet opens so a cancelled edit doesn't
-  // persist into the next open.
+  // Réinitialise le brouillon à chaque ouverture de la feuille pour qu'une
+  // modification annulée ne persiste pas à l'ouverture suivante.
   useEffect(() => {
     if (visible) {
       setFullName(initial.fullName);
@@ -257,48 +262,48 @@ export function EditProfileSheet({
   return (
     <SettingsSheet
       visible={visible}
-      title="Edit profile"
+      title="Modifier le profil"
       onClose={onClose}
       onSave={() => onSave(trimmed)}
       saveDisabled={!dirty || !valid}
       themeName={themeName}
     >
       <Field
-        label="Full name"
+        label="Nom complet"
         value={fullName}
         onChangeText={setFullName}
-        placeholder="Your name"
+        placeholder="Votre nom"
         autoFocus
         autoCapitalize="words"
-        error={fullName.length > 0 && !valid ? "Name can't be empty." : undefined}
+        error={fullName.length > 0 && !valid ? "Le nom ne peut pas être vide." : undefined}
         themeName={themeName}
       />
       <Field
-        label="Job title"
+        label="Intitulé de poste"
         value={jobTitle}
         onChangeText={setJobTitle}
-        placeholder="e.g. Technical Manager"
+        placeholder="ex. Responsable technique"
         autoCapitalize="words"
         themeName={themeName}
       />
       <Field
-        label="Company name"
+        label="Raison sociale"
         value={companyName}
         onChangeText={setCompanyName}
-        placeholder="Company"
+        placeholder="Entreprise"
         autoCapitalize="characters"
         themeName={themeName}
       />
       <Footnote themeName={themeName}>
-        Saved on this device for the preview — profile changes don't sync to FFIE
-        yet.
+        Enregistré sur cet appareil pour l'aperçu — les modifications du profil ne
+        sont pas encore synchronisées avec la FFIE.
       </Footnote>
     </SettingsSheet>
   );
 }
 
 // ---------------------------------------------------------------------------
-// ChangePasswordSheet — current / new / confirm, with local validation.
+// ChangePasswordSheet — actuel / nouveau / confirmation, avec validation locale.
 // ---------------------------------------------------------------------------
 const MIN_PASSWORD = 8;
 
@@ -310,7 +315,7 @@ export function ChangePasswordSheet({
 }: {
   visible: boolean;
   onClose: () => void;
-  /** Called when a valid new password is submitted (local mock — no server). */
+  /** Appelé lorsqu'un nouveau mot de passe valide est soumis (simulation locale — pas de serveur). */
   onUpdated: () => void;
   themeName: ThemeName;
 }) {
@@ -331,62 +336,62 @@ export function ChangePasswordSheet({
   const canSave = current.length > 0 && longEnough && matches;
 
   const nextError =
-    next.length > 0 && !longEnough ? `Use at least ${MIN_PASSWORD} characters.` : undefined;
+    next.length > 0 && !longEnough ? `Utilisez au moins ${MIN_PASSWORD} caractères.` : undefined;
   const confirmError =
-    confirm.length > 0 && next !== confirm ? "Passwords don't match." : undefined;
+    confirm.length > 0 && next !== confirm ? "Les mots de passe ne correspondent pas." : undefined;
 
   return (
     <SettingsSheet
       visible={visible}
-      title="Change password"
-      saveLabel="Update"
+      title="Changer le mot de passe"
+      saveLabel="Mettre à jour"
       onClose={onClose}
       onSave={onUpdated}
       saveDisabled={!canSave}
       themeName={themeName}
     >
       <Field
-        label="Current password"
+        label="Mot de passe actuel"
         value={current}
         onChangeText={setCurrent}
-        placeholder="Current password"
+        placeholder="Mot de passe actuel"
         secureTextEntry
         autoCapitalize="none"
         autoFocus
         themeName={themeName}
       />
       <Field
-        label="New password"
+        label="Nouveau mot de passe"
         value={next}
         onChangeText={setNext}
-        placeholder={`At least ${MIN_PASSWORD} characters`}
+        placeholder={`Au moins ${MIN_PASSWORD} caractères`}
         secureTextEntry
         autoCapitalize="none"
         error={nextError}
         themeName={themeName}
       />
       <Field
-        label="Confirm new password"
+        label="Confirmer le nouveau mot de passe"
         value={confirm}
         onChangeText={setConfirm}
-        placeholder="Re-enter new password"
+        placeholder="Saisissez à nouveau le nouveau mot de passe"
         secureTextEntry
         autoCapitalize="none"
         error={confirmError}
         themeName={themeName}
       />
       <Footnote themeName={themeName}>
-        This preview validates your entry but doesn't change a real password —
-        sign-in is mocked in v1.
+        Cet aperçu valide votre saisie mais ne change pas un vrai mot de passe —
+        la connexion est simulée en v1.
       </Footnote>
     </SettingsSheet>
   );
 }
 
 // ---------------------------------------------------------------------------
-// RegionPickerSheet — single-select list of the French federation regions.
-// These are real public administrative regions (not fabricated data); the
-// member's region is mock account state.
+// RegionPickerSheet — liste à sélection unique des régions de la fédération
+// française. Ce sont de vraies régions administratives publiques (pas des données
+// fabriquées) ; la région de l'adhérent est un état de compte simulé.
 // ---------------------------------------------------------------------------
 export const FR_REGIONS = [
   "Auvergne-Rhône-Alpes",
@@ -419,16 +424,16 @@ export function RegionPickerSheet({
   visible: boolean;
   selected: string;
   onClose: () => void;
-  /** Tap-to-apply: selecting a region commits it and closes the sheet. */
+  /** Application immédiate : sélectionner une région la valide et ferme la feuille. */
   onSelect: (region: string) => void;
   themeName: ThemeName;
 }) {
   const t = themes[themeName];
   return (
-    <SettingsSheet visible={visible} title="Region displayed" onClose={onClose} themeName={themeName}>
+    <SettingsSheet visible={visible} title="Région affichée" onClose={onClose} themeName={themeName}>
       <InsetGroup
         themeName={themeName}
-        footer="The region whose news and events appear first across the app."
+        footer="La région dont les actualités et les événements apparaissent en premier dans toute l'app."
       >
         {FR_REGIONS.map((region, i) => (
           <InsetRow
@@ -441,7 +446,7 @@ export function RegionPickerSheet({
               region === selected ? <Check size={20} color={t.brand.accent} strokeWidth={2.5} /> : undefined
             }
             onPress={() => onSelect(region)}
-            accessibilityLabel={`${region}${region === selected ? ", selected" : ""}`}
+            accessibilityLabel={`${region}${region === selected ? ", sélectionnée" : ""}`}
           />
         ))}
       </InsetGroup>
@@ -450,15 +455,15 @@ export function RegionPickerSheet({
 }
 
 // ---------------------------------------------------------------------------
-// InterestsSheet — multi-select list, committed on Save.
+// InterestsSheet — liste à sélection multiple, validée à l'enregistrement.
 // ---------------------------------------------------------------------------
 export const INTEREST_OPTIONS = [
-  { key: "regulatory", label: "Regulatory updates" },
-  { key: "training", label: "Training & certification" },
-  { key: "events", label: "Events & networking" },
-  { key: "partners", label: "Partner offers" },
-  { key: "technical", label: "Technical resources" },
-  { key: "news", label: "Federation news" },
+  { key: "regulatory", label: "Actualités réglementaires" },
+  { key: "training", label: "Formation et certification" },
+  { key: "events", label: "Événements et réseautage" },
+  { key: "partners", label: "Offres partenaires" },
+  { key: "technical", label: "Ressources techniques" },
+  { key: "news", label: "Actualités de la fédération" },
 ] as const;
 
 export type InterestKey = (typeof INTEREST_OPTIONS)[number]["key"];
@@ -492,7 +497,7 @@ export function InterestsSheet({
   return (
     <SettingsSheet
       visible={visible}
-      title="Interests"
+      title="Centres d'intérêt"
       onClose={onClose}
       onSave={() => onSave(draft)}
       saveDisabled={!dirty}
@@ -500,7 +505,7 @@ export function InterestsSheet({
     >
       <InsetGroup
         themeName={themeName}
-        footer="We use your interests to prioritise what you see across the app."
+        footer="Nous utilisons vos centres d'intérêt pour prioriser ce que vous voyez dans toute l'app."
       >
         {INTEREST_OPTIONS.map((opt, i) => {
           const on = draft.includes(opt.key);
@@ -513,7 +518,7 @@ export function InterestsSheet({
               showChevron={false}
               trailing={on ? <Check size={20} color={t.brand.accent} strokeWidth={2.5} /> : undefined}
               onPress={() => toggle(opt.key)}
-              accessibilityLabel={`${opt.label}${on ? ", selected" : ", not selected"}`}
+              accessibilityLabel={`${opt.label}${on ? ", sélectionné" : ", non sélectionné"}`}
             />
           );
         })}

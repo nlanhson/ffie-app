@@ -1,17 +1,18 @@
-// WeekCalendar — a one-week-tall calendar strip for the Events tab. Shows the
-// seven days of a week (Mon–Sun, English) with the month/year above; the user
-// swipes left/right or taps the chevrons to move to the previous/next week.
+// WeekCalendar — une bande calendrier d'une semaine de hauteur pour l'onglet Événements.
+// Affiche les sept jours d'une semaine (lun–dim, en français) avec le mois/année au-dessus ;
+// l'utilisateur balaie à gauche/droite ou appuie sur les chevrons pour passer à la semaine
+// précédente/suivante.
 //
-// Infinite weeks via the classic three-page trick: the horizontal pager always
-// holds [prev, current, next] and stays parked on the middle page. A swipe
-// settles on a side page, we shift the week by ±1 and snap back to centre
-// (un-animated) — so the content under the finger is continuous and you can
-// page forever without a giant list. Chevron taps just change the week in
-// place (no scroll), which keeps them instant and reduced-motion-safe.
+// Semaines infinies via l'astuce classique des trois pages : le pager horizontal contient
+// toujours [préc., courante, suiv.] et reste calé sur la page du milieu. Un balayage se pose
+// sur une page latérale, on décale la semaine de ±1 et on revient brusquement au centre
+// (sans animation) — ainsi le contenu sous le doigt est continu et on peut paginer à l'infini
+// sans liste géante. Les appuis sur les chevrons changent simplement la semaine sur place
+// (pas de défilement), ce qui les rend instantanés et compatibles avec le mouvement réduit.
 //
-// Days that have an event get a dot; today gets an accent ring; the selected
-// day gets a filled accent disc. Selection is internal (defaults to today) and
-// surfaced via onSelectDate for callers that want to react to it.
+// Les jours qui ont un événement reçoivent un point ; aujourd'hui reçoit un anneau d'accent ;
+// le jour sélectionné reçoit un disque d'accent plein. La sélection est interne (aujourd'hui
+// par défaut) et exposée via onSelectDate pour les appelants qui veulent y réagir.
 
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -30,14 +31,14 @@ import { MonthYearPickerModal } from "@/components/ui/MonthYearPickerModal";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-// English week + month names. Week starts Monday (ISO / France).
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// Noms français des jours + des mois. La semaine commence le lundi (ISO / France).
+const WEEKDAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
 ];
 
-// --- date helpers (local civil dates, no timezone math) --------------------
+// --- utilitaires de date (dates civiles locales, sans calcul de fuseau horaire) ---
 function midnight(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -68,21 +69,21 @@ export function WeekCalendar({
   onSelectDate,
 }: {
   themeName?: ThemeName;
-  /** Set of ISO dates (yyyy-mm-dd) that should show an event dot. */
+  /** Ensemble de dates ISO (aaaa-mm-jj) qui doivent afficher un point d'événement. */
   eventDates: Set<string>;
   onSelectDate?: (iso: string) => void;
 }) {
   const t = themes[themeName];
 
-  // "Today" and the initial selection, computed once so they stay stable.
+  // « Aujourd'hui » et la sélection initiale, calculés une fois pour rester stables.
   const [todayIso] = useState(() => isoDate(new Date()));
   const [selected, setSelected] = useState(todayIso);
 
-  // Which week is centred, relative to the week containing today.
+  // Quelle semaine est centrée, par rapport à la semaine contenant aujourd'hui.
   const [weekOffset, setWeekOffset] = useState(0);
 
-  // Pager geometry: we can only position the three pages once we know the
-  // strip's width, so the pager renders after the first layout pass.
+  // Géométrie du pager : on ne peut positionner les trois pages qu'une fois la
+  // largeur de la bande connue, donc le pager s'affiche après la première passe de layout.
   const [width, setWidth] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const didCentre = useRef(false);
@@ -101,8 +102,8 @@ export function WeekCalendar({
     if (w > 0 && w !== width) setWidth(w);
   };
 
-  // A swipe that settles on a side page shifts the week and re-centres so the
-  // pager can keep going forever.
+  // Un balayage qui se pose sur une page latérale décale la semaine et recentre pour
+  // que le pager puisse continuer indéfiniment.
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (width <= 0) return;
     const page = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -117,11 +118,11 @@ export function WeekCalendar({
     onSelectDate?.(iso);
   };
 
-  // System month/year picker (tapping the header label opens it).
+  // Sélecteur de mois/année système (appuyer sur le libellé de l'en-tête l'ouvre).
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  // Jump to the week containing a picked date, and select that day. weekOffset
-  // is measured in whole weeks from today's week; round() absorbs any DST hour.
+  // Sauter à la semaine contenant une date choisie, et sélectionner ce jour. weekOffset
+  // est mesuré en semaines entières depuis la semaine d'aujourd'hui ; round() absorbe toute heure de changement d'heure.
   const jumpToDate = (date: Date) => {
     const target = startOfWeek(date);
     const offset = Math.round((target.getTime() - startOfWeek(new Date()).getTime()) / WEEK_MS);
@@ -130,16 +131,16 @@ export function WeekCalendar({
     setPickerOpen(false);
   };
 
-  // Header label: the dominant month of the centred week (its Thursday).
+  // Libellé de l'en-tête : le mois dominant de la semaine centrée (son jeudi).
   const centreMonday = addDays(baseMonday, weekOffset * 7);
   const labelDate = addDays(centreMonday, 3);
   const headerLabel = `${capitalize(MONTHS[labelDate.getMonth()])} ${labelDate.getFullYear()}`;
-  // The picker opens on the displayed month (first of it).
+  // Le sélecteur s'ouvre sur le mois affiché (son premier jour).
   const pickerValue = new Date(labelDate.getFullYear(), labelDate.getMonth(), 1);
 
   return (
     <View>
-      {/* Month + week navigation */}
+      {/* Navigation mois + semaine */}
       <View
         style={{
           flexDirection: "row",
@@ -155,7 +156,7 @@ export function WeekCalendar({
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${headerLabel}. Choose month and year`}
+          accessibilityLabel={`${headerLabel}. Choisir le mois et l'année`}
           onPress={() => setPickerOpen(true)}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -186,7 +187,7 @@ export function WeekCalendar({
         />
       </View>
 
-      {/* Swipeable week pager — three pages parked on the middle one. */}
+      {/* Pager de semaine balayable — trois pages calées sur celle du milieu. */}
       <View onLayout={handleLayout}>
         {width > 0 ? (
           <ScrollView
@@ -196,8 +197,8 @@ export function WeekCalendar({
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={handleMomentumEnd}
             contentOffset={{ x: width, y: 0 }}
-            // The three pages are interchangeable; React keys by offset would
-            // remount on every shift, so we key by relative slot instead.
+            // Les trois pages sont interchangeables ; des clés React par offset
+            // remonteraient à chaque décalage, donc on utilise plutôt un slot relatif comme clé.
           >
             {[-1, 0, 1].map((slot) => (
               <WeekRow
@@ -226,7 +227,7 @@ export function WeekCalendar({
   );
 }
 
-// One week of seven day cells, sized to exactly one pager page.
+// Une semaine de sept cellules de jour, dimensionnée pour exactement une page du pager.
 function WeekRow({
   width,
   monday,
@@ -260,7 +261,7 @@ function WeekRow({
             key={iso}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
-            accessibilityLabel={`${WEEKDAYS[i]} ${day.getDate()}${hasEvent ? ", event" : ""}`}
+            accessibilityLabel={`${WEEKDAYS[i]} ${day.getDate()}${hasEvent ? ", événement" : ""}`}
             onPress={() => onSelect(iso)}
             style={{ flex: 1, alignItems: "center", paddingVertical: 2 }}
           >
@@ -304,8 +305,8 @@ function WeekRow({
               </Text>
             </View>
 
-            {/* Event indicator — colour + position (never colour alone, P4: it
-                also sits below the number, paired with the row's logo list). */}
+            {/* Indicateur d'événement — couleur + position (jamais la couleur seule, P4 : il
+                se place aussi sous le numéro, associé à la liste de logos de la ligne). */}
             <View
               style={{
                 width: 5,
@@ -335,7 +336,7 @@ function WeekArrow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={dir === "left" ? "Previous week" : "Next week"}
+      accessibilityLabel={dir === "left" ? "Semaine précédente" : "Semaine suivante"}
       onPress={onPress}
       hitSlop={10}
       style={({ pressed }) => ({

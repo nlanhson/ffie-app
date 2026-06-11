@@ -1,23 +1,27 @@
-// SSO federation connection — the identity-provider chooser.
+// Connexion SSO fédération — le sélecteur de fournisseur d'identité.
 //
-// Federation SSO ("Single Sign-On") lets a member sign in with the account
-// they already hold at their regional/departmental federation (the FFB
-// identity network) instead of an FFIE-specific email + password. Before a
-// real handoff, the member has to say WHICH federation issues their identity —
-// pick your federation, then Continue.
+// Le SSO fédération (« Single Sign-On ») permet à un adhérent de se connecter
+// avec le compte qu'il possède déjà auprès de sa fédération régionale /
+// départementale (le réseau d'identité FFB) plutôt qu'avec un e-mail + mot de
+// passe propre à la FFIE. Avant une vraie redirection, l'adhérent doit indiquer
+// QUELLE fédération délivre son identité — choisissez votre fédération, puis
+// Continuer.
 //
-// LAYOUT: deliberately mirrors the Join directory (BecomeMemberScreen) so the
-// two federation surfaces feel identical — light/white surface, large title,
-// map of pins, search with a clear-all (✕) button, a collapsible list ("Show
-// N more" / "Show less"), and a floating "back to top" once scrolled deep.
-// The one difference is BEHAVIOUR: rows here SELECT a single federation (radio)
-// and a pinned "Continue" signs you in, rather than expanding to contacts.
+// DISPOSITION : reflète délibérément l'annuaire d'adhésion (BecomeMemberScreen)
+// pour que les deux surfaces de fédération paraissent identiques — surface
+// claire / blanche, grand titre, carte à épingles, recherche avec un bouton de
+// tout effacer (✕), une liste repliable (« Afficher N de plus » / « Afficher
+// moins »), et un « retour en haut » flottant une fois descendu loin. La seule
+// différence est le COMPORTEMENT : les rangées ici SÉLECTIONNENT une seule
+// fédération (bouton radio) et un « Continuer » épinglé vous connecte, plutôt
+// que de se déplier vers des contacts.
 //
-// In production, Continue would open the chosen federation's secure sign-in
-// (OAuth2 / OIDC redirect via expo-auth-session) and return a token. In v1
-// this is mocked: select any federation + Continue authenticates locally (see
-// TESTFLIGHT.md / CLAUDE.md — no backend, don't wire to a real IdP without
-// instruction). Data-driven from src/data/federations.ts.
+// En production, Continuer ouvrirait la connexion sécurisée de la fédération
+// choisie (redirection OAuth2 / OIDC via expo-auth-session) et renverrait un
+// jeton. En v1, c'est simulé : sélectionnez n'importe quelle fédération +
+// Continuer authentifie localement (voir TESTFLIGHT.md / CLAUDE.md — pas de
+// backend, ne reliez pas à un vrai fournisseur d'identité sans instruction).
+// Piloté par les données de src/data/federations.ts.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -52,20 +56,22 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { SearchClearButton } from "@/components/ui/ios";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 
-// Light surface — reads like the rest of the app (white bg, dark text), even
-// though it's launched from the dark login. The app is light-only for now.
+// Surface claire — se lit comme le reste de l'app (fond blanc, texte foncé),
+// même si elle est lancée depuis la connexion sombre. L'app est en thème clair
+// uniquement pour l'instant.
 const t = themes.light;
-const GUTTER = semantics.spacing.gutter.mobile; // 16 — same as the Join directory
-const RADIUS = primitives.radii.lg; // 12 — fields, rows, buttons, map card
-const TEAL = t.brand.accent; // #027489 — selection highlight (radio / borders); now the same brand teal as the CTA below
-const TEAL_TINT = primitives.colors.brand.teal[50]; // #E6F8FB — selected-row fill
-// Continue CTA uses teal[700] — the FFIE brand teal, matching the app's default
-// primary action (≈5.4:1 white-on-teal, clears WCAG AA).
+const GUTTER = semantics.spacing.gutter.mobile; // 16 — identique à l'annuaire d'adhésion
+const RADIUS = primitives.radii.lg; // 12 — champs, rangées, boutons, carte
+const TEAL = t.brand.accent; // #027489 — surbrillance de sélection (radio / bordures) ; désormais le même teal de marque que le CTA plus bas
+const TEAL_TINT = primitives.colors.brand.teal[50]; // #E6F8FB — remplissage de rangée sélectionnée
+// Le CTA Continuer utilise teal[700] — le teal de marque FFIE, en cohérence avec
+// l'action principale par défaut de l'app (≈5.4:1 blanc-sur-teal, respecte WCAG AA).
 const CTA_BG = primitives.colors.brand.teal[700]; // #027489
 const CTA_PRESSED = primitives.colors.brand.teal[800]; // #045764
 
-// Initial map view centred on metropolitan France (same frame as the Join
-// directory; overseas federations sit outside it — pan/zoom to reach them).
+// Vue initiale de la carte centrée sur la France métropolitaine (même cadrage
+// que l'annuaire d'adhésion ; les fédérations d'outre-mer sont en dehors —
+// déplacez / zoomez pour les atteindre).
 const FRANCE_REGION = {
   latitude: 46.6,
   longitude: 2.5,
@@ -74,9 +80,9 @@ const FRANCE_REGION = {
 };
 const MAP_HEIGHT = 180;
 
-// One pin per federation that has a coordinate. Built once — the source is
-// static. (Federations without a coordinate have no pin but stay selectable
-// from the list.)
+// Une épingle par fédération qui a une coordonnée. Construit une seule fois — la
+// source est statique. (Les fédérations sans coordonnée n'ont pas d'épingle mais
+// restent sélectionnables depuis la liste.)
 const FEDERATION_PINS: FederationPin[] = FEDERATIONS_WITH_COORDS.map((f) => ({
   id: f.id,
   lat: f.lat as number,
@@ -85,13 +91,15 @@ const FEDERATION_PINS: FederationPin[] = FEDERATIONS_WITH_COORDS.map((f) => ({
   description: f.name,
 }));
 
-// Show a short list by default; "Show more" reveals the rest. A live search
-// bypasses the cap so every match is visible.
+// Affiche une liste courte par défaut ; « Afficher plus » révèle le reste. Une
+// recherche en direct contourne le plafond pour que chaque correspondance soit
+// visible.
 const INITIAL_COUNT = 10;
 
-// Android's scrollbar pins to the ScrollView's right edge and ignores
-// scrollIndicatorInsets, so inset the inner list a hair to lift the bar off the
-// screen edge like iOS. iOS keeps full width + indicator insets.
+// La barre de défilement d'Android se cale sur le bord droit de la ScrollView et
+// ignore scrollIndicatorInsets ; on décale donc légèrement la liste interne pour
+// soulever la barre du bord de l'écran comme sur iOS. iOS garde la pleine
+// largeur + les marges d'indicateur.
 const ANDROID_BAR_INSET = Platform.OS === "android" ? 8 : 0;
 
 export function SSOFederationScreen({
@@ -99,15 +107,15 @@ export function SSOFederationScreen({
   onConnect,
 }: {
   onBack: () => void;
-  // A federation was chosen and confirmed — promote the session (v1 mock).
+  // Une fédération a été choisie et confirmée — promouvoir la session (maquette v1).
   onConnect: (federation: Federation) => void;
 }) {
   const insets = useSafeAreaInsets();
   const reducedMotion = useReducedMotion();
   const { height: windowHeight } = useWindowDimensions();
-  // The list scrolls inside this fixed-height window so the outer page can
-  // scroll around it (nested scroll). ~42% of the screen — enough rows to scan,
-  // leaving the map + search visible above.
+  // La liste défile dans cette fenêtre à hauteur fixe pour que la page externe
+  // puisse défiler autour (défilement imbriqué). ~42 % de l'écran — assez de
+  // rangées à parcourir, en laissant la carte + la recherche visibles au-dessus.
   const listWindowHeight = Math.max(260, Math.round(windowHeight * 0.42));
 
   const [query, setQuery] = useState("");
@@ -117,12 +125,12 @@ export function SSOFederationScreen({
   const [footerH, setFooterH] = useState(0);
 
   const mapRef = useRef<FederationMapHandle>(null);
-  const pageRef = useRef<ScrollView>(null); // outer page scroll
-  const listRef = useRef<ScrollView>(null); // inner list window
+  const pageRef = useRef<ScrollView>(null); // défilement de la page externe
+  const listRef = useRef<ScrollView>(null); // fenêtre de liste interne
   const backToTopAnim = useRef(new Animated.Value(0)).current;
 
-  // Filter by department code, area, or official name — the three things a
-  // member might type to find their federation.
+  // Filtre par code de département, zone ou nom officiel — les trois choses
+  // qu'un adhérent pourrait taper pour trouver sa fédération.
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return FEDERATIONS;
@@ -145,8 +153,9 @@ export function SSOFederationScreen({
   );
   const canConnect = selected !== null;
 
-  // Back-to-top fades in once scrolled deep (opacity only — no slide), gated
-  // to an instant toggle under reduced motion. Hysteresis avoids flicker.
+  // Le retour en haut apparaît en fondu une fois descendu loin (opacité
+  // seulement — pas de glissement), réduit à une bascule instantanée en mouvement
+  // réduit. L'hystérésis évite le scintillement.
   useEffect(() => {
     Animated.timing(backToTopAnim, {
       toValue: showBackToTop ? 1 : 0,
@@ -167,8 +176,9 @@ export function SSOFederationScreen({
     pageRef.current?.scrollTo({ y: 0, animated: !reducedMotion });
   };
 
-  // One selection path for both inputs: tapping a list row or a map pin selects
-  // that federation and recentres the map on it (reduced-motion → instant).
+  // Un seul chemin de sélection pour les deux entrées : toucher une rangée de
+  // liste ou une épingle de carte sélectionne cette fédération et recentre la
+  // carte dessus (mouvement réduit → instantané).
   const selectFederation = (id: number) => {
     setSelectedId(id);
     const f = FEDERATIONS.find((x) => x.id === id);
@@ -184,16 +194,17 @@ export function SSOFederationScreen({
     <SafeAreaView edges={["top"]} style={styles.root}>
       <StatusBar style="dark" />
 
-      {/* Close — top-right, clear of the left-aligned large title (matches the
-          Join directory's modal close). */}
+      {/* Fermer — en haut à droite, dégagé du grand titre aligné à gauche (suit
+          la fermeture de la modale de l'annuaire d'adhésion). */}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Close"
+        accessibilityLabel="Fermer"
         onPress={onBack}
         hitSlop={10}
-        // Absolute children aren't offset by the SafeAreaView's top padding, so
-        // add the inset ourselves — otherwise the button sits under the status
-        // bar (clock / battery). +12 then aligns it with the title below.
+        // Les enfants absolus ne sont pas décalés par la marge supérieure de la
+        // SafeAreaView ; on ajoute donc la marge nous-mêmes — sinon le bouton se
+        // place sous la barre d'état (horloge / batterie). +12 l'aligne ensuite
+        // avec le titre en dessous.
         style={({ pressed }) => [
           styles.close,
           { top: insets.top + 12 },
@@ -203,9 +214,10 @@ export function SSOFederationScreen({
         <X size={18} color={t.text.muted} />
       </Pressable>
 
-      {/* Outer page scroll — drag anywhere OUTSIDE the list box (title, map,
-          search) to scroll the whole page; drag INSIDE the list box to scroll
-          just the list (the nested window below). */}
+      {/* Défilement de la page externe — faites glisser n'importe où HORS de la
+          boîte de liste (titre, carte, recherche) pour faire défiler toute la
+          page ; faites glisser DANS la boîte de liste pour ne faire défiler que
+          la liste (la fenêtre imbriquée ci-dessous). */}
       <ScrollView
         ref={pageRef}
         style={styles.page}
@@ -214,42 +226,43 @@ export function SSOFederationScreen({
         contentContainerStyle={styles.pageContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title + subtitle */}
+        {/* Titre + sous-titre */}
         <View style={styles.head}>
           <Text accessibilityRole="header" style={styles.title}>
-            Sign in with your federation
+            Connectez-vous avec votre fédération
           </Text>
           <Text style={styles.subtitle}>
-            Choose your federation below. You'll be securely redirected to
-            confirm your identity.
+            Choisissez votre fédération ci-dessous. Vous serez redirigé en toute
+            sécurité pour confirmer votre identité.
           </Text>
         </View>
 
-        {/* Map — tap a pin to select that federation (same component the Join
-            directory uses). Native module: Apple Maps on iOS, Google on Android. */}
+        {/* Carte — touchez une épingle pour sélectionner cette fédération (même
+            composant que celui de l'annuaire d'adhésion). Module natif : Apple
+            Maps sur iOS, Google sur Android. */}
         <View style={styles.mapCard}>
           <FederationMap
             ref={mapRef}
             style={styles.map}
             initialRegion={FRANCE_REGION}
             pins={FEDERATION_PINS}
-            accessibilityLabel="Map of departmental federations"
+            accessibilityLabel="Carte des fédérations départementales"
             onPinPress={selectFederation}
           />
         </View>
 
-        {/* Search with clear-all */}
+        {/* Recherche avec tout effacer */}
         <View style={styles.searchWrap}>
           <Search size={17} color={t.text.muted} />
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Search a department or federation"
+            placeholder="Rechercher un département ou une fédération"
             placeholderTextColor={t.text.placeholder}
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyType="search"
-            accessibilityLabel="Search federations"
+            accessibilityLabel="Rechercher des fédérations"
             style={styles.searchInput}
           />
           {query.length > 0 ? (
@@ -257,19 +270,19 @@ export function SSOFederationScreen({
           ) : null}
         </View>
 
-        {/* Federation list */}
+        {/* Liste des fédérations */}
         {results.length === 0 ? (
           <View style={styles.emptyWrap}>
-            <Text style={styles.empty}>No federation found.</Text>
+            <Text style={styles.empty}>Aucune fédération trouvée.</Text>
             <Text style={styles.emptyHint}>
-              Try a department number ("69"), a name ("Rhône") or "Building".
+              Essayez un numéro de département (« 69 »), un nom (« Rhône ») ou « Bâtiment ».
             </Text>
           </View>
         ) : (
           <>
-            {/* The list scrolls inside its own fixed-height window (nested
-                scroll) so the map stays in view; the outer page scrolls when you
-                drag outside this box. */}
+            {/* La liste défile dans sa propre fenêtre à hauteur fixe (défilement
+                imbriqué) pour que la carte reste visible ; la page externe défile
+                quand vous faites glisser hors de cette boîte. */}
             <View style={{ paddingRight: ANDROID_BAR_INSET }}>
               <ScrollView
                 ref={listRef}
@@ -290,7 +303,7 @@ export function SSOFederationScreen({
                       key={item.id}
                       accessibilityRole="radio"
                       accessibilityState={{ selected: isSelected }}
-                      accessibilityLabel={`${item.area} — department ${item.code}`}
+                      accessibilityLabel={`${item.area} — département ${item.code}`}
                       onPress={() => selectFederation(item.id)}
                       style={({ pressed }) => [
                         styles.row,
@@ -318,16 +331,17 @@ export function SSOFederationScreen({
               </ScrollView>
             </View>
 
-            {/* Show more / less + count caption sit in the page, below the
-                window — re-tapping is page-level, not list-scroll-level. */}
+            {/* Afficher plus / moins + légende de comptage se placent dans la
+                page, sous la fenêtre — re-toucher agit au niveau de la page, pas
+                du défilement de la liste. */}
             {collapsedList && hiddenCount > 0 ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Show all ${results.length} federations`}
+                accessibilityLabel={`Afficher les ${results.length} fédérations`}
                 onPress={() => setShowAll(true)}
                 style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
               >
-                <Text style={styles.toggleLabel}>Show {hiddenCount} more</Text>
+                <Text style={styles.toggleLabel}>Afficher {hiddenCount} de plus</Text>
                 <ChevronDown size={18} color={TEAL} />
               </Pressable>
             ) : null}
@@ -335,28 +349,28 @@ export function SSOFederationScreen({
             {showAll && !isSearching ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Show fewer federations"
+                accessibilityLabel="Afficher moins de fédérations"
                 onPress={() => {
                   setShowAll(false);
                   scrollToTop();
                 }}
                 style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
               >
-                <Text style={styles.toggleLabel}>Show less</Text>
+                <Text style={styles.toggleLabel}>Afficher moins</Text>
                 <ChevronUp size={18} color={TEAL} />
               </Pressable>
             ) : null}
 
             {collapsedList ? (
               <Text style={styles.countCaption}>
-                {`Showing ${visible.length} of ${FEDERATIONS.length} departmental federations.`}
+                {`Affichage de ${visible.length} fédérations départementales sur ${FEDERATIONS.length}.`}
               </Text>
             ) : null}
           </>
         )}
       </ScrollView>
 
-      {/* Pinned footer — Continue signs in with the selected federation. */}
+      {/* Pied de page épinglé — Continuer connecte avec la fédération sélectionnée. */}
       <View
         onLayout={(e) => setFooterH(e.nativeEvent.layout.height)}
         style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}
@@ -364,7 +378,7 @@ export function SSOFederationScreen({
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !canConnect }}
-          accessibilityLabel={selected ? `Continue with ${selected.area}` : "Continue"}
+          accessibilityLabel={selected ? `Continuer avec ${selected.area}` : "Continuer"}
           disabled={!canConnect}
           onPress={() => selected && onConnect(selected)}
           style={({ pressed }) => [
@@ -374,20 +388,20 @@ export function SSOFederationScreen({
           ]}
         >
           <Text style={[styles.ctaLabel, !canConnect && styles.ctaLabelDisabled]}>
-            {selected ? `Continue with ${selected.area}` : "Select a federation"}
+            {selected ? `Continuer avec ${selected.area}` : "Sélectionnez une fédération"}
           </Text>
         </Pressable>
       </View>
 
-      {/* Back to top — fades in over the list once scrolled deep, lifted above
-          the footer. */}
+      {/* Retour en haut — apparaît en fondu sur la liste une fois descendu loin,
+          relevé au-dessus du pied de page. */}
       <Animated.View
         pointerEvents={showBackToTop ? "box-none" : "none"}
         style={[styles.backToTop, { bottom: 24 + footerH, opacity: backToTopAnim }]}
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to top"
+          accessibilityLabel="Retour en haut"
           onPress={scrollToTop}
           style={({ pressed }) => [
             styles.backToTopBtn,
@@ -421,7 +435,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: GUTTER,
     paddingTop: 12,
     paddingBottom: 6,
-    paddingRight: 52, // clear of the close button
+    paddingRight: 52, // dégagé du bouton de fermeture
   },
   title: {
     fontSize: 30,

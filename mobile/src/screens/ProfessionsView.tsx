@@ -1,14 +1,16 @@
-// ProfessionsView — the "Trades" segment of the Discover tab.
+// ProfessionsView — le segment « Métiers » de l'onglet Découvrir.
 //
-// "Discover the professions" (WBS Epic 4 / FFIE-TRADES-01), rebuilt strictly to
-// the WBS acceptance criteria: a public section whose core is CAREER PROFILES,
-// optionally layered with educational content (training paths) and presentation
-// videos (real FFIE testimonial films). Public / no login (P6); video-led, not
-// a wall of text (P7).
+// « Découvrir les métiers » (WBS Epic 4 / FFIE-TRADES-01), reconstruit
+// strictement selon les critères d'acceptation du WBS : une section publique
+// dont le cœur est les FICHES MÉTIERS, éventuellement enrichie de contenu
+// pédagogique (parcours de formation) et de vidéos de présentation (vrais films
+// de témoignages FFIE). Public / sans connexion (P6) ; mené par la vidéo, pas un
+// mur de texte (P7).
 //
-// Layout: a video hero → the role cards (tap → a full profile) → "how you'd get
-// there" training paths → "voices from the field" real videos. Content + types
-// live in data/professions.ts. Imagery is placeholder (RemoteImage seeds).
+// Disposition : un hero vidéo → les cartes de métiers (toucher → une fiche
+// complète) → les parcours de formation « comment y arriver » → « paroles du
+// terrain », de vraies vidéos. Le contenu + les types vivent dans
+// data/professions.ts. L'imagerie est provisoire (graines RemoteImage).
 
 import React, { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
@@ -34,12 +36,12 @@ import {
   type Profession,
 } from "@/data/professions";
 
-// Brand teal[700] — the app's accessible action teal (matches CTAs / pills).
+// Teal[700] de la marque — le teal d'action accessible de l'app (assorti aux CTA / pastilles).
 const TEAL = primitives.colors.brand.teal[700];
 
 export function ProfessionsView({ themeName = "light" }: { themeName?: ThemeName }) {
-  // Which profile is open in the full-screen reader (null = closed), and which
-  // video is playing (null = closed). Never both at once, so no nested modals.
+  // Quelle fiche est ouverte dans le lecteur plein écran (null = fermé), et quelle
+  // vidéo est en lecture (null = fermé). Jamais les deux à la fois, donc pas de modales imbriquées.
   const [active, setActive] = useState<Profession | null>(null);
   const [videoId, setVideoId] = useState<string | null>(null);
 
@@ -51,17 +53,17 @@ export function ProfessionsView({ themeName = "light" }: { themeName?: ThemeName
         {PROFESSIONS_INTRO}
       </Text>
 
-      <SectionHeader title="Explore the roles" themeName={themeName} />
+      <SectionHeader title="Explorer les métiers" themeName={themeName} />
       <View style={{ paddingHorizontal: GUTTER, rowGap: 12 }}>
         {PROFESSIONS.map((p) => (
           <ProfessionCard key={p.id} profession={p} themeName={themeName} onPress={() => setActive(p)} />
         ))}
       </View>
 
-      <SectionHeader title="How you'd get there" themeName={themeName} />
+      <SectionHeader title="Comment y arriver" themeName={themeName} />
       <TrainingPaths themeName={themeName} />
 
-      <SectionHeader title="Voices from the field" themeName={themeName} />
+      <SectionHeader title="Paroles du terrain" themeName={themeName} />
       <VideoRow themeName={themeName} onPlay={setVideoId} />
 
       <ProfessionDetailModal profession={active} themeName={themeName} onClose={() => setActive(null)} />
@@ -71,15 +73,16 @@ export function ProfessionsView({ themeName = "light" }: { themeName?: ThemeName
 }
 
 // ---------------------------------------------------------------------------
-// Hero — a full-bleed image card with a dark scrim, the section title, and a
-// "Watch the film" pill (P7 — video-led). White text on the scrim clears AA for
-// the large display sizes; the pill is a white chip with teal[700] label.
+// Hero — une carte image pleine largeur avec un voile sombre, le titre de section
+// et une pastille « Voir le film » (P7 — mené par la vidéo). Le texte blanc sur le
+// voile passe l'AA pour les grandes tailles d'affichage ; la pastille est une puce
+// blanche avec un libellé teal[700].
 // ---------------------------------------------------------------------------
 function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => void }) {
   return (
     <View style={{ paddingHorizontal: GUTTER, paddingTop: 8 }}>
-      {/* Outer view casts the shadow; the inner view clips the image to the
-          radius — a shadow + overflow:hidden on one view clips the shadow. */}
+      {/* La vue externe projette l'ombre ; la vue interne découpe l'image au
+          rayon — une ombre + overflow:hidden sur une seule vue découperait l'ombre. */}
       <View style={{ borderRadius: primitives.radii.xl, backgroundColor: "#0A0E18", ...CARD_SHADOW }}>
         <View style={{ height: 264, borderRadius: primitives.radii.xl, overflow: "hidden" }}>
           <RemoteImage
@@ -87,23 +90,23 @@ function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => voi
             width="100%"
             height="100%"
             themeName={themeName}
-            accessibilityLabel="A diverse team of electricians working on a connected-building site"
+            accessibilityLabel="Une équipe diversifiée d'électriciens travaillant sur un chantier de bâtiment connecté"
           />
           <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(8,12,31,0.55)" }} />
           <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: 20 }}>
             <Text style={{ color: "#FFFFFF", fontSize: 12, fontFamily: ralewayFamily("700"), fontWeight: "700", letterSpacing: 1, textTransform: "uppercase", opacity: 0.9 }}>
-              FFIE · Electrical trades
+              FFIE · Métiers de l'électricité
             </Text>
             <Text style={{ color: "#FFFFFF", fontSize: 30, lineHeight: 34, fontFamily: displayFamily("700"), fontWeight: "700", letterSpacing: -0.6, marginTop: 8 }}>
-              Find your place in the trade
+              Trouvez votre place dans le métier
             </Text>
             <Text style={{ color: "rgba(255,255,255,0.92)", fontSize: 15, lineHeight: 21, marginTop: 8 }}>
-              A field that's growing fast — and probably nothing like you picture it.
+              Un secteur en pleine croissance — et sans doute bien différent de ce que vous imaginez.
             </Text>
             <Pressable
               onPress={onWatch}
               accessibilityRole="button"
-              accessibilityLabel="Watch the film"
+              accessibilityLabel="Voir le film"
               style={({ pressed }) => ({
                 flexDirection: "row",
                 alignItems: "center",
@@ -118,7 +121,7 @@ function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => voi
             >
               <Play size={16} color={TEAL} fill={TEAL} />
               <Text style={{ color: TEAL, fontSize: 15, fontFamily: ralewayFamily("700"), fontWeight: "700", marginLeft: 8 }}>
-                Watch the film
+                Voir le film
               </Text>
             </Pressable>
           </View>
@@ -129,8 +132,8 @@ function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => voi
 }
 
 // ---------------------------------------------------------------------------
-// SectionHeader — the uppercase eyebrow above each block (matches the Tools hub
-// + grouped-list section headers).
+// SectionHeader — le sur-titre en majuscules au-dessus de chaque bloc (assorti
+// aux en-têtes de section du hub Outils + des listes groupées).
 // ---------------------------------------------------------------------------
 function SectionHeader({ title, themeName }: { title: string; themeName: ThemeName }) {
   const t = themes[themeName];
@@ -155,8 +158,8 @@ function SectionHeader({ title, themeName }: { title: string; themeName: ThemeNa
 }
 
 // ---------------------------------------------------------------------------
-// ProfessionCard — one role in the list: a portrait, the job title, its domain
-// chip and a one-line hook. Tapping opens the full profile.
+// ProfessionCard — un métier dans la liste : un portrait, l'intitulé du poste,
+// sa puce de domaine et une accroche d'une ligne. Toucher ouvre la fiche complète.
 // ---------------------------------------------------------------------------
 function ProfessionCard({
   profession,
@@ -170,8 +173,8 @@ function ProfessionCard({
   const t = themes[themeName];
   const c = useHomeColors(themeName);
   return (
-    // Outer view casts the shadow; the inner Pressable clips the portrait to the
-    // card radius (shadow + overflow:hidden on one view would clip the shadow).
+    // La vue externe projette l'ombre ; le Pressable interne découpe le portrait
+    // au rayon de la carte (ombre + overflow:hidden sur une seule vue découperait l'ombre).
     <View style={{ borderRadius: primitives.radii.lg, backgroundColor: c.cardBg, ...CARD_SHADOW }}>
       <Pressable
         onPress={onPress}
@@ -211,7 +214,7 @@ function ProfessionCard({
   );
 }
 
-// DomainChip — a small category pill (surface tint + muted label).
+// DomainChip — une petite pastille de catégorie (teinte de surface + libellé atténué).
 function DomainChip({ label, themeName }: { label: string; themeName: ThemeName }) {
   const t = themes[themeName];
   return (
@@ -224,8 +227,9 @@ function DomainChip({ label, themeName }: { label: string; themeName: ThemeName 
 }
 
 // ---------------------------------------------------------------------------
-// TrainingPaths — the optional educational layer: the real French routes into
-// the trade, two-up. Informational cards (no destination — content is mock).
+// TrainingPaths — la couche pédagogique optionnelle : les vraies filières
+// françaises vers le métier, à deux colonnes. Cartes informatives (sans
+// destination — le contenu est fictif).
 // ---------------------------------------------------------------------------
 function TrainingPaths({ themeName }: { themeName: ThemeName }) {
   const t = themes[themeName];
@@ -251,9 +255,10 @@ function TrainingPaths({ themeName }: { themeName: ThemeName }) {
               }}
             >
               <GraduationCap size={20} color={TEAL} strokeWidth={1.9} />
-              {/* Reserve 2 lines for the label and note so every card is the
-                  same height and the level/note line up across the whole grid
-                  (labels like "BTS Électrotechnique" wrap to two lines). */}
+              {/* Réserver 2 lignes pour le libellé et la note pour que chaque
+                  carte ait la même hauteur et que le niveau/la note s'alignent
+                  sur toute la grille (des libellés comme « BTS Électrotechnique »
+                  passent sur deux lignes). */}
               <Text
                 numberOfLines={2}
                 style={{ color: t.text.body, fontSize: 15, lineHeight: 19, fontFamily: ralewayFamily("700"), fontWeight: "700", marginTop: 10, minHeight: 38 }}
@@ -276,8 +281,8 @@ function TrainingPaths({ themeName }: { themeName: ThemeName }) {
 }
 
 // ---------------------------------------------------------------------------
-// VideoRow — the optional presentation-videos layer: real FFIE testimonials in
-// a horizontal rail. Tapping a card opens the inline player.
+// VideoRow — la couche optionnelle de vidéos de présentation : de vrais
+// témoignages FFIE dans un rail horizontal. Toucher une carte ouvre le lecteur intégré.
 // ---------------------------------------------------------------------------
 function VideoRow({ themeName, onPlay }: { themeName: ThemeName; onPlay: (id: string) => void }) {
   const t = themes[themeName];
@@ -292,7 +297,7 @@ function VideoRow({ themeName, onPlay }: { themeName: ThemeName; onPlay: (id: st
           key={v.youtubeId}
           onPress={() => onPlay(v.youtubeId)}
           accessibilityRole="button"
-          accessibilityLabel={`Play ${v.name}'s testimonial`}
+          accessibilityLabel={`Lire le témoignage de ${v.name}`}
           style={({ pressed }) => ({ width: 208, opacity: pressed ? 0.9 : 1 })}
         >
           <RemoteImage
@@ -317,9 +322,10 @@ function VideoRow({ themeName, onPlay }: { themeName: ThemeName; onPlay: (id: st
 }
 
 // ---------------------------------------------------------------------------
-// ProfessionDetailModal — the full career profile: portrait, the job summary,
-// "what you'd do", the skills, and how to train into it. A page sheet matching
-// the rest of the app's detail modals; reduced motion snaps it in (P4).
+// ProfessionDetailModal — la fiche métier complète : portrait, le résumé du
+// poste, « ce que vous feriez », les compétences, et comment s'y former. Une page
+// sheet assortie aux autres modales de détail de l'app ; le mouvement réduit la
+// fait apparaître d'un coup (P4).
 // ---------------------------------------------------------------------------
 function ProfessionDetailModal({
   profession,
@@ -356,7 +362,7 @@ function ProfessionDetailModal({
               <Pressable
                 onPress={onClose}
                 accessibilityRole="button"
-                accessibilityLabel="Close"
+                accessibilityLabel="Fermer"
                 hitSlop={8}
                 style={({ pressed }) => ({
                   position: "absolute",
@@ -383,7 +389,7 @@ function ProfessionDetailModal({
               <Text style={{ color: t.text.muted, fontSize: 16, lineHeight: 22, marginTop: 6 }}>{p.tagline}</Text>
               <Text style={{ color: t.text.body, fontSize: 15, lineHeight: 23, marginTop: 14 }}>{p.summary}</Text>
 
-              <DetailSection title="What you'd do" themeName={themeName}>
+              <DetailSection title="Ce que vous feriez" themeName={themeName}>
                 <View style={{ rowGap: 10 }}>
                   {p.dayInLife.map((item, i) => (
                     <View key={i} style={{ flexDirection: "row", alignItems: "flex-start" }}>
@@ -396,7 +402,7 @@ function ProfessionDetailModal({
                 </View>
               </DetailSection>
 
-              <DetailSection title="Skills you'd use" themeName={themeName}>
+              <DetailSection title="Compétences mobilisées" themeName={themeName}>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                   {p.skills.map((s) => (
                     <View key={s} style={{ backgroundColor: t.surface.subtle, borderWidth: 1, borderColor: t.border.subtle, borderRadius: primitives.radii.full, paddingHorizontal: 12, paddingVertical: 7 }}>
@@ -406,7 +412,7 @@ function ProfessionDetailModal({
                 </View>
               </DetailSection>
 
-              <DetailSection title="How to get there" themeName={themeName}>
+              <DetailSection title="Comment y arriver" themeName={themeName}>
                 <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                   <View style={{ width: 26, paddingTop: 1 }}>
                     <GraduationCap size={18} color={TEAL} strokeWidth={1.9} />
@@ -422,7 +428,7 @@ function ProfessionDetailModal({
   );
 }
 
-// DetailSection — a titled block inside the profile (navy uppercase header).
+// DetailSection — un bloc titré dans la fiche (en-tête en majuscules bleu marine).
 function DetailSection({
   title,
   themeName,
@@ -447,8 +453,9 @@ function DetailSection({
 }
 
 // ---------------------------------------------------------------------------
-// VideoModal — the inline player for the hero film + the testimonial rail.
-// Captions are on by default (YouTubeEmbed). Reduced motion snaps it in.
+// VideoModal — le lecteur intégré pour le film du hero + le rail de témoignages.
+// Les sous-titres sont activés par défaut (YouTubeEmbed). Le mouvement réduit le
+// fait apparaître d'un coup.
 // ---------------------------------------------------------------------------
 function VideoModal({
   youtubeId,
@@ -473,7 +480,7 @@ function VideoModal({
           <Pressable
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Close"
+            accessibilityLabel="Fermer"
             hitSlop={8}
             style={({ pressed }) => ({ width: 44, height: 44, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.6 : 1 })}
           >
@@ -483,7 +490,7 @@ function VideoModal({
         <View style={{ paddingHorizontal: GUTTER, paddingTop: 8 }}>
           {youtubeId ? <YouTubeEmbed youtubeId={youtubeId} /> : null}
           <Text style={{ color: t.text.muted, fontSize: 13, lineHeight: 19, marginTop: 12 }}>
-            Captions are on by default — tap the player to start.
+            Les sous-titres sont activés par défaut — touchez le lecteur pour démarrer.
           </Text>
         </View>
       </SafeAreaView>

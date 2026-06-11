@@ -1,13 +1,14 @@
-// EventDetailScreen — the per-event page reached by tapping an event in the
-// Events tab. Content comes from data/events.ts (FFIE's published pages);
-// no fabricated detail. Layout:
-//   • a location tag (map pin + city) at the top,
-//   • the date + title,
-//   • the date/time info rows,
-//   • two CTAs — "Details" (the full FFIE page) and "Register" (the
-//     registration form) — both opened in the in-app browser, matching the
-//     News reader and Partners directory.
-// Events FFIE hasn't published yet fall back to a "details coming" placeholder.
+// EventDetailScreen — la page par événement atteinte en tapant un événement dans
+// l'onglet Événements. Le contenu provient de data/events.ts (les pages publiées par la
+// FFIE) ; aucun détail fabriqué. Mise en page :
+//   • une étiquette de lieu (épingle de carte + ville) en haut,
+//   • la date + le titre,
+//   • les lignes d'infos date/heure,
+//   • deux CTA — « Détails » (la page FFIE complète) et « Inscription » (le
+//     formulaire d'inscription) — tous deux ouverts dans le navigateur intégré, à
+//     l'image du lecteur Actualités et de l'annuaire Partenaires.
+// Les événements que la FFIE n'a pas encore publiés se rabattent sur un texte d'attente
+// « Détails à venir ».
 
 import React from "react";
 import { Calendar, ChevronLeft, Clock, MapPin } from "lucide-react-native";
@@ -20,13 +21,13 @@ import { Button } from "@/components/ui/Button";
 import { EVENTS } from "@/data/events";
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "janvier", "février", "mars", "avril", "mai", "juin",
+  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
 ];
 
 function formatLongDate(iso: string): string {
   const [y, m, d] = iso.split("-").map((n) => parseInt(n, 10));
-  return `${MONTHS[m - 1]} ${d}, ${y}`;
+  return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
 export function EventDetailScreen({
@@ -41,8 +42,9 @@ export function EventDetailScreen({
   const t = themes[themeName];
   const event = EVENTS.find((e) => e.id === id);
 
-  // Open external links in the native in-app browser (page sheet), matching the
-  // News reader / Partners directory — dismissing returns straight here.
+  // Ouvre les liens externes dans le navigateur intégré natif (feuille de page), à
+  // l'image du lecteur Actualités / de l'annuaire Partenaires — fermer renvoie
+  // directement ici.
   const openInBrowser = (url: string) => {
     WebBrowser.openBrowserAsync(url, {
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
@@ -58,7 +60,7 @@ export function EventDetailScreen({
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: t.surface.default }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel="Retour"
         onPress={onBack}
         hitSlop={8}
         style={({ pressed }) => ({
@@ -72,16 +74,16 @@ export function EventDetailScreen({
         })}
       >
         <ChevronLeft size={26} color={t.brand.accent} />
-        <Text style={{ color: t.brand.accent, fontSize: 16 }}>Events</Text>
+        <Text style={{ color: t.brand.accent, fontSize: 16 }}>Événements</Text>
       </Pressable>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: 32 }}>
         {event ? (
           <>
-            {/* Location tag — map pin + city. */}
+            {/* Étiquette de lieu — épingle de carte + ville. */}
             {event.city ? (
               <View
-                accessibilityLabel={`Location: ${event.city}`}
+                accessibilityLabel={`Lieu : ${event.city}`}
                 style={{
                   flexDirection: "row",
                   alignSelf: "flex-start",
@@ -124,7 +126,7 @@ export function EventDetailScreen({
               {event.title}
             </Text>
 
-            {/* Date / time info rows. */}
+            {/* Lignes d'infos date / heure. */}
             <View style={{ marginTop: 18, rowGap: 10 }}>
               <InfoRow
                 icon={<Calendar size={17} color={t.brand.accent} />}
@@ -140,7 +142,7 @@ export function EventDetailScreen({
               ) : null}
             </View>
 
-            {/* CTAs — Details (the FFIE page) + Register (the form). */}
+            {/* CTA — Détails (la page FFIE) + Inscription (le formulaire). */}
             {hasCtas ? (
               <View style={{ flexDirection: "row", columnGap: 12, marginTop: 28 }}>
                 {event.detailsUrl ? (
@@ -150,9 +152,9 @@ export function EventDetailScreen({
                       fullWidth
                       themeName={themeName}
                       onPress={() => openInBrowser(event.detailsUrl!)}
-                      accessibilityHint="Opens the event page on ffie.fr"
+                      accessibilityHint="Ouvre la page de l'événement sur ffie.fr"
                     >
-                      Details
+                      Détails
                     </Button>
                   </View>
                 ) : null}
@@ -163,23 +165,23 @@ export function EventDetailScreen({
                       fullWidth
                       themeName={themeName}
                       onPress={() => openInBrowser(event.registrationUrl!)}
-                      accessibilityHint="Opens the registration form"
+                      accessibilityHint="Ouvre le formulaire d'inscription"
                     >
-                      Register
+                      Inscription
                     </Button>
                   </View>
                 ) : null}
               </View>
             ) : (
-              // Placeholder — FFIE hasn't published this event's detail yet.
+              // Texte d'attente — la FFIE n'a pas encore publié le détail de cet événement.
               <Text style={{ color: t.text.muted, fontSize: 15, lineHeight: 22, marginTop: 24 }}>
-                Details coming.
+                Détails à venir.
               </Text>
             )}
           </>
         ) : (
           <Text style={{ color: t.text.muted, fontSize: 15, lineHeight: 22 }}>
-            Event not found.
+            Événement introuvable.
           </Text>
         )}
       </ScrollView>
@@ -187,7 +189,7 @@ export function EventDetailScreen({
   );
 }
 
-// InfoRow — an icon + a line of text, used for the date/time facts.
+// InfoRow — une icône + une ligne de texte, utilisée pour les informations date/heure.
 function InfoRow({
   icon,
   text,

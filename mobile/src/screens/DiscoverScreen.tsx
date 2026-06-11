@@ -1,26 +1,27 @@
-// Trades tab — the public discovery surface for guests (Karim + Léa).
+// Onglet Métiers — la surface de découverte publique pour les invités (Karim + Léa).
 //
-// A segmented control under the large title splits the tab into three segments,
-// mirroring the News / Partners tabs' toggle:
-//   • Trades       — the careers content (the original Discover screen, below).
-//   • Videos       — multimedia content (FFIE-VIDEO-01, 🔵 Phase 1): a clone of
-//                    the FFIE "Videos" page — four themed categories that open
-//                    the federation's video pages in the in-app browser.
-//   • Calculators  — technical calculation tools (FFIE-CALC-01/02, 🟢 Phase 2,
-//                    member-only). The module + the power↔current tool
-//                    are built (see CalculatorsView); guests get a locked state.
+// Un contrôle segmenté sous le grand titre divise l'onglet en trois segments,
+// comme le sélecteur des onglets Actualités / Partenaires :
+//   • Métiers      — le contenu carrières (l'écran Découvrir original, ci-dessous).
+//   • Vidéos       — contenu multimédia (FFIE-VIDEO-01, 🔵 Phase 1) : un clone de
+//                    la page « Vidéos » de la FFIE — quatre catégories thématiques
+//                    qui ouvrent les pages vidéo de la fédération dans le navigateur intégré.
+//   • Calculateurs — outils de calcul technique (FFIE-CALC-01/02, 🟢 Phase 2,
+//                    réservés aux adhérents). Le module + l'outil puissance↔courant
+//                    sont construits (voir CalculatorsView) ; les invités obtiennent un état verrouillé.
 //
-// The "Trades" segment (TradesBody) mirrors the client careers page
-// (ffie.fr/les-metiers-de-lelectricite/metiers-et-formations) section-by-section:
-//   1. The client's intro paragraph (verbatim).
-//   2. Explore the field — the 5 domains as tappable rows opening a detail sheet.
-//   3. Two feature cards — "7 Reasons…" and the "kit professions"; each opens
-//      its page (the kit is a PDF) in the in-app browser.
-//   4. "Professions of tomorrow" — heading + intro + a 2-column TRAINING grid
-//      + a "See more training" button (opens the trades index).
+// Le segment « Métiers » (TradesBody) reproduit la page carrières du client
+// (ffie.fr/les-metiers-de-lelectricite/metiers-et-formations) section par section :
+//   1. Le paragraphe d'introduction du client (verbatim).
+//   2. Explorer le domaine — les 5 domaines en lignes touchables ouvrant une feuille de détail.
+//   3. Deux cartes vedettes — « 7 raisons… » et le « kit métiers » ; chacune ouvre
+//      sa page (le kit est un PDF) dans le navigateur intégré.
+//   4. « Les métiers de demain » — titre + intro + une grille FORMATION à 2 colonnes
+//      + un bouton « Voir plus de formations » (ouvre l'index des métiers).
 //
-// Scope: Trades is FFIE-TRADES-01 (career profiles + educational content). All
-// imagery is placeholder (see data/trades.ts); links open externally (P6).
+// Périmètre : Métiers correspond à FFIE-TRADES-01 (fiches métiers + contenu
+// pédagogique). Toute l'imagerie est provisoire (voir data/trades.ts) ; les liens
+// s'ouvrent en externe (P6).
 
 import React, { useEffect, useRef, useState } from "react";
 import { ExternalLink, Play } from "lucide-react-native";
@@ -55,10 +56,10 @@ import {
   type VideoCategory,
 } from "@/data/videos";
 
-// Open an external link in the native in-app browser (page sheet, slides up
-// from the bottom), matching the News / training readers and the Partners
-// directory. Used by the Trades feature cards, the "See more training"
-// button, and the Videos channel link.
+// Ouvre un lien externe dans le navigateur intégré natif (page sheet, glisse
+// vers le haut depuis le bas), comme les lecteurs Actualités / formations et
+// l'annuaire Partenaires. Utilisé par les cartes vedettes Métiers, le bouton
+// « Voir plus de formations » et le lien de la chaîne Vidéos.
 function openInBrowser(url: string, themeName: ThemeName) {
   const t = themes[themeName];
   WebBrowser.openBrowserAsync(url, {
@@ -69,10 +70,11 @@ function openInBrowser(url: string, themeName: ThemeName) {
   }).catch(() => {});
 }
 
-// The Discover tab is a self-contained native stack (Feed → VideoCategory),
-// like the News tab: opening a video category pushes the in-app player, which
-// gets the platform back affordances for free (iOS left-edge swipe, Android
-// system back). Routes carry only the category id (params must be serialisable).
+// L'onglet Découvrir est une pile native autonome (Feed → VideoCategory),
+// comme l'onglet Actualités : ouvrir une catégorie vidéo empile le lecteur
+// intégré, qui obtient gratuitement les affordances de retour de la plateforme
+// (balayage depuis le bord gauche sur iOS, retour système Android). Les routes
+// ne transportent que l'id de catégorie (les params doivent être sérialisables).
 type TradesStackParamList = {
   Feed: undefined;
   VideoCategory: { id: string };
@@ -82,18 +84,19 @@ const Stack = createNativeStackNavigator<TradesStackParamList>();
 
 const GRID_GAP = 14;
 
-// The segments inside the Discover tab. "trades" is the public careers content
-// (the default landing — a blank placeholder for now, pending FFIE content);
-// "tools" is the launcher grid that now also hosts the calculators (see
-// ToolsHubView); "videos" clones the FFIE videos page. A segmented control at
-// the top toggles between them, like the News tab.
+// Les segments à l'intérieur de l'onglet Découvrir. "trades" est le contenu
+// carrières public (l'atterrissage par défaut — un espace réservé vide pour
+// l'instant, en attendant le contenu FFIE) ; "tools" est la grille de lancement
+// qui accueille désormais aussi les calculateurs (voir ToolsHubView) ; "videos"
+// clone la page vidéos de la FFIE. Un contrôle segmenté en haut bascule entre
+// eux, comme l'onglet Actualités.
 type TradesTab = "trades" | "tools" | "videos";
 
-// Large-title text per segment (the header re-titles like the News tab does).
+// Texte du grand titre par segment (l'en-tête se retitre comme le fait l'onglet Actualités).
 const TAB_TITLES: Record<TradesTab, string> = {
-  trades: "Trades",
-  tools: "Tools",
-  videos: "Videos",
+  trades: "Métiers",
+  tools: "Outils",
+  videos: "Vidéos",
 };
 
 export function DiscoverScreen({
@@ -102,18 +105,18 @@ export function DiscoverScreen({
   initialSegment,
 }: {
   themeName?: ThemeName;
-  /** Incremented by the shell when the Trades tab is re-tapped while already
-   *  active. We use it to pop the stack back to the grid from an open reader. */
+  /** Incrémenté par le shell quand l'onglet Métiers est re-touché alors qu'il est
+   *  déjà actif. On l'utilise pour dépiler la pile jusqu'à la grille depuis un lecteur ouvert. */
   resetSignal?: number;
-  /** Open on a specific segment (e.g. "tools" when arriving from the Home
-   *  "Tools FFIE" shortcut). Defaults to the careers content ("trades"). */
+  /** Ouvrir sur un segment spécifique (p. ex. "tools" en arrivant depuis le
+   *  raccourci « Outils FFIE » de l'Accueil). Par défaut, le contenu carrières ("trades"). */
   initialSegment?: TradesTab;
 }) {
   const reducedMotion = useReducedMotion();
   const navRef = useNavigationContainerRef<TradesStackParamList>();
 
-  // Re-tapping the active Trades tab pops the training reader back to the grid.
-  // Skip the first run (mount) so we only react to genuine re-taps.
+  // Re-toucher l'onglet Métiers actif dépile le lecteur de formation jusqu'à la grille.
+  // On ignore la première exécution (montage) pour ne réagir qu'aux véritables re-touches.
   const isFirstResetRun = useRef(true);
   useEffect(() => {
     if (isFirstResetRun.current) {
@@ -129,10 +132,11 @@ export function DiscoverScreen({
     <NavigationContainer ref={navRef}>
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // each screen draws its own iOS-HIG header
-          // Reduced motion is non-negotiable (P5): collapse the push/pop
-          // transition to an instant cut. The left-edge swipe-back gesture
-          // stays enabled either way — it's an input, not decorative motion.
+          headerShown: false, // chaque écran dessine son propre en-tête iOS-HIG
+          // Le mouvement réduit est non négociable (P5) : on réduit la transition
+          // d'empilement/dépilement à une coupe instantanée. Le geste de retour
+          // par balayage depuis le bord gauche reste activé dans tous les cas —
+          // c'est une entrée, pas un mouvement décoratif.
           animation: reducedMotion ? "none" : "default",
         }}
       >
@@ -160,8 +164,8 @@ export function DiscoverScreen({
   );
 }
 
-// VideoCategoryRoute — resolves the route's category id into the video reader.
-// An unknown id just pops back to the grid.
+// VideoCategoryRoute — résout l'id de catégorie de la route en lecteur vidéo.
+// Un id inconnu dépile simplement jusqu'à la grille.
 function VideoCategoryRoute({
   id,
   themeName,
@@ -181,10 +185,11 @@ function VideoCategoryRoute({
   return <VideoCategoryScreen category={category} themeName={themeName} onBack={onBack} />;
 }
 
-// DiscoverFeed — the Trades tab feed itself: the segmented control (Trades /
-// Videos / Calculators) and, on the Trades segment, the careers content. Owns
-// the active-segment state; stays mounted beneath a pushed training reader
-// (native stack), so scroll and segment survive the round-trip.
+// DiscoverFeed — le flux de l'onglet Métiers lui-même : le contrôle segmenté
+// (Métiers / Vidéos / Calculateurs) et, sur le segment Métiers, le contenu
+// carrières. Détient l'état du segment actif ; reste monté sous un lecteur de
+// formation empilé (pile native), de sorte que le défilement et le segment
+// survivent à l'aller-retour.
 function DiscoverFeed({
   themeName = "light",
   initialTab,
@@ -195,64 +200,67 @@ function DiscoverFeed({
   onOpenVideo?: (id: string) => void;
 }) {
   const c = useGroupedColors(themeName);
-  // The "Tools" launcher grid takes the Home dashboard look — recessed grey
-  // page behind raised white cards — so it gets the Home palette, not the list
-  // screens' inverted (white page / grey card) one.
+  // La grille de lancement « Outils » adopte l'allure du tableau de bord de
+  // l'Accueil — page grise en creux derrière des cartes blanches surélevées —
+  // elle obtient donc la palette de l'Accueil, et non celle inversée des écrans
+  // de liste (page blanche / carte grise).
   const homeC = useHomeColors(themeName);
 
-  // Active segment. The "Trades" careers content is the default landing (a blank
-  // placeholder for now). "Tools" is the launcher grid (now hosting the
-  // calculators) and "Videos" clones the FFIE videos page. `initialTab` lets a
-  // deep link (Home "Tools FFIE" / "Our trades" shortcut) open a specific segment.
+  // Segment actif. Le contenu carrières « Métiers » est l'atterrissage par défaut
+  // (un espace réservé vide pour l'instant). « Outils » est la grille de lancement
+  // (qui accueille désormais les calculateurs) et « Vidéos » clone la page vidéos
+  // de la FFIE. `initialTab` permet à un lien profond (raccourci « Outils FFIE » /
+  // « Nos métiers » de l'Accueil) d'ouvrir un segment spécifique.
   const [tab, setTab] = useState<TradesTab>(initialTab ?? "trades");
 
-  // Switching segment starts fresh at the top, matching News / Partners.
+  // Changer de segment repart en haut, comme Actualités / Partenaires.
   const scrollRef = useRef<ScrollView>(null);
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [tab]);
 
-  // The Tools launcher sits on the recessed grey dashboard page; the other
-  // segments keep the list screens' page background.
+  // Le lanceur Outils repose sur la page tableau de bord grise en creux ; les
+  // autres segments conservent le fond de page des écrans de liste.
   const pageBg = tab === "tools" || tab === "trades" ? homeC.pageBg : c.pageBg;
 
   return (
-    // Page title now lives in the shared AppHeader (shell); content renders
-    // directly beneath it.
+    // Le titre de page vit désormais dans l'AppHeader partagé (shell) ; le
+    // contenu se rend directement en dessous.
     <View style={{ flex: 1, backgroundColor: pageBg }}>
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Segment toggle. Sits under the large title like an iOS segmented
-            control: Trades (careers content, default), Tools (launcher grid +
-            calculators) and Videos. */}
+        {/* Sélecteur de segment. Placé sous le grand titre comme un contrôle
+            segmenté iOS : Métiers (contenu carrières, par défaut), Outils (grille
+            de lancement + calculateurs) et Vidéos. */}
         <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 18 }}>
           <SegmentedControl
             themeName={themeName}
             value={tab}
             options={[
-              { key: "trades", label: "Trades" },
-              { key: "tools", label: "Tools" },
-              { key: "videos", label: "Videos" },
+              { key: "trades", label: "Métiers" },
+              { key: "tools", label: "Outils" },
+              { key: "videos", label: "Vidéos" },
             ]}
             onChange={setTab}
           />
         </View>
 
         {tab === "tools" ? (
-          // The "Tools FFIE" launcher grid — now also hosts the calculators as
-          // tiles (PowerCalculatorSheet / VoltageDropSheet), member-gated.
-          // See ToolsHubView.
+          // La grille de lancement « Outils FFIE » — accueille désormais aussi les
+          // calculateurs sous forme de tuiles (PowerCalculatorSheet /
+          // VoltageDropSheet), réservées aux adhérents. Voir ToolsHubView.
           <ToolsHubView themeName={themeName} />
         ) : tab === "videos" ? (
-          // FFIE-VIDEO-01 (🔵 Phase 1) — clone of the FFIE "Videos" page.
+          // FFIE-VIDEO-01 (🔵 Phase 1) — clone de la page « Vidéos » de la FFIE.
           <VideosView themeName={themeName} onOpenCategory={onOpenVideo} />
         ) : (
-          // "Trades" (default) — the public "Discover the professions" section
-          // (WBS Epic 4): career profiles + training paths + presentation
-          // videos. The earlier careers content is kept in TradesBody (below).
+          // « Métiers » (par défaut) — la section publique « Découvrir les métiers »
+          // (WBS Epic 4) : fiches métiers + parcours de formation + vidéos de
+          // présentation. Le contenu carrières précédent est conservé dans
+          // TradesBody (ci-dessous).
           <ProfessionsView themeName={themeName} />
         )}
       </ScrollView>
@@ -261,10 +269,11 @@ function DiscoverFeed({
 }
 
 // ---------------------------------------------------------------------------
-// VideosView — the "Videos" segment: a clone of the FFIE "Videos" page. An
-// intro line, a 2-up grid of themed video categories (each pushing an in-app
-// category reader that plays the films), and a button to the federation's
-// YouTube channel. Data lives in data/videos.ts.
+// VideosView — le segment « Vidéos » : un clone de la page « Vidéos » de la FFIE.
+// Une ligne d'introduction, une grille à deux colonnes de catégories vidéo
+// thématiques (chacune empilant un lecteur de catégorie intégré qui joue les
+// films), et un bouton vers la chaîne YouTube de la fédération. Les données
+// vivent dans data/videos.ts.
 // ---------------------------------------------------------------------------
 function VideosView({
   themeName,
@@ -304,8 +313,8 @@ function VideosView({
         ))}
       </View>
 
-      {/* The intro points users to the federation's channel "to see everything" —
-          this is that link, opening the channel in the in-app browser. */}
+      {/* L'introduction oriente les utilisateurs vers la chaîne de la fédération
+          « pour tout voir » — voici ce lien, qui ouvre la chaîne dans le navigateur intégré. */}
       <View style={{ alignItems: "center", marginTop: 24 }}>
         <ChannelButton themeName={themeName} />
       </View>
@@ -313,16 +322,16 @@ function VideosView({
   );
 }
 
-// ChannelButton — the outlined "View our YouTube channel" button under the
-// Videos grid. Mirrors SeeMoreButton, with an external-link glyph (the channel
-// opens in the in-app browser, not inline) — YOUTUBE_CHANNEL_URL.
+// ChannelButton — le bouton encadré « Voir notre chaîne YouTube » sous la grille
+// Vidéos. Reflète SeeMoreButton, avec un glyphe de lien externe (la chaîne
+// s'ouvre dans le navigateur intégré, pas en ligne) — YOUTUBE_CHANNEL_URL.
 function ChannelButton({ themeName }: { themeName: ThemeName }) {
   const t = themes[themeName];
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="View our YouTube channel."
-      accessibilityHint="Opens the FFIE YouTube channel"
+      accessibilityLabel="Voir notre chaîne YouTube."
+      accessibilityHint="Ouvre la chaîne YouTube de la FFIE"
       onPress={() => openInBrowser(YOUTUBE_CHANNEL_URL, themeName)}
       style={({ pressed }) => ({
         flexDirection: "row",
@@ -347,14 +356,14 @@ function ChannelButton({ themeName }: { themeName: ThemeName }) {
           textTransform: "uppercase",
         }}
       >
-        View our YouTube channel
+        Voir notre chaîne YouTube
       </Text>
     </Pressable>
   );
 }
 
-// VideoTile — a 2-up grid card for a video category: 16:9 thumbnail with a
-// centered play badge, then the title and the number of films.
+// VideoTile — une carte de grille à deux colonnes pour une catégorie vidéo :
+// miniature 16:9 avec un badge de lecture centré, puis le titre et le nombre de films.
 function VideoTile({
   category,
   width,
@@ -372,7 +381,7 @@ function VideoTile({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${category.title}. ${count > 1 ? `${count} videos` : "1 video"}.`}
+      accessibilityLabel={`${category.title}. ${count > 1 ? `${count} vidéos` : "1 vidéo"}.`}
       onPress={onPress}
       style={({ pressed }) => ({
         width,
@@ -395,7 +404,7 @@ function VideoTile({
           themeName={themeName}
           accessibilityLabel={category.alt}
         />
-        {/* Centered play badge over the thumbnail. */}
+        {/* Badge de lecture centré par-dessus la miniature. */}
         <View
           pointerEvents="none"
           style={[StyleSheet.absoluteFill, { alignItems: "center", justifyContent: "center" }]}
@@ -428,7 +437,7 @@ function VideoTile({
           {category.title}
         </Text>
         <Text style={{ color: t.text.muted, fontSize: 12.5, marginTop: 4 }}>
-          {count > 1 ? `${count} videos` : "1 video"}
+          {count > 1 ? `${count} vidéos` : "1 vidéo"}
         </Text>
       </View>
     </Pressable>

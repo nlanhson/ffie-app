@@ -1,19 +1,19 @@
-// Shared filter controls — the FFIE filter button + bottom-sheet pattern,
-// extracted from the Library screen so every screen that filters a list uses
-// the same visual style and the same motion. Used by Library (filter docs by
-// status) and News (filter articles by category).
+// Contrôles de filtre partagés — le motif bouton de filtre + feuille du bas FFIE,
+// extrait de l'écran Bibliothèque pour que chaque écran qui filtre une liste utilise
+// le même style visuel et le même mouvement. Utilisé par la Bibliothèque (filtrer les
+// documents par statut) et les Actualités (filtrer les articles par catégorie).
 //
-// Two exports:
-//   - FilterButton — the 38×38 rounded trigger with an active-count badge.
-//     Brand-accent fill when any filter is active, hairline border in themes
-//     that lean on borders (sunlight).
-//   - FilterSheet — the animated bottom sheet of toggleable chips, with
-//     Reset + "Show N results" actions. Immediate-apply: chip taps update the
-//     caller's filter state right away and the list re-renders behind the
-//     dimmed scrim; the action button is just a dismiss affordance.
+// Deux exports :
+//   - FilterButton — le déclencheur arrondi de 38×38 avec un badge de compteur actif.
+//     Remplissage à l'accent de marque quand un filtre est actif, bordure fine dans les
+//     thèmes qui s'appuient sur les bordures (sunlight).
+//   - FilterSheet — la feuille du bas animée de puces basculables, avec les
+//     actions Réinitialiser + « Voir N résultats ». Application immédiate : les appuis
+//     sur les puces mettent à jour l'état de filtre de l'appelant tout de suite et la liste
+//     se réaffiche derrière le voile assombri ; le bouton d'action n'est qu'un moyen de fermer.
 //
-// Both are generic over the option key type K (a string union), so a caller
-// passes its own option list and a Set<K> of selected keys.
+// Les deux sont génériques sur le type de clé d'option K (une union de chaînes), donc un
+// appelant passe sa propre liste d'options et un Set<K> de clés sélectionnées.
 
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -34,11 +34,11 @@ import { useGroupedColors } from "@/components/ui/ios";
 
 export type FilterOption<K extends string> = { key: K; label: string };
 
-/** One titled group of chips inside the sheet. A sheet can stack several — the
- *  Library stacks "Family" + "Offline". Keys are plain strings at this
- *  boundary; each caller keeps its own typed Set behind `onToggle`. */
+/** Un groupe de puces titré à l'intérieur de la feuille. Une feuille peut en empiler
+ *  plusieurs — la Bibliothèque empile « Famille » + « Hors ligne ». Les clés sont de
+ *  simples chaînes à cette frontière ; chaque appelant garde son propre Set typé derrière `onToggle`. */
 export type FilterSection = {
-  /** Uppercase label above this chip group, e.g. "Family". */
+  /** Libellé en majuscules au-dessus de ce groupe de puces, par ex. « Famille ». */
   label: string;
   options: FilterOption<string>[];
   selected: Set<string>;
@@ -46,8 +46,9 @@ export type FilterSection = {
 };
 
 // ---------------------------------------------------------------------------
-// FilterButton — inline trigger. Place next to a search field, or in a header
-// trailing slot. Shows a red count badge when filters are active.
+// FilterButton — déclencheur en ligne. À placer à côté d'un champ de recherche, ou
+// dans un emplacement de fin d'en-tête. Affiche un badge de compteur rouge quand des
+// filtres sont actifs.
 // ---------------------------------------------------------------------------
 export function FilterButton({
   themeName,
@@ -108,18 +109,18 @@ export function FilterButton({
 }
 
 // ---------------------------------------------------------------------------
-// FilterSheet — bottom sheet with toggleable chips.
+// FilterSheet — feuille du bas avec des puces basculables.
 //
-// Animation: two independently driven Animated.Values — a black scrim that
-// fades from opacity 0 → 0.45 and a sheet that slides translateY: window-h
-// → 0. Decoupling them removes the "whole block slides up" feel of native
-// `animationType="slide"` and gives the gradual darken-then-rise motion.
-// Both run on the native driver. The sheet stays mounted through the exit
-// animation via an internal `rendered` flag — the Modal only unmounts after
-// the close anim finishes.
+// Animation : deux Animated.Values pilotées indépendamment — un voile noir qui
+// passe d'une opacité 0 → 0,45 et une feuille qui glisse translateY : window-h
+// → 0. Les découpler supprime la sensation « tout le bloc remonte » de l'animation
+// native `animationType="slide"` et donne le mouvement progressif assombrir-puis-monter.
+// Les deux tournent sur le pilote natif. La feuille reste montée pendant l'animation de
+// sortie via un drapeau interne `rendered` — la Modal ne se démonte qu'après la fin de
+// l'animation de fermeture.
 //
-// Wrapped in a fresh SafeAreaProvider — keeps react-native-safe-area-context's
-// insets from compounding across host views.
+// Enveloppée dans un SafeAreaProvider neuf — empêche les insets de
+// react-native-safe-area-context de se cumuler entre les vues hôtes.
 // ---------------------------------------------------------------------------
 const WINDOW_H = Dimensions.get("window").height;
 const SCRIM_MAX_OPACITY = 0.45;
@@ -135,18 +136,18 @@ export function FilterSheet<K extends string>({
   onToggle,
   onReset,
   onClose,
-  title = "Filter",
+  title = "Filtrer",
 }: {
   visible: boolean;
   themeName: ThemeName;
-  /** Single-section API (News, Partners): provide these OR `sections`.
-   *  Uppercase label above the chip group, e.g. "Category". */
+  /** API à section unique (Actualités, Partenaires) : fournir ces props OU `sections`.
+   *  Libellé en majuscules au-dessus du groupe de puces, par ex. « Catégorie ». */
   sectionLabel?: string;
   options?: FilterOption<K>[];
   selected?: Set<K>;
   onToggle?: (key: K) => void;
-  /** Multi-section API: stack several titled chip groups (the Library stacks
-   *  "Family" + "Offline"). Takes precedence over the single-section props. */
+  /** API multi-sections : empiler plusieurs groupes de puces titrés (la Bibliothèque empile
+   *  « Famille » + « Hors ligne »). A priorité sur les props à section unique. */
   sections?: FilterSection[];
   resultCount: number;
   onReset: () => void;
@@ -155,10 +156,10 @@ export function FilterSheet<K extends string>({
 }) {
   const t = themes[themeName];
 
-  // Normalize to a section list so the body renders one path. The single-section
-  // props collapse to a one-element list; that legacy `onToggle` is keyed by the
-  // caller's K but only ever called with a key from its own options, so widening
-  // to string is safe.
+  // Normaliser en une liste de sections pour que le corps ne rende qu'un seul chemin. Les
+  // props à section unique se réduisent à une liste à un élément ; ce `onToggle` hérité est
+  // clé par le K de l'appelant mais n'est jamais appelé qu'avec une clé issue de ses propres
+  // options, donc l'élargir en string est sûr.
   const resolvedSections: FilterSection[] = sections ?? [
     {
       label: sectionLabel ?? "",
@@ -169,8 +170,8 @@ export function FilterSheet<K extends string>({
   ];
   const totalSelected = resolvedSections.reduce((n, s) => n + s.selected.size, 0);
 
-  // Internal mount flag — keep the Modal alive while the exit animation plays
-  // out, then unmount when it finishes.
+  // Drapeau de montage interne — garder la Modal en vie pendant que l'animation de sortie
+  // se joue, puis la démonter quand elle se termine.
   const [rendered, setRendered] = useState(false);
   const scrimOpacity = useRef(new Animated.Value(0)).current;
   const sheetY = useRef(new Animated.Value(WINDOW_H)).current;
@@ -229,7 +230,7 @@ export function FilterSheet<K extends string>({
     >
       <SafeAreaProvider>
         <View style={sheetStyles.root}>
-          {/* Scrim — opacity driven separately from the sheet. */}
+          {/* Voile — opacité pilotée séparément de la feuille. */}
           <Animated.View
             pointerEvents="none"
             style={[
@@ -238,15 +239,15 @@ export function FilterSheet<K extends string>({
             ]}
           />
 
-          {/* Tap-outside dismiss layer, between scrim and sheet. */}
+          {/* Couche de fermeture par appui à l'extérieur, entre le voile et la feuille. */}
           <Pressable
-            accessibilityLabel="Close filter"
+            accessibilityLabel="Fermer le filtre"
             accessibilityRole="button"
             onPress={onClose}
             style={StyleSheet.absoluteFill}
           />
 
-          {/* Sheet — slides up while the scrim fades in. */}
+          {/* Feuille — glisse vers le haut pendant que le voile apparaît. */}
           <Animated.View
             style={{
               position: "absolute",
@@ -264,11 +265,11 @@ export function FilterSheet<K extends string>({
                 borderTopRightRadius: 24,
               }}
             >
-              {/* No drag handle: this sheet isn't draggable (dismiss via the X
-                  or the backdrop), so a grabber would imply an affordance that
-                  doesn't exist and confuse users. */}
+              {/* Pas de poignée de glissement : cette feuille n'est pas déplaçable
+                  (on la ferme via la croix ou l'arrière-plan), donc une poignée laisserait
+                  croire à une affordance qui n'existe pas et déroute les utilisateurs. */}
 
-              {/* Title row */}
+              {/* Ligne de titre */}
               <View style={sheetStyles.titleRow}>
                 <Text
                   style={{
@@ -284,7 +285,7 @@ export function FilterSheet<K extends string>({
                 <Pressable
                   onPress={onClose}
                   accessibilityRole="button"
-                  accessibilityLabel="Close filter"
+                  accessibilityLabel="Fermer le filtre"
                   hitSlop={12}
                   style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
                 >
@@ -292,7 +293,7 @@ export function FilterSheet<K extends string>({
                 </Pressable>
               </View>
 
-              {/* Sections: each is a label + a wrapped row of toggleable chips. */}
+              {/* Sections : chacune est un libellé + une ligne enveloppée de puces basculables. */}
               {resolvedSections.map((section, si) => (
                 <View key={section.label || si}>
                   <Text style={[sheetStyles.sectionLabel, { color: t.text.muted }]}>
@@ -342,7 +343,7 @@ export function FilterSheet<K extends string>({
               <View style={sheetStyles.actionsRow}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Reset filters"
+                  accessibilityLabel="Réinitialiser les filtres"
                   onPress={onReset}
                   disabled={totalSelected === 0}
                   style={({ pressed }) => ({
@@ -364,12 +365,12 @@ export function FilterSheet<K extends string>({
                       fontWeight: "600",
                     }}
                   >
-                    Reset
+                    Réinitialiser
                   </Text>
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`See ${resultCount} results`}
+                  accessibilityLabel={`Voir ${resultCount} résultats`}
                   onPress={onClose}
                   style={({ pressed }) => ({
                     flex: 2,
@@ -388,7 +389,7 @@ export function FilterSheet<K extends string>({
                       fontWeight: "600",
                     }}
                   >
-                    See {resultCount} {resultCount === 1 ? "result" : "results"}
+                    Voir {resultCount} {resultCount === 1 ? "résultat" : "résultats"}
                   </Text>
                 </Pressable>
               </View>

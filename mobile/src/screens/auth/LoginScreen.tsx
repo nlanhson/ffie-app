@@ -1,27 +1,30 @@
-// Member sign-in — the "Member & Professional Space" login screen.
+// Connexion adhérent — l'écran de connexion « Espace adhérent & professionnel ».
 //
-// A teal hero + white sheet, matching the Home header (HEADER_SURFACE teal).
-// The teal band up top carries only large white display text (logo chip +
-// "Welcome"); the whole form drops onto a white sheet below where every label
-// and control clears WCAG AA. Colors live in auth.login (tokens.ts). Reached
-// two ways, both as a full-screen slide-up Modal with its own SafeAreaProvider:
-//   - Onboarding: PathSelection → "Sign in" → here → (Connect) authenticated.
-//   - Guest shell: "I already have an account" → here (SignInFlow).
+// Un bandeau teal + une feuille blanche, en cohérence avec l'en-tête de
+// l'accueil (HEADER_SURFACE teal). La bande teal du haut ne porte que du grand
+// texte d'affichage blanc (pastille de logo + « Bienvenue ») ; tout le
+// formulaire repose sur une feuille blanche en dessous où chaque libellé et
+// contrôle respecte WCAG AA. Les couleurs sont dans auth.login (tokens.ts).
+// Atteint de deux façons, toutes deux en Modal plein écran qui glisse vers le
+// haut avec son propre SafeAreaProvider :
+//   - Onboarding : PathSelection → « Se connecter » → ici → (Se connecter) authentifié.
+//   - Coquille invité : « J'ai déjà un compte » → ici (SignInFlow).
 //
-// Layout (top → bottom):
-//   - Header bar: subtle back chevron (left) + centered "FFIE" wordmark.
-//   - Brand: FFIE logo in a white card, "Welcome", "Member & Professional Space".
-//   - Identifier field + password field.
-//   - "Connect" CTA — disabled until both fields have content.
-//   - "Forgot your password?" / "Help & contact" link row.
-//   - "or" divider → "SSO federation connection" (lock).
-//   - Footer: "The FFIE is a member of the FFB" note + "Not yet a member?
-//     Join the FFIE →" bar.
+// Disposition (haut → bas) :
+//   - Barre d'en-tête : chevron de retour discret (à gauche) + logotype « FFIE » centré.
+//   - Marque : logo FFIE dans une carte blanche, « Bienvenue », « Espace adhérent & professionnel ».
+//   - Champ identifiant + champ mot de passe.
+//   - CTA « Se connecter » — désactivé tant que les deux champs ne sont pas remplis.
+//   - Rangée de liens « Mot de passe oublié ? » / « Aide & contact ».
+//   - Séparateur « ou » → « Connexion SSO fédération » (cadenas).
+//   - Pied de page : note « La FFIE est membre de la FFB » + barre « Pas encore
+//     adhérent ? Adhérer à la FFIE → ».
 //
-// v1 mock: any well-formed identifier + password authenticates (no backend);
-// SSO opens the federation picker → federation sign-in (verification) before
-// authenticating; Forgot / Help are inert. Don't wire these to a real API
-// without explicit instruction (see TESTFLIGHT.md / CLAUDE.md).
+// Maquette v1 : tout identifiant + mot de passe bien formés authentifient (pas
+// de backend) ; le SSO ouvre le sélecteur de fédération → connexion fédération
+// (vérification) avant l'authentification ; Mot de passe oublié / Aide sont
+// inertes. Ne reliez pas ces écrans à une vraie API sans instruction explicite
+// (voir TESTFLIGHT.md / CLAUDE.md).
 
 import React, { useState } from "react";
 import {
@@ -57,7 +60,7 @@ export function LoginScreen({
 }: {
   initialIdentifier?: string;
   onBack: () => void;
-  // Connect with a well-formed identifier + password — v1 accepts any.
+  // Se connecter avec un identifiant + mot de passe bien formés — la v1 accepte tout.
   onSubmit: (identifier: string) => void;
   onSso?: () => void;
   onForgotPassword?: () => void;
@@ -67,9 +70,9 @@ export function LoginScreen({
   const [identifier, setIdentifier] = useState(initialIdentifier ?? "");
   const [password, setPassword] = useState("");
   const [focused, setFocused] = useState<"identifier" | "password" | null>(null);
-  // The "SSO federation connection" button opens the SSO flow in-place: pick
-  // your federation → sign in to it (verification) → onSso fires. Selecting a
-  // federation alone no longer authenticates.
+  // Le bouton « Connexion SSO fédération » ouvre le parcours SSO sur place :
+  // choisissez votre fédération → connectez-vous à elle (vérification) → onSso
+  // se déclenche. Sélectionner une fédération seule n'authentifie plus.
   const [ssoOpen, setSsoOpen] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -90,19 +93,21 @@ export function LoginScreen({
   }
 
   return (
-    // Only the TOP edge here — the white form sheet runs to the very bottom and
-    // pads its own content for the home indicator (insets.bottom).
+    // Seulement le bord du HAUT ici — la feuille blanche du formulaire descend
+    // jusqu'en bas et gère elle-même la marge pour l'indicateur d'accueil
+    // (insets.bottom).
     <SafeAreaView edges={["top"]} style={styles.root}>
-      {/* Teal hero surface — force light status-bar content (white clock /
-          battery). The deepest-mounted StatusBar wins while this screen shows. */}
+      {/* Surface du bandeau teal — force un contenu de barre d'état clair
+          (horloge / batterie blanches). La StatusBar montée le plus en
+          profondeur l'emporte tant que cet écran est affiché. */}
       <StatusBar style="light" />
 
-      {/* Header — subtle back affordance (the modal needs a way out; the
-          mockup's centered wordmark stays) + centered "FFIE". */}
+      {/* En-tête — affordance de retour discrète (la modale a besoin d'une
+          sortie ; le logotype centré de la maquette reste) + « FFIE » centré. */}
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Retour"
           onPress={onBack}
           hitSlop={16}
           style={({ pressed }) => [styles.back, pressed && styles.pressedDim]}
@@ -121,33 +126,34 @@ export function LoginScreen({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Hero — white logo chip + "Welcome" on the teal band. */}
+          {/* Bandeau — pastille de logo blanche + « Bienvenue » sur la bande teal. */}
           <View style={styles.brand}>
             <View style={styles.logoCard}>
               <FFIELogo size={56} themeName="light" />
             </View>
-            <Text style={styles.title}>Welcome</Text>
-            <Text style={styles.subtitle}>Member &amp; Professional Space</Text>
+            <Text style={styles.title}>Bienvenue</Text>
+            <Text style={styles.subtitle}>Espace adhérent &amp; professionnel</Text>
           </View>
 
-          {/* White form sheet — rounded top, runs to the bottom edge. Every
-              small label + control rides this white surface so it clears AA
-              (the teal hero above only carries large white display text). */}
+          {/* Feuille blanche du formulaire — haut arrondi, descend jusqu'au bord
+              du bas. Chaque petit libellé + contrôle repose sur cette surface
+              blanche pour respecter AA (le bandeau teal au-dessus ne porte que
+              du grand texte d'affichage blanc). */}
           <View style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
-          {/* Credentials */}
+          {/* Identifiants */}
           <View style={styles.fields}>
             <TextInput
               value={identifier}
               onChangeText={setIdentifier}
               onFocus={() => setFocused("identifier")}
               onBlur={() => setFocused(null)}
-              placeholder="Email address or identifier FFIE"
+              placeholder="Adresse e-mail ou identifiant FFIE"
               placeholderTextColor={L.field.placeholder}
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
               returnKeyType="next"
-              accessibilityLabel="Email address or FFIE identifier"
+              accessibilityLabel="Adresse e-mail ou identifiant FFIE"
               style={[styles.field, focused === "identifier" && styles.fieldFocused]}
             />
             <TextInput
@@ -155,14 +161,14 @@ export function LoginScreen({
               onChangeText={setPassword}
               onFocus={() => setFocused("password")}
               onBlur={() => setFocused(null)}
-              placeholder="Password"
+              placeholder="Mot de passe"
               placeholderTextColor={L.field.placeholder}
               autoCapitalize="none"
               autoCorrect={false}
               secureTextEntry
               returnKeyType="go"
               onSubmitEditing={submit}
-              accessibilityLabel="Password"
+              accessibilityLabel="Mot de passe"
               style={[styles.field, focused === "password" && styles.fieldFocused]}
             />
           </View>
@@ -170,7 +176,7 @@ export function LoginScreen({
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ disabled: !canConnect }}
-            accessibilityLabel="Connect"
+            accessibilityLabel="Se connecter"
             disabled={!canConnect}
             onPress={submit}
             style={({ pressed }) => [
@@ -180,11 +186,11 @@ export function LoginScreen({
             ]}
           >
             <Text style={[styles.ctaLabel, !canConnect && styles.ctaLabelDisabled]}>
-              Connect
+              Se connecter
             </Text>
           </Pressable>
 
-          {/* Recovery + help — inert in v1. */}
+          {/* Récupération + aide — inertes en v1. */}
           <View style={styles.linkRow}>
             <Pressable
               accessibilityRole="link"
@@ -192,7 +198,7 @@ export function LoginScreen({
               hitSlop={8}
               style={({ pressed }) => pressed && styles.pressedDim}
             >
-              <Text style={styles.link}>Forgot your password?</Text>
+              <Text style={styles.link}>Mot de passe oublié ?</Text>
             </Pressable>
             <Pressable
               accessibilityRole="link"
@@ -200,21 +206,21 @@ export function LoginScreen({
               hitSlop={8}
               style={({ pressed }) => pressed && styles.pressedDim}
             >
-              <Text style={styles.link}>Help &amp; contact</Text>
+              <Text style={styles.link}>Aide &amp; contact</Text>
             </Pressable>
           </View>
 
-          {/* "or" divider */}
+          {/* Séparateur « ou » */}
           <View style={styles.dividerRow}>
             <View style={styles.rule} />
-            <Text style={styles.dividerLabel}>or</Text>
+            <Text style={styles.dividerLabel}>ou</Text>
             <View style={styles.rule} />
           </View>
 
-          {/* SSO — opens the federation picker; confirming there authenticates. */}
+          {/* SSO — ouvre le sélecteur de fédération ; la confirmation authentifie. */}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="SSO federation connection"
+            accessibilityLabel="Connexion SSO fédération"
             onPress={() => {
               Keyboard.dismiss();
               setSsoOpen(true);
@@ -222,28 +228,29 @@ export function LoginScreen({
             style={({ pressed }) => [styles.sso, pressed && styles.ssoPressed]}
           >
             <Lock size={18} color={L.sso.fg} />
-            <Text style={styles.ssoLabel}>SSO federation connection</Text>
+            <Text style={styles.ssoLabel}>Connexion SSO fédération</Text>
           </Pressable>
 
-          {/* Pushes the footer to the bottom when content is short. */}
+          {/* Pousse le pied de page vers le bas quand le contenu est court. */}
           <View style={styles.flex} />
 
-          {/* Footer — FFB affiliation note + join bar. */}
+          {/* Pied de page — note d'affiliation FFB + barre d'adhésion. */}
           <View style={styles.footer}>
             <View style={styles.fbbNote}>
-              {/* Logo carries its own white background; clip to a rounded tile
-                  so it reads as a white chip on the navy footer. */}
+              {/* Le logo porte son propre fond blanc ; on le rogne en tuile
+                  arrondie pour qu'il se lise comme une pastille blanche sur le
+                  pied de page navy. */}
               <View style={styles.fbbMark}>
                 <FFBLogo size={32} />
               </View>
               <Text style={styles.fbbText}>
-                The FFIE is a member{"\n"}of the FFB
+                La FFIE est membre{"\n"}de la FFB
               </Text>
             </View>
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Not yet a member? Join the FFIE"
+              accessibilityLabel="Pas encore adhérent ? Adhérer à la FFIE"
               onPress={() => {
                 Keyboard.dismiss();
                 onJoin?.();
@@ -251,7 +258,7 @@ export function LoginScreen({
               style={({ pressed }) => [styles.joinBar, pressed && styles.joinBarPressed]}
             >
               <Text style={styles.joinText}>
-                Not yet a member? <Text style={styles.joinAccent}>Join the FFIE</Text>
+                Pas encore adhérent ? <Text style={styles.joinAccent}>Adhérer à la FFIE</Text>
               </Text>
               <ArrowRight size={16} color={L.accent} />
             </Pressable>
@@ -293,7 +300,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  // White form sheet — rounded top, grows to fill below the teal hero.
+  // Feuille blanche du formulaire — haut arrondi, s'étend pour remplir sous le bandeau teal.
   sheet: {
     flexGrow: 1,
     backgroundColor: L.sheet,
@@ -394,7 +401,7 @@ const styles = StyleSheet.create({
     backgroundColor: L.divider,
   },
   dividerLabel: {
-    color: L.footer.noteText, // navy on the white sheet (not the white hero subtitle)
+    color: L.footer.noteText, // navy sur la feuille blanche (pas le sous-titre blanc du bandeau)
     fontSize: 13,
     fontFamily: ralewayFamily("400"),
   },
@@ -453,7 +460,7 @@ const styles = StyleSheet.create({
   },
   joinBarPressed: { opacity: 0.7 },
   joinText: {
-    color: L.footer.noteText, // navy on the white sheet (not the white hero subtitle)
+    color: L.footer.noteText, // navy sur la feuille blanche (pas le sous-titre blanc du bandeau)
     fontSize: 14,
     fontFamily: ralewayFamily("500"),
     fontWeight: "500",

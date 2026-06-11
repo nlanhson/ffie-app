@@ -1,20 +1,23 @@
-// Federation sign-in — the SSO hand-off step.
+// Connexion fédération — l'étape de redirection SSO.
 //
-// After the member picks their federation, this screen represents the OAuth /
-// OIDC hand-off: FFIE redirects to THAT federation's own secure sign-in (the
-// FFB identity network), the federation verifies the member, and returns a
-// token. Crucially, FFIE never collects the member's password — that's entered
-// on the federation's page, not here. (Why no password field: the WBS leaves
-// the auth model open — "member number? email-based SSO? something else?"
-// [DESIGN_BRIEF open questions] — and a real SSO app must not proxy the
-// federation's password. So we model the redirect, not a credential form.)
+// Une fois que l'adhérent a choisi sa fédération, cet écran représente la
+// redirection OAuth / OIDC : la FFIE redirige vers la connexion sécurisée propre
+// à CETTE fédération (le réseau d'identité FFB), la fédération vérifie l'adhérent
+// et renvoie un jeton. Point crucial, la FFIE ne collecte jamais le mot de passe
+// de l'adhérent — il est saisi sur la page de la fédération, pas ici. (Pourquoi
+// pas de champ mot de passe : le WBS laisse le modèle d'authentification ouvert
+// — « numéro d'adhérent ? SSO par e-mail ? autre chose ? » [questions ouvertes
+// du DESIGN_BRIEF] — et une vraie app SSO ne doit pas relayer le mot de passe de
+// la fédération. On modélise donc la redirection, pas un formulaire
+// d'identifiants.)
 //
-// v1 mock: there's no backend and no real redirect, so "Continue" simply
-// completes (authenticates locally) — see TESTFLIGHT.md / CLAUDE.md. In
-// production this kicks off an expo-auth-session redirect to the federation's
-// IdP. Don't wire it to a real IdP without explicit instruction.
+// Maquette v1 : il n'y a pas de backend ni de vraie redirection, donc
+// « Continuer » termine simplement (authentifie localement) — voir TESTFLIGHT.md
+// / CLAUDE.md. En production, cela lance une redirection expo-auth-session vers
+// le fournisseur d'identité de la fédération. Ne le reliez pas à un vrai
+// fournisseur d'identité sans instruction explicite.
 //
-// Light surface (themes.light), WCAG AA.
+// Surface claire (themes.light), WCAG AA.
 
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -27,7 +30,7 @@ import { ralewayFamily, displayFamily } from "@/theme/fonts";
 
 const t = themes.light;
 const RADIUS = primitives.radii.lg; // 12
-const TEAL = primitives.colors.brand.teal[700]; // #027489 — white label ≈5.4:1 (AA)
+const TEAL = primitives.colors.brand.teal[700]; // #027489 — libellé blanc ≈5.4:1 (AA)
 const TEAL_PRESSED = primitives.colors.brand.teal[800]; // #045764
 
 export function FederationSignInScreen({
@@ -37,7 +40,7 @@ export function FederationSignInScreen({
 }: {
   federation: Federation;
   onBack: () => void;
-  // The federation has verified the member (v1 mock: Continue completes it).
+  // La fédération a vérifié l'adhérent (maquette v1 : Continuer le termine).
   onSignIn: () => void;
 }) {
   const insets = useSafeAreaInsets();
@@ -46,18 +49,18 @@ export function FederationSignInScreen({
     <SafeAreaView edges={["top", "bottom"]} style={styles.root}>
       <StatusBar style="dark" />
 
-      {/* Header — back returns to the federation list. */}
+      {/* En-tête — le retour renvoie à la liste des fédérations. */}
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to federation list"
+          accessibilityLabel="Retour à la liste des fédérations"
           onPress={onBack}
           hitSlop={16}
           style={({ pressed }) => [styles.back, pressed && styles.dim]}
         >
           <ChevronLeft size={24} color={t.text.body} />
         </Pressable>
-        <Text style={styles.headerTitle}>Federation sign-in</Text>
+        <Text style={styles.headerTitle}>Connexion fédération</Text>
       </View>
 
       <View style={styles.body}>
@@ -65,23 +68,23 @@ export function FederationSignInScreen({
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          {/* Secure framing — this happens on the federation's side, not ours. */}
+          {/* Cadre de sécurité — cela se passe du côté de la fédération, pas du nôtre. */}
           <View style={styles.secureBadge}>
             <ShieldCheck size={16} color={TEAL} />
             <Text style={styles.secureText}>
-              Secure sign-in via the FFB federation network
+              Connexion sécurisée via le réseau de fédérations FFB
             </Text>
           </View>
 
           <Text accessibilityRole="header" style={styles.title}>
-            Sign in with your federation
+            Connectez-vous avec votre fédération
           </Text>
           <Text style={styles.subtitle}>
-            You'll be securely redirected to your federation to confirm your
-            identity, then brought back to FFIE.
+            Vous serez redirigé en toute sécurité vers votre fédération pour
+            confirmer votre identité, puis ramené à la FFIE.
           </Text>
 
-          {/* Which federation will verify you */}
+          {/* Quelle fédération vous vérifiera */}
           <View style={styles.fedCard}>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{federation.code}</Text>
@@ -96,26 +99,26 @@ export function FederationSignInScreen({
             </View>
           </View>
 
-          {/* Reassurance — why there's no password here. */}
+          {/* Réassurance — pourquoi il n'y a pas de mot de passe ici. */}
           <View style={styles.reassure}>
             <ShieldCheck size={18} color={TEAL} style={styles.reassureIcon} />
             <Text style={styles.reassureText}>
-              You sign in on your federation's own page — FFIE never sees your
-              password. Your federation confirms your membership and grants
-              access.
+              Vous vous connectez sur la page de votre propre fédération — la FFIE
+              ne voit jamais votre mot de passe. Votre fédération confirme votre
+              adhésion et accorde l'accès.
             </Text>
           </View>
         </ScrollView>
 
-        {/* Continue → the redirect (mock: completes sign-in). */}
+        {/* Continuer → la redirection (maquette : termine la connexion). */}
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Continue to ${federation.area} sign-in`}
+            accessibilityLabel={`Continuer vers la connexion ${federation.area}`}
             onPress={onSignIn}
             style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
           >
-            <Text style={styles.ctaLabel}>Continue to sign in</Text>
+            <Text style={styles.ctaLabel}>Continuer pour se connecter</Text>
             <ExternalLink size={18} color="#FFFFFF" />
           </Pressable>
         </View>

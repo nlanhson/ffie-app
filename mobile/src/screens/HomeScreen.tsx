@@ -1,24 +1,27 @@
-// Home tab — the app's landing surface (first bottom-tab, both roles).
+// Onglet Accueil — la surface d'atterrissage de l'app (premier onglet du bas, les deux rôles).
 //
-// Opens on the navy "hero" header (HomeHeader): the FFIE lockup, top-right
-// actions (notifications + search), and a greeting + identity block (member
-// name + status pill, or a guest welcome + join CTA). Beneath it, a lifted
-// grey "dashboard sheet" (rounded top corners, pulled up over the navy) hosts
-// the hub content:
-//   • Quick access — a 2×2 grid of shortcut cards to the load-bearing tabs
-//   • Public space — the two public gradient cards (Find a pro / Our trades)
-//     + the "member of the FFB" affiliation card
-//   • Recent news  — a horizontal teaser rail of the newest articles
+// S'ouvre sur l'en-tête « hero » bleu marine (HomeHeader) : le logo FFIE, les
+// actions en haut à droite (notifications + recherche), et un bloc salutation +
+// identité (nom de l'adhérent + pastille de statut, ou un message de bienvenue
+// invité + CTA d'adhésion). En dessous, une « feuille tableau de bord » grise
+// surélevée (coins supérieurs arrondis, remontée par-dessus le bleu marine)
+// accueille le contenu du hub :
+//   • Accès rapide — une grille 2×2 de cartes raccourcis vers les onglets porteurs
+//   • Espace public — les deux cartes publiques en dégradé (Trouver un pro / Nos métiers)
+//     + la carte d'affiliation « membre de la FFB »
+//   • Actualités récentes — un rail horizontal d'aperçus des articles les plus récents
 //
-// The header is a fixed navy brand surface that bleeds up behind the status
-// bar, so this screen does NOT use SafeAreaView for the top edge — HomeHeader
-// consumes the top inset itself. A status-bar-height navy layer sits behind
-// the scroll view so a top-overscroll bounce reveals navy (not grey), while
-// the dashboard background stays grey below.
+// L'en-tête est une surface de marque bleu marine fixe qui déborde derrière la
+// barre d'état, donc cet écran n'utilise PAS SafeAreaView pour le bord supérieur —
+// HomeHeader consomme lui-même l'inset supérieur. Une couche bleu marine de la
+// hauteur de la barre d'état se trouve derrière la vue de défilement pour qu'un
+// rebond de sur-défilement en haut révèle le bleu marine (et non le gris),
+// tandis que le fond du tableau de bord reste gris en dessous.
 //
-// Navigation: cards report an abstract `HomeNavTarget`; the shell (App.tsx)
-// resolves each to a tab switch or action, so this screen stays presentational
-// and the home → tab routing lives next to the tab state.
+// Navigation : les cartes signalent une `HomeNavTarget` abstraite ; le shell
+// (App.tsx) résout chacune en un changement d'onglet ou une action, de sorte que
+// cet écran reste présentationnel et que le routage accueil → onglet vit à côté
+// de l'état des onglets.
 
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -36,12 +39,13 @@ import { SHEET, useHomeColors } from "@/components/home/homeColors";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { currentMember } from "@/data/member";
 
-// Backstop behind the lifted dashboard sheet — matches HomeHeader's surface.
+// Arrière-plan derrière la feuille tableau de bord surélevée — assorti à la surface de HomeHeader.
 const NAVY = HEADER_SURFACE;
 
-// Abstract destinations a Home card can request. The shell maps each to a real
-// tab/action (e.g. "docs" → Library tab, "find-pro" → federation directory),
-// keeping this screen decoupled from the navigation model.
+// Destinations abstraites qu'une carte de l'Accueil peut demander. Le shell mappe
+// chacune vers un onglet/une action réelle (p. ex. "docs" → onglet Bibliothèque,
+// "find-pro" → annuaire de la fédération), en gardant cet écran découplé du
+// modèle de navigation.
 export type HomeNavTarget =
   | "docs"
   | "tools"
@@ -60,23 +64,23 @@ export function HomeScreen({
   onNavigate,
 }: {
   themeName?: ThemeName;
-  /** Member: open the notifications screen (bell). */
+  /** Adhérent : ouvrir l'écran des notifications (cloche). */
   onOpenNotifications?: () => void;
-  /** Open search. */
+  /** Ouvrir la recherche. */
   onOpenSearch?: () => void;
-  /** Member: open the personal Profile page (tap identity block). */
+  /** Adhérent : ouvrir la page Profil personnelle (toucher le bloc identité). */
   onOpenProfile?: () => void;
-  /** Guest: open the membership / join flow. */
+  /** Invité : ouvrir le parcours d'adhésion. */
   onJoin?: () => void;
-  /** Route a dashboard card to a tab/action (resolved by the shell). */
+  /** Router une carte du tableau de bord vers un onglet/une action (résolu par le shell). */
   onNavigate?: (target: HomeNavTarget) => void;
 }) {
   const c = useHomeColors(themeName);
   const { role } = useRole();
   const variant = role === "member" || role === "admin" ? "member" : "guest";
 
-  // The FFB affiliation card opens the federation's site in the in-app browser
-  // (page sheet), matching the News / Trades external-link readers.
+  // La carte d'affiliation FFB ouvre le site de la fédération dans le navigateur
+  // intégré (page sheet), comme les lecteurs de liens externes Actualités / Métiers.
   const openFFB = () => {
     const t = themes[themeName];
     WebBrowser.openBrowserAsync("https://www.ffbatiment.fr", {
@@ -89,21 +93,22 @@ export function HomeScreen({
 
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Light status-bar content (clock / signal) over the navy hero. */}
+      {/* Contenu clair de la barre d'état (horloge / signal) par-dessus le hero bleu marine. */}
       <StatusBar style="light" />
 
-      {/* Navy backstop behind the status bar so a top-overscroll bounce
-          reveals navy rather than the grey page. Sits under the scroll
-          content, which covers it at rest. */}
+      {/* Arrière-plan bleu marine derrière la barre d'état pour qu'un rebond de
+          sur-défilement en haut révèle le bleu marine plutôt que la page grise.
+          Se trouve sous le contenu de défilement, qui le couvre au repos. */}
       <View
         pointerEvents="none"
         style={{ position: "absolute", top: 0, left: 0, right: 0, height: 400, backgroundColor: NAVY }}
       />
 
-      {/* contentInsetAdjustmentBehavior="never": the navy header applies the
-          top safe-area inset itself (insets.top padding). Without this, iOS
-          ALSO auto-insets the scroll content for the safe area, double-counting
-          it and pushing the header down with an empty navy gap above. */}
+      {/* contentInsetAdjustmentBehavior="never" : l'en-tête bleu marine applique
+          lui-même l'inset supérieur de safe-area (padding insets.top). Sans cela,
+          iOS applique AUSSI automatiquement l'inset de safe-area au contenu de
+          défilement, le comptant deux fois et poussant l'en-tête vers le bas avec
+          un espace bleu marine vide au-dessus. */}
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{ flexGrow: 1 }}
@@ -120,9 +125,10 @@ export function HomeScreen({
           onPressJoin={onJoin}
         />
 
-        {/* Dashboard sheet — lifted over the navy with rounded top corners. The
-            navy backstop above shows through the corners for the "sheet rising
-            over the hero" look. */}
+        {/* Feuille tableau de bord — surélevée par-dessus le bleu marine avec des
+            coins supérieurs arrondis. L'arrière-plan bleu marine au-dessus
+            transparaît à travers les coins pour l'effet « feuille qui s'élève
+            par-dessus le hero ». */}
         <View
           style={{
             flex: 1,
@@ -134,26 +140,26 @@ export function HomeScreen({
             paddingBottom: SHEET.padBottom,
           }}
         >
-          {/* Quick access — shortcut grid */}
+          {/* Accès rapide — grille de raccourcis */}
           <View style={{ marginBottom: 28 }}>
-            <SectionLabel title="Quick access" themeName={themeName} />
+            <SectionLabel title="Accès rapide" themeName={themeName} />
             <QuickAccessGrid themeName={themeName} onNavigate={onNavigate} />
           </View>
 
-          {/* Public space — gradient entry points + FFB affiliation */}
+          {/* Espace public — points d'entrée en dégradé + affiliation FFB */}
           <View style={{ marginBottom: 28 }}>
-            <SectionLabel title="Public space" themeName={themeName} />
+            <SectionLabel title="Espace public" themeName={themeName} />
             <PublicSpaceCards themeName={themeName} onNavigate={onNavigate} />
             <View style={{ height: 12 }} />
             <FFBMembershipCard themeName={themeName} onPress={openFFB} />
           </View>
 
-          {/* Recent news — horizontal teaser rail */}
+          {/* Actualités récentes — rail horizontal d'aperçus */}
           <View>
             <SectionLabel
-              title="Recent news"
+              title="Actualités récentes"
               themeName={themeName}
-              actionLabel="See all"
+              actionLabel="Tout voir"
               onActionPress={() => onNavigate?.("news")}
             />
             <RecentNews

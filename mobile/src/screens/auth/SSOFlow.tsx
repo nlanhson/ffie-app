@@ -1,16 +1,17 @@
-// SSO flow — federation picker → federation sign-in (verification) → done.
+// Parcours SSO — sélecteur de fédération → connexion fédération (vérification) → terminé.
 //
-// Selecting a federation no longer authenticates on its own: it only chooses
-// WHICH federation identity provider to verify against. The member is then
-// handed off to that federation's secure sign-in (FederationSignInScreen — a
-// redirect, no in-app credentials) before being let in — closing the "pick a
-// random place and you're logged in" gap.
+// Sélectionner une fédération n'authentifie plus à elle seule : cela ne fait que
+// choisir QUEL fournisseur d'identité de fédération vérifier. L'adhérent est
+// ensuite redirigé vers la connexion sécurisée de cette fédération
+// (FederationSignInScreen — une redirection, sans identifiants dans l'app) avant
+// d'être admis — comblant l'écart « choisissez un endroit au hasard et vous êtes
+// connecté ».
 //
-//   SSOFederationScreen (pick)  →  FederationSignInScreen (hand-off)  →  onAuthenticated
+//   SSOFederationScreen (choix)  →  FederationSignInScreen (redirection)  →  onAuthenticated
 //
-// Rendered in-place by LoginScreen when the "SSO federation connection" button
-// is tapped. onCancel returns to the login; onAuthenticated promotes the
-// session. v1 mock throughout (no backend) — see FederationSignInScreen.
+// Rendu sur place par LoginScreen quand le bouton « Connexion SSO fédération »
+// est touché. onCancel renvoie à la connexion ; onAuthenticated promeut la
+// session. Maquette v1 de bout en bout (pas de backend) — voir FederationSignInScreen.
 
 import React, { useState } from "react";
 import { SSOFederationScreen } from "./SSOFederationScreen";
@@ -24,7 +25,7 @@ export function SSOFlow({
   onCancel: () => void;
   onAuthenticated: () => void;
 }) {
-  // null = picking a federation; set = signing in to it (verification step).
+  // null = choix d'une fédération ; défini = connexion à elle (étape de vérification).
   const [federation, setFederation] = useState<Federation | null>(null);
 
   if (federation) {

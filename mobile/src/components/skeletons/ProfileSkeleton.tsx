@@ -1,13 +1,13 @@
-// ProfileSkeleton — loading placeholder for ProfileScreen. Mirrors the new
-// layout: the navy identity hero (round avatar + name/role/member lines) then
-// the My company, Qualifications, Push notifications, Alert types, Preferences
-// and Account grouped cards. Same gutters, card radii, and leading-visual
-// widths as the real screen so the swap doesn't jump.
+// ProfileSkeleton — espace réservé de chargement pour ProfileScreen. Reflète la nouvelle
+// mise en page : le hero d'identité bleu marine (avatar rond + lignes nom/rôle/adhérent) puis
+// les cartes groupées Mon entreprise, Qualifications, Notifications push, Types d'alerte,
+// Préférences et Compte. Mêmes gouttières, rayons de carte et largeurs de visuel en tête que
+// le vrai écran pour que la substitution ne saute pas.
 //
-// The hero sits on the fixed navy brand surface, so its placeholders are flat
-// translucent-white blocks (no shimmer) rather than the grey SkeletonBlock —
-// the same reasoning as HomeHeader being static. The grouped content below
-// uses the shared shimmer skeleton.
+// Le hero se pose sur la surface de marque bleu marine fixe, ses espaces réservés sont donc
+// des blocs blanc translucide plats (sans scintillement) plutôt que le SkeletonBlock gris —
+// le même raisonnement que pour HomeHeader qui est statique. Le contenu groupé en dessous
+// utilise le squelette à scintillement partagé.
 
 import React from "react";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
@@ -22,14 +22,14 @@ import {
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 
 const NAVY = HEADER_SURFACE;
-const HERO_BLOCK = "rgba(255,255,255,0.18)"; // flat placeholder on navy
+const HERO_BLOCK = "rgba(255,255,255,0.18)"; // espace réservé plat sur le bleu marine
 const TOP_GAP = Platform.OS === "android" ? 14 : 12;
 const LEAD_ICON_W = 24;
 const LEAD_DOT_W = 12;
 
-// One grouped-list row: a leading visual (icon box or dot), a title line, and
-// an optional trailing block (value / badge / switch). The hairline separator
-// insets past the leading visual to align under the title, matching InsetRow.
+// Une ligne de liste groupée : un visuel en tête (boîte d'icône ou point), une ligne de
+// titre, et un bloc de fin optionnel (valeur / badge / interrupteur). Le séparateur en fine
+// ligne se décale au-delà du visuel en tête pour s'aligner sous le titre, comme InsetRow.
 function RowSkeleton({
   isLast,
   leadingWidth = LEAD_ICON_W,
@@ -125,8 +125,8 @@ export function ProfileSkeleton({ themeName = "light" }: { themeName?: ThemeName
 
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Teal backstop for the overscroll bounce above the hero, matching the
-          real screen (the page-coloured wrapper below the hero covers it). */}
+      {/* Fond bleu marine pour le rebond de suroscillation au-dessus du hero, correspondant
+          au vrai écran (l'enveloppe couleur-page sous le hero le recouvre). */}
       <View
         pointerEvents="none"
         style={{ position: "absolute", top: 0, left: 0, right: 0, height: 200, backgroundColor: NAVY }}
@@ -137,9 +137,9 @@ export function ProfileSkeleton({ themeName = "light" }: { themeName?: ThemeName
           contentContainerStyle={{ flexGrow: 1 }}
           scrollEnabled={false}
         >
-          {/* Identity header — flat translucent placeholders on the teal band.
-              Matches ProfileScreen's compact hero (44pt avatar, paddingBottom
-              16, tight three-line identity). */}
+          {/* En-tête d'identité — espaces réservés translucides plats sur la bande bleu marine.
+              Correspond au hero compact de ProfileScreen (avatar 44pt, paddingBottom
+              16, identité serrée sur trois lignes). */}
           <View
             style={{
               backgroundColor: NAVY,
@@ -159,30 +159,30 @@ export function ProfileSkeleton({ themeName = "light" }: { themeName?: ThemeName
             </View>
           </View>
 
-          {/* Page-coloured wrapper below the hero — paints over the teal
-              backstop so the header colour wraps the identity block only. */}
+          {/* Enveloppe couleur-page sous le hero — recouvre le fond bleu marine pour que
+              la couleur d'en-tête n'enveloppe que le bloc d'identité. */}
           <View style={{ flexGrow: 1, backgroundColor: c.pageBg, paddingBottom: 32 }}>
           <View style={{ height: 12 }} />
 
-          {/* My company — 3 fact rows (icon + value). */}
+          {/* Mon entreprise — 3 lignes de faits (icône + valeur). */}
           <Group headerWidth={95} themeName={themeName}>
             <RowSkeleton isLast={false} trailingWidth={88} themeName={themeName} />
             <RowSkeleton isLast={false} trailingWidth={88} themeName={themeName} />
             <RowSkeleton isLast trailingWidth={70} themeName={themeName} />
           </Group>
 
-          {/* Qualifications — 2 rows (check + Valid badge). */}
+          {/* Qualifications — 2 lignes (coche + badge Valide). */}
           <Group headerWidth={110} themeName={themeName}>
             <RowSkeleton isLast={false} trailingWidth={48} themeName={themeName} />
             <RowSkeleton isLast trailingWidth={48} themeName={themeName} />
           </Group>
 
-          {/* Push notifications — 1 toggle row (dot + switch). */}
+          {/* Notifications push — 1 ligne d'interrupteur (point + interrupteur). */}
           <Group headerWidth={130} themeName={themeName}>
             <RowSkeleton isLast leadingWidth={LEAD_DOT_W} trailingWidth={48} themeName={themeName} />
           </Group>
 
-          {/* Alert types — 5 toggle rows. */}
+          {/* Types d'alerte — 5 lignes d'interrupteur. */}
           <Group headerWidth={80} themeName={themeName}>
             <RowSkeleton isLast={false} leadingWidth={LEAD_DOT_W} trailingWidth={48} themeName={themeName} />
             <RowSkeleton isLast={false} leadingWidth={LEAD_DOT_W} trailingWidth={48} themeName={themeName} />
@@ -191,13 +191,13 @@ export function ProfileSkeleton({ themeName = "light" }: { themeName?: ThemeName
             <RowSkeleton isLast leadingWidth={LEAD_DOT_W} trailingWidth={48} themeName={themeName} />
           </Group>
 
-          {/* Preferences — 2 rows. */}
+          {/* Préférences — 2 lignes. */}
           <Group headerWidth={100} themeName={themeName}>
             <RowSkeleton isLast={false} trailingWidth={80} themeName={themeName} />
             <RowSkeleton isLast themeName={themeName} />
           </Group>
 
-          {/* Account — 3 rows. */}
+          {/* Compte — 3 lignes. */}
           <Group headerWidth={75} themeName={themeName}>
             <RowSkeleton isLast={false} themeName={themeName} />
             <RowSkeleton isLast={false} themeName={themeName} />

@@ -1,26 +1,29 @@
-// Onboarding flow — the state machine that walks the user from app launch
-// to the main app (doc library).
+// Parcours d'onboarding — la machine à états qui accompagne l'utilisateur du
+// lancement de l'app jusqu'à l'app principale (bibliothèque de documents).
 //
-// State graph (v0.8 — both paths are slide-up overlays on Welcome):
+// Graphe d'états (v0.8 — les deux parcours sont des surcouches qui glissent vers
+// le haut sur Bienvenue) :
 //   splash → path:
-//     "Log in"         → LoginScreen → DONE (member)
-//                          └─ "Join the FFIE" → BecomeMemberScreen (directory)
-//     "Browse freely"  → DiscoverPlaceholderScreen → DONE (public)
+//     « Se connecter »      → LoginScreen → TERMINÉ (adhérent)
+//                              └─ « Adhérer à la FFIE » → BecomeMemberScreen (annuaire)
+//     « Naviguer librement » → DiscoverPlaceholderScreen → TERMINÉ (public)
 //
-// Both paths render inside slide-up Modals presented over the Welcome
-// screen. Back from login → dismisses to Welcome; back from Discover →
-// dismisses to Welcome. The password-based LoginScreen replaced the old
-// passwordless email → OTP pair, so there is no longer an intermediate
-// verification step: Connect (or SSO) authenticates directly (v1 mock).
+// Les deux parcours s'affichent dans des Modales qui glissent vers le haut,
+// présentées par-dessus l'écran de bienvenue. Retour depuis la connexion →
+// referme vers Bienvenue ; retour depuis Découvrir → referme vers Bienvenue. Le
+// LoginScreen à mot de passe a remplacé l'ancienne paire sans mot de passe
+// e-mail → OTP, il n'y a donc plus d'étape de vérification intermédiaire : Se
+// connecter (ou SSO) authentifie directement (maquette v1).
 //
-// "Join the FFIE" on the login does NOT enter the app — membership is
-// federated (you apply through your departmental federation), so it opens
-// the federation directory (map + list) over the login, matching the guest
-// shell. Closing it returns to the login.
+// « Adhérer à la FFIE » sur la connexion N'entre PAS dans l'app — l'adhésion est
+// fédérée (on candidate via sa fédération départementale), cela ouvre donc
+// l'annuaire des fédérations (carte + liste) par-dessus la connexion, comme la
+// coquille invité. Le refermer renvoie à la connexion.
 //
-// In production: persist `done` + `mode` in SecureStore / AsyncStorage so
-// the user only sees onboarding once. For the design-preview shell, state
-// lives in memory and a debug "Reset onboarding" control replays it.
+// En production : persister `done` + `mode` dans SecureStore / AsyncStorage pour
+// que l'utilisateur ne voie l'onboarding qu'une seule fois. Pour la coquille de
+// design-preview, l'état vit en mémoire et un contrôle de débogage
+// « Réinitialiser l'onboarding » le rejoue.
 
 import React, { useCallback, useState } from "react";
 import { Modal } from "react-native";
@@ -46,15 +49,17 @@ export function OnboardingFlow({
 }: {
   themeName?: ThemeName;
   onComplete: (result: OnboardingResult) => void;
-  // Launch starts on the brand splash; an explicit sign-out passes "path" to
-  // land straight on the login / path-selection screen (no splash replay).
+  // Le lancement démarre sur le splash de marque ; une déconnexion explicite
+  // passe « path » pour atterrir directement sur l'écran de connexion / sélection
+  // de parcours (sans rejouer le splash).
   initialStep?: Step;
 }) {
   const [step, setStep] = useState<Step>(initialStep);
   const [loginVisible, setLoginVisible] = useState(false);
-  // "Not yet a member? Join the FFIE" opens the federation directory (map +
-  // departmental list) over the login — the real join funnel, never a silent
-  // entry into the app. Same screen the guest shell uses, for consistency.
+  // « Pas encore adhérent ? Adhérer à la FFIE » ouvre l'annuaire des fédérations
+  // (carte + liste départementale) par-dessus la connexion — le vrai tunnel
+  // d'adhésion, jamais une entrée silencieuse dans l'app. Même écran que celui
+  // utilisé par la coquille invité, par cohérence.
   const [joinVisible, setJoinVisible] = useState(false);
   const [discoverVisible, setDiscoverVisible] = useState(false);
   const [identifier, setIdentifier] = useState<string>("");
@@ -67,7 +72,7 @@ export function OnboardingFlow({
     return () => clearTimeout(t);
   }, [splashAdvanced]);
 
-  // Connect / SSO → authenticate directly (v1 mock: any well-formed input).
+  // Se connecter / SSO → authentifier directement (maquette v1 : toute saisie bien formée).
   const handleLogin = useCallback(
     (value?: string) => {
       setLoginVisible(false);
@@ -91,12 +96,13 @@ export function OnboardingFlow({
             }}
           />
 
-          {/* Member path — slide-up Modal so the Welcome card visually
-              "expands" into the full-screen login form.
-              The Modal contents get a fresh SafeAreaProvider — react-native-
-              safe-area-context's insets do not propagate reliably through
-              the native Modal host view, so without this the top inset
-              can grow on remount. */}
+          {/* Parcours adhérent — Modale qui glisse vers le haut pour que la carte
+              de bienvenue « s'agrandisse » visuellement en formulaire de
+              connexion plein écran. Le contenu de la Modale reçoit un
+              SafeAreaProvider neuf — les marges de react-native-safe-area-context
+              ne se propagent pas de façon fiable à travers la vue hôte de la
+              Modale native, donc sans ceci la marge du haut peut grandir au
+              remontage. */}
           <Modal
             visible={loginVisible}
             animationType="slide"
@@ -112,17 +118,18 @@ export function OnboardingFlow({
                   handleLogin(value);
                 }}
                 onSso={() => handleLogin()}
-                // "Not yet a member?" — open the federation directory, not the
-                // app. Membership is federated: you apply through your
-                // departmental federation (no self-signup).
+                // « Pas encore adhérent ? » — ouvre l'annuaire des fédérations,
+                // pas l'app. L'adhésion est fédérée : on candidate via sa
+                // fédération départementale (pas d'auto-inscription).
                 onJoin={() => setJoinVisible(true)}
               />
 
-              {/* Federation directory — nested INSIDE the login modal's content
-                  so it presents over the login on iOS (a sibling modal at the
-                  root can't present while the login modal is up — same
-                  constraint the guest shell works around). Closing it, or
-                  "Already a member? Sign in", returns to the login underneath. */}
+              {/* Annuaire des fédérations — imbriqué DANS le contenu de la modale
+                  de connexion pour qu'il se présente par-dessus la connexion sur
+                  iOS (une modale sœur à la racine ne peut pas se présenter tant
+                  que la modale de connexion est ouverte — même contrainte que
+                  contourne la coquille invité). Le refermer, ou « Déjà adhérent ?
+                  Se connecter », renvoie à la connexion en dessous. */}
               <Modal
                 visible={joinVisible}
                 animationType="slide"
@@ -140,8 +147,9 @@ export function OnboardingFlow({
             </SafeAreaProvider>
           </Modal>
 
-          {/* Discover path — same slide-up Modal pattern so the two paths
-              feel symmetric. Dismiss returns to Welcome. */}
+          {/* Parcours Découvrir — même schéma de Modale qui glisse vers le haut
+              pour que les deux parcours paraissent symétriques. Le refermer
+              renvoie à Bienvenue. */}
           <Modal
             visible={discoverVisible}
             animationType="slide"

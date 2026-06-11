@@ -1,19 +1,24 @@
-// AppHeader — the persistent navy "branded bar" shown at the top of every main
-// tab page EXCEPT Home (Home has its own richer hero, HomeHeader).
+// AppHeader — la « barre de marque » marine persistante affichée en haut de
+// chaque page d'onglet principale SAUF l'Accueil (l'Accueil a son propre héros
+// plus riche, HomeHeader).
 //
-// It's the same brand surface as the Home hero, reduced to a pinned nav bar:
-//   [logo chip]  Page title ……………  [actions]
-// where actions are role-aware:
-//   - member → notifications (bell) · profile
-//   - guest  → join
+// C'est la même surface de marque que le héros de l'Accueil, réduite à une barre
+// de navigation fixe :
+//   [pastille logo]  Titre de la page ……………  [actions]
+// où les actions dépendent du rôle :
+//   - adhérent → notifications (cloche) · profil
+//   - invité   → adhésion
 //
-// Rendered ONCE by the shell (App.tsx), above the scrolling tab content, so it
-// stays put as you switch tabs and keeps the status bar over navy (light icons
-// stay legible no matter how far a list scrolls). The greeting / identity block
-// is deliberately Home-only — other pages just show their title here.
+// Rendue UNE SEULE fois par le shell (App.tsx), au-dessus du contenu défilant de
+// l'onglet, afin de rester en place quand on change d'onglet et de garder la
+// barre d'état sur le marine (les icônes claires restent lisibles quelle que soit
+// la distance de défilement d'une liste). Le bloc d'accueil / identité est
+// délibérément réservé à l'Accueil — les autres pages n'affichent ici que leur
+// titre.
 //
-// Like FFIELogo / HomeHeader, the navy + on-colors are fixed brand constants,
-// not theme tokens: this is a brand surface, not a themed surface.
+// Comme FFIELogo / HomeHeader, le marine + les couleurs de premier plan sont des
+// constantes de marque fixes, pas des tokens de thème : c'est une surface de
+// marque, pas une surface thématisée.
 
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
@@ -25,7 +30,7 @@ import { GUTTER } from "@/components/ui/ios";
 import { FFIELogo } from "@/components/ui/FFIELogo";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 
-// --- fixed brand-surface colors (shared with HomeHeader) -------------------
+// --- couleurs de surface de marque fixes (partagées avec HomeHeader) -------
 const WHITE = primitives.colors.white;
 
 function withAlpha(hex: string, alpha: number): string {
@@ -36,28 +41,29 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const PRESS_BG = withAlpha(WHITE, 0.12); // icon-button pressed tint
-const CIRCLE_BG = withAlpha(WHITE, 0.2); // resting fill behind the profile glyph — visible enough to read as a button and anchor the right edge at the gutter (mirrors the white logo chip on the left)
+const PRESS_BG = withAlpha(WHITE, 0.12); // teinte du bouton icône à l'appui
+const CIRCLE_BG = withAlpha(WHITE, 0.2); // fond au repos derrière le glyphe de profil — assez visible pour se lire comme un bouton et ancrer le bord droit à la marge (reflet de la pastille blanche du logo à gauche)
 
-const TOP_GAP = Platform.OS === "android" ? 14 : 12; // kept identical to HomeHeader
-const LOGO_SIZE = 42; // matches the Home hero logo
+const TOP_GAP = Platform.OS === "android" ? 14 : 12; // gardé identique à HomeHeader
+const LOGO_SIZE = 42; // correspond au logo du héros de l'Accueil
 
 export type AppHeaderProps = {
   title: string;
   variant: "member" | "guest";
   hasUnread?: boolean;
-  /** Member: open notifications (bell). Omit to hide the bell. */
+  /** Adhérent : ouvrir les notifications (cloche). Omettre pour masquer la cloche. */
   onPressNotifications?: () => void;
-  /** Open search. Omit to hide the search button. */
+  /** Ouvrir la recherche. Omettre pour masquer le bouton de recherche. */
   onPressSearch?: () => void;
-  /** Member: open the personal Profile page. Omit to hide the profile button. */
+  /** Adhérent : ouvrir la page de Profil personnelle. Omettre pour masquer le bouton profil. */
   onPressProfile?: () => void;
-  /** Guest: open the join flow. Omit to hide the join button. */
+  /** Invité : ouvrir le parcours d'adhésion. Omettre pour masquer le bouton d'adhésion. */
   onPressJoin?: () => void;
 };
 
-// A plain top-bar icon button (white glyph on the brand surface). hitSlop lifts
-// the 40pt visible disc to a ≥44pt accessible target.
+// Un simple bouton icône de barre supérieure (glyphe blanc sur la surface de
+// marque). hitSlop élargit le disque visible de 40 pt à une cible accessible de
+// ≥ 44 pt.
 function IconButton({
   icon: Icon,
   label,
@@ -69,7 +75,7 @@ function IconButton({
   label: string;
   hint?: string;
   onPress?: () => void;
-  /** Show a resting translucent circle behind the glyph (profile action). */
+  /** Affiche un cercle translucide au repos derrière le glyphe (action profil). */
   filled?: boolean;
 }) {
   return (
@@ -116,8 +122,8 @@ export function AppHeader({
         {isMember && onPressProfile ? (
           <IconButton
             icon={User}
-            label="My profile"
-            hint="Opens your profile and settings"
+            label="Mon profil"
+            hint="Ouvre votre profil et vos réglages"
             onPress={onPressProfile}
             filled
           />
@@ -125,8 +131,8 @@ export function AppHeader({
         {!isMember && onPressJoin ? (
           <IconButton
             icon={UserPlus}
-            label="Join the FFIE"
-            hint="Opens membership information"
+            label="Adhérer à la FFIE"
+            hint="Ouvre les informations d'adhésion"
             onPress={onPressJoin}
             filled
           />
@@ -147,11 +153,11 @@ const styles = StyleSheet.create({
   },
   logoChip: {
     backgroundColor: WHITE,
-    borderRadius: 6, // between radii.sm (4) and radii.md (8) — no exact token
+    borderRadius: 6, // entre radii.sm (4) et radii.md (8) — pas de token exact
     padding: 5,
   },
   title: {
-    flex: 1, // take the middle; truncate before the actions
+    flex: 1, // occupe le centre ; tronque avant les actions
     color: WHITE,
     fontFamily: displayFamily("700"),
     fontWeight: "700",
@@ -162,8 +168,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 2,
-    // Trailing action is a filled circle; align its outer edge to the gutter so
-    // the right padding mirrors the logo chip on the left (matches HomeHeader).
+    // L'action de fin est un cercle plein ; aligner son bord extérieur sur la
+    // marge pour que le rembourrage droit reflète la pastille du logo à gauche
+    // (correspond à HomeHeader).
     marginRight: 0,
   },
   iconBtn: {

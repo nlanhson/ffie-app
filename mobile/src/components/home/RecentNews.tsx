@@ -1,14 +1,17 @@
-// RecentNews — the horizontal "Recent news" carousel that closes the Home hub.
+// RecentNews — le carrousel horizontal « Actualités récentes » qui clôt le hub
+// Accueil.
 //
-// A peek-scrolling rail of the newest articles (ARTICLES is pre-sorted newest
-// first in data/news). Each card shows the article image, a category eyebrow,
-// the title, and read time. Tapping a card hands the article up to the parent,
-// which routes to the News tab (a full reader lands when detail nav is wired).
+// Un rail à défilement par aperçu présentant les articles les plus récents
+// (ARTICLES est déjà trié du plus récent au plus ancien dans data/news). Chaque
+// carte affiche l'image de l'article, une étiquette de catégorie, le titre et le
+// temps de lecture. Toucher une carte transmet l'article au parent, qui navigue
+// vers l'onglet Actualités (un lecteur complet apparaîtra quand la navigation de
+// détail sera câblée).
 //
-// The rail bleeds past the page gutter on the right (cards scroll off-edge),
-// so it manages its own horizontal padding rather than sitting inside the
-// dashboard's section padding. snapToInterval gives a gentle card-by-card
-// settle without any custom animation.
+// Le rail déborde au-delà de la marge de page à droite (les cartes défilent hors
+// bord) : il gère donc sa propre marge horizontale plutôt que de s'insérer dans
+// la marge de section du tableau de bord. snapToInterval offre un calage doux
+// carte par carte sans animation personnalisée.
 
 import React from "react";
 import { Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
@@ -21,7 +24,8 @@ import { ARTICLES, type Article } from "@/data/news";
 
 const CARD_W = 264;
 const CARD_GAP = 14;
-// Newest few only — the rail is a teaser; the full feed lives in the News tab.
+// Seulement les plus récents — le rail est un aperçu ; le fil complet vit dans
+// l'onglet Actualités.
 const ITEMS = ARTICLES.slice(0, 6);
 
 export function RecentNews({
@@ -67,9 +71,9 @@ function NewsCard({
   const t = themes[themeName];
   const c = useHomeColors(themeName);
 
-  // Shadow on the OUTER wrapper, rounded clip (overflow: hidden, so the top
-  // image honours the corners) on the inner Pressable — on a single view iOS
-  // clips its own shadow when overflow is hidden.
+  // Ombre sur le conteneur EXTÉRIEUR, découpe arrondie (overflow: hidden, pour
+  // que l'image du haut respecte les coins) sur le Pressable intérieur — sur une
+  // seule vue, iOS découpe sa propre ombre quand overflow est masqué.
   return (
     <View
       style={{
@@ -83,7 +87,7 @@ function NewsCard({
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={article.title}
-        accessibilityHint={`${article.category}, ${article.readMinutes} minute read`}
+        accessibilityHint={`${article.category}, lecture de ${article.readMinutes} minutes`}
         style={({ pressed }): ViewStyle => ({
           borderRadius: primitives.radii.lg,
           borderWidth: 1,
@@ -100,7 +104,7 @@ function NewsCard({
           pixelWidth={640}
           pixelHeight={400}
           themeName={themeName}
-          accessibilityLabel={`Illustration for ${article.title}`}
+          accessibilityLabel={`Illustration pour ${article.title}`}
         />
         <View style={{ padding: 14 }}>
         <Text
@@ -125,7 +129,7 @@ function NewsCard({
             fontFamily: ralewayFamily("600"),
             fontWeight: "600",
             letterSpacing: -0.2,
-            minHeight: 38, // reserve two lines so card feet align
+            minHeight: 38, // réserve deux lignes pour aligner le bas des cartes
           }}
         >
           {article.title}
@@ -138,7 +142,7 @@ function NewsCard({
             marginTop: 8,
           }}
         >
-          {article.date} · {article.readMinutes} min read
+          {article.date} · {article.readMinutes} min de lecture
         </Text>
         </View>
       </Pressable>

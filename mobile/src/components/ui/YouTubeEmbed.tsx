@@ -1,14 +1,14 @@
-// YouTubeEmbed — an inline 16:9 YouTube player. Wraps react-native-webview
-// around the privacy-friendly youtube-nocookie embed, so a film plays IN the
-// app instead of opening a browser (FFIE-VIDEO-01).
+// YouTubeEmbed — un lecteur YouTube 16:9 en ligne. Enveloppe react-native-webview
+// autour de l'embed youtube-nocookie respectueux de la vie privée, pour qu'un film se
+// lise DANS l'application au lieu d'ouvrir un navigateur (FFIE-VIDEO-01).
 //
-// Captions are non-negotiable (Léa watches muted): cc_load_policy=1 turns them
-// on by default. No autoplay — the player shows its poster + a play button and
-// waits for a tap (mediaPlaybackRequiresUserAction). playsinline keeps playback
-// inside the card on iOS; the native fullscreen button still works.
+// Les sous-titres sont non négociables (Léa regarde en sourdine) : cc_load_policy=1 les
+// active par défaut. Pas de lecture automatique — le lecteur affiche son poster + un bouton
+// de lecture et attend un appui (mediaPlaybackRequiresUserAction). playsinline garde la
+// lecture à l'intérieur de la carte sur iOS ; le bouton plein écran natif fonctionne toujours.
 //
-// react-native-webview ships inside Expo Go; a custom dev/TestFlight build needs
-// a rebuild to include the native module.
+// react-native-webview est livré dans Expo Go ; un build dev/TestFlight personnalisé a
+// besoin d'une reconstruction pour inclure le module natif.
 
 import React from "react";
 import { View } from "react-native";
@@ -24,8 +24,8 @@ export function YouTubeEmbed({
   radius?: number;
   accessibilityLabel?: string;
 }) {
-  // A minimal, responsive iframe doc — the wrapper fills the WebView, the iframe
-  // fills the wrapper, so the 16:9 box (set below) drives the player's size.
+  // Un document iframe minimal et responsive — l'enveloppe remplit la WebView, l'iframe
+  // remplit l'enveloppe, donc la boîte 16:9 (définie ci-dessous) pilote la taille du lecteur.
   const html = `<!DOCTYPE html>
 <html>
   <head>

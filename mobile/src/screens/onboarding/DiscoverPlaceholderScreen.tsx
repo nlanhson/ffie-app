@@ -1,9 +1,10 @@
-// Discover (public) path — placeholder for v1.
-// This is where Karim and Léa land when they pick "Discover FFIE" on the
-// path-selection screen. The real screen (Screen 4 in the roadmap) is the
-// "Discover the trades" public landing. For now this is a clear placeholder
-// that honors P6 (no login wall) and P7 (substance over brochure copy) by
-// showing what the visitor will get + a path back to member sign-in.
+// Parcours Découvrir (public) — espace réservé pour la v1.
+// C'est ici qu'atterrissent Karim et Léa lorsqu'ils choisissent « Découvrir la
+// FFIE » sur l'écran de sélection de parcours. Le vrai écran (Écran 4 de la
+// feuille de route) est la page publique « Découvrir les métiers ». Pour
+// l'instant, c'est un espace réservé clair qui respecte P6 (pas de mur de
+// connexion) et P7 (du fond plutôt que de la prose de brochure) en montrant ce
+// que le visiteur obtiendra + un chemin de retour vers la connexion adhérent.
 
 import React from "react";
 import { ChevronLeft, Newspaper, UserCircle2, Zap } from "lucide-react-native";
@@ -34,10 +35,10 @@ export function DiscoverPlaceholderScreen({
           paddingBottom: 32,
         }}
       >
-        {/* Back row → returns to path selection */}
+        {/* Rangée de retour → renvoie à la sélection de parcours */}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Retour"
           onPress={onSignInInstead}
           hitSlop={12}
           style={({ pressed }) => ({
@@ -50,10 +51,10 @@ export function DiscoverPlaceholderScreen({
           })}
         >
           <ChevronLeft size={20} color={t.text.muted} />
-          <Text style={{ color: t.text.muted, fontSize: 15 }}>Back</Text>
+          <Text style={{ color: t.text.muted, fontSize: 15 }}>Retour</Text>
         </Pressable>
 
-        {/* Hero */}
+        {/* Bandeau */}
         <View style={{ marginTop: 16, marginBottom: 32 }}>
           <Text
             style={{
@@ -64,32 +65,32 @@ export function DiscoverPlaceholderScreen({
               lineHeight: 32,
             }}
           >
-            Welcome, visitor
+            Bienvenue, visiteur
           </Text>
           <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 8, lineHeight: 22 }}>
-            Browse freely. No account is needed to explore our public content.
+            Naviguez librement. Aucun compte n'est nécessaire pour explorer nos contenus publics.
           </Text>
         </View>
 
-        {/* Preview cards */}
+        {/* Cartes d'aperçu */}
         <View style={{ rowGap: 12 }}>
           <PreviewRow
             themeName={themeName}
             icon={Newspaper}
-            title="Public news"
-            subtitle="Industry news and federation announcements."
+            title="Actualités publiques"
+            subtitle="Actualités du secteur et annonces de la fédération."
           />
           <PreviewRow
             themeName={themeName}
             icon={Zap}
-            title="The electrical integration trades"
-            subtitle="What our 7,300 member companies actually do."
+            title="Les métiers de l'intégration électrique"
+            subtitle="Ce que font réellement nos 7 300 entreprises adhérentes."
           />
           <PreviewRow
             themeName={themeName}
             icon={UserCircle2}
-            title="Become a member"
-            subtitle="Requirements, benefits and steps to join the federation."
+            title="Devenir adhérent"
+            subtitle="Conditions, avantages et étapes pour adhérer à la fédération."
           />
         </View>
 
@@ -106,19 +107,19 @@ export function DiscoverPlaceholderScreen({
         >
           <Text style={{ fontSize: 13, color: t.text.muted, lineHeight: 20 }}>
             <Text style={{ fontFamily: ralewayFamily("600"), fontWeight: "600", color: t.text.body }}>v0.1 · </Text>
-            public screen under construction. Tap Continue to see the draft of the public news feed.
+            écran public en construction. Touchez Continuer pour voir le brouillon du fil d'actualités publiques.
           </Text>
         </View>
 
-        {/* Spacer + actions */}
+        {/* Espaceur + actions */}
         <View style={{ flex: 1 }} />
 
         <View style={{ marginTop: 32, rowGap: 8 }}>
           <Button themeName={themeName} size="lg" fullWidth onPress={onContinue}>
-            Continue
+            Continuer
           </Button>
           <Button themeName={themeName} variant="ghost" size="md" fullWidth onPress={onSignInInstead}>
-            I already have a member account
+            J'ai déjà un compte adhérent
           </Button>
         </View>
       </ScrollView>
@@ -140,8 +141,9 @@ function PreviewRow({
   const t = themes[themeName];
 
   return (
-    // Informational only — no card background and no chevron, so it doesn't
-    // read as a tappable row (these previews aren't actionable in v1).
+    // Informatif uniquement — pas de fond de carte ni de chevron, pour que ça ne
+    // se lise pas comme une rangée touchable (ces aperçus ne sont pas
+    // actionnables en v1).
     <View
       style={{
         paddingVertical: 8,

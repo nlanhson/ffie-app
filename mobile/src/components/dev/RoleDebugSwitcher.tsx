@@ -1,20 +1,20 @@
-// RoleDebugSwitcher — preview-only chips that cycle the current Role and
-// reset logged session data.
+// RoleDebugSwitcher — puces réservées à la préview qui font défiler le Role courant et
+// réinitialisent les données de session enregistrées.
 //
-// Floats above the whole app (rendered last in AppRoot, absolutely
-// positioned) so the client preview can flip between Julien (member),
-// Karim (guest-company), Léa (guest-public) without re-running onboarding.
-// Triggers RequireRole guards in real-time — cycle to "guest-public" while
-// looking at the Library and the MemberOnlyPrompt slides in.
+// Flotte au-dessus de toute l'application (rendu en dernier dans AppRoot, positionné en
+// absolu) pour que la préview client puisse basculer entre Julien (member),
+// Karim (guest-company), Léa (guest-public) sans relancer l'onboarding.
+// Déclenche les barrières RequireRole en temps réel — faire défiler jusqu'à « guest-public »
+// en regardant la Bibliothèque et le MemberOnlyPrompt apparaît.
 //
-// Draggable: the cluster starts docked top-right but can be dragged anywhere
-// so it never sits on top of whatever you're previewing. Taps still land on
-// the individual chips — the container only claims the gesture once the
-// finger moves past a small threshold (onStartShouldSetPanResponder stays
-// false; onMoveShouldSetPanResponder fires on drag). Built on RN-core
-// PanResponder + Animated, so no gesture-handler/reanimated dependency.
+// Déplaçable : le groupe démarre ancré en haut à droite mais peut être glissé n'importe où
+// pour qu'il ne se pose jamais par-dessus ce que vous prévisualisez. Les appuis atteignent
+// toujours les puces individuelles — le conteneur ne réclame le geste qu'une fois que le
+// doigt dépasse un petit seuil (onStartShouldSetPanResponder reste à false ;
+// onMoveShouldSetPanResponder se déclenche au glissement). Bâti sur le PanResponder + Animated
+// du cœur de RN, donc aucune dépendance gesture-handler/reanimated.
 //
-// Gated behind ENABLE_ROLE_DEBUG in App.tsx. NOT for production builds.
+// Conditionné par ENABLE_ROLE_DEBUG dans App.tsx. PAS pour les builds de production.
 
 import React, { useRef, useState } from "react";
 import {
@@ -33,28 +33,28 @@ import { primitives, themes, type ThemeName } from "@tokens";
 import { useRole, type Role } from "@/auth/roleContext";
 import { ralewayFamily } from "@/theme/fonts";
 
-// Cycle order chosen for client preview narrative — start in the public
-// guest state, then member (the killer use case). guest-company is omitted
-// from the cycle because it's behaviourally identical to guest-public today
-// (canAccess treats both as public-only); it stays in the Role type for the
-// planned non-member conversion surface. Admin is also excluded: it's a
-// web-only back-office role that never appears on a mobile session.
+// Ordre de défilement choisi pour la narration de la préview client — commencer dans l'état
+// invité public, puis adhérent (le cas d'usage phare). guest-company est omis du défilement
+// car il est aujourd'hui comportementalement identique à guest-public (canAccess traite les
+// deux comme public uniquement) ; il reste dans le type Role pour la surface de conversion
+// des non-adhérents prévue. Admin est aussi exclu : c'est un rôle de back-office web
+// uniquement qui n'apparaît jamais dans une session mobile.
 const CYCLE: Role[] = ["guest-public", "member"];
 
 const LABEL: Record<Role, string> = {
-  "guest-public": "General public",
-  "guest-company": "Non-member company",
-  member: "Member",
-  admin: "Admin (web-only)",
+  "guest-public": "Grand public",
+  "guest-company": "Entreprise non adhérente",
+  member: "Adhérent",
+  admin: "Admin (web uniquement)",
 };
 
-// Edge inset kept between the cluster and the screen bounds when docking/clamping.
-// Sets the default top-right dock gap (≈16px right padding) and the drag bounds.
+// Retrait de bord gardé entre le groupe et les limites de l'écran lors de l'ancrage/du serrage.
+// Définit l'écart d'ancrage par défaut en haut à droite (≈16px de marge à droite) et les limites de glissement.
 const MARGIN = 16;
-// Movement (in pt) past which a gesture becomes a drag rather than a chip tap.
+// Mouvement (en pt) au-delà duquel un geste devient un glissement plutôt qu'un appui de puce.
 const DRAG_THRESHOLD = 6;
-// Gap below the safe-area top edge before the docked cluster. Android's status
-// inset sits tighter, so give it a touch more breathing room than iOS.
+// Écart sous le bord supérieur de la safe area avant le groupe ancré. L'inset de statut
+// d'Android est plus serré, on lui donne donc un peu plus de respiration qu'iOS.
 const TOP_GAP = Platform.OS === "android" ? 24 : 4;
 
 const clamp = (v: number, min: number, max: number) =>
@@ -72,9 +72,9 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
     setRole(nextRole);
   };
 
-  // --- Drag plumbing ---------------------------------------------------------
-  // Layout values live in refs so the long-lived PanResponder reads current
-  // screen size / inset on release (e.g. after an orientation change).
+  // --- Tuyauterie de glissement ----------------------------------------------
+  // Les valeurs de layout vivent dans des refs pour que le PanResponder à longue durée de
+  // vie lise la taille d'écran / l'inset courants au relâchement (par ex. après un changement d'orientation).
   const winW = useRef(screenW);
   const winH = useRef(screenH);
   const topInset = useRef(insets.top + 4);
@@ -83,7 +83,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
   topInset.current = insets.top + TOP_GAP;
 
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const posRef = useRef({ x: 0, y: 0 }); // committed (post-release) position
+  const posRef = useRef({ x: 0, y: 0 }); // position validée (post-relâchement)
   const sizeRef = useRef({ w: 0, h: 0 });
   const placedRef = useRef(false);
   const [ready, setReady] = useState(false);
@@ -91,7 +91,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
 
   const panResponder = useRef(
     PanResponder.create({
-      // Let taps fall through to the chips; only claim the gesture on drag.
+      // Laisser les appuis passer vers les puces ; ne réclamer le geste qu'au glissement.
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, g) =>
         Math.abs(g.dx) > DRAG_THRESHOLD || Math.abs(g.dy) > DRAG_THRESHOLD,
@@ -106,7 +106,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
       onPanResponderRelease: (_, g) => {
         setDragging(false);
         pan.flattenOffset();
-        // Clamp the dropped position back inside the safe area.
+        // Ramener la position lâchée à l'intérieur de la safe area.
         const maxX = winW.current - sizeRef.current.w - MARGIN;
         const maxY = winH.current - sizeRef.current.h - MARGIN;
         const x = clamp(posRef.current.x + g.dx, MARGIN, Math.max(MARGIN, maxX));
@@ -133,7 +133,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
         onLayout={(e) => {
           const { width, height } = e.nativeEvent.layout;
           sizeRef.current = { w: width, h: height };
-          // First measured frame: dock to the top-right safe area.
+          // Premier cadre mesuré : ancrer à la safe area en haut à droite.
           if (!placedRef.current && width > 0) {
             const x = screenW - width - MARGIN;
             const y = insets.top + TOP_GAP;
@@ -156,7 +156,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Debug: switch role. Current: ${LABEL[role]}. Drag to move.`}
+          accessibilityLabel={`Débogage : changer de rôle. Actuel : ${LABEL[role]}. Glisser pour déplacer.`}
           onPress={next}
           style={({ pressed }) => [
             styles.chip,
@@ -167,7 +167,7 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
             },
           ]}
         >
-          {/* Big, high-contrast title — "Role - Persona" */}
+          {/* Grand titre à fort contraste — « Rôle - Persona » */}
           <View style={styles.roleTitleRow}>
             <Bug size={13} color={t.action.primary.fg} style={{ marginTop: 2 }} />
             <Text
@@ -177,9 +177,9 @@ export function RoleDebugSwitcher({ themeName = "light" }: { themeName?: ThemeNa
               {LABEL[role]}
             </Text>
           </View>
-          {/* Small, tinted action hint */}
+          {/* Petit indice d'action teinté */}
           <Text style={[styles.hint, { color: t.action.primary.fg }]} numberOfLines={1}>
-tap to switch · drag to move
+appuyer pour changer · glisser pour déplacer
           </Text>
         </Pressable>
       </Animated.View>
@@ -190,8 +190,8 @@ tap to switch · drag to move
 const styles = StyleSheet.create({
   host: {
     ...StyleSheet.absoluteFillObject,
-    // Sit above app content. (Native Modals render in their own window above
-    // this — inherent to RN; not something a debug chip fights.)
+    // Se placer au-dessus du contenu de l'application. (Les Modals natives s'affichent dans
+    // leur propre fenêtre au-dessus de ceci — inhérent à RN ; pas un combat de puce de débogage.)
     zIndex: 9999,
     elevation: 9999,
   },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     columnGap: 8,
-    // Shadow lives on the cluster so it lifts as a unit while dragging.
+    // L'ombre vit sur le groupe pour qu'il se soulève d'un seul tenant pendant le glissement.
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
   },
@@ -217,10 +217,10 @@ const styles = StyleSheet.create({
     maxWidth: 240,
     elevation: 3,
   },
-  // Role chip uses a vertical stack: big title row over a tinted hint.
-  // Hugs its content; maxWidth caps it so the long label ("Non-member
-  // company") wraps to two lines instead of running off-screen, while
-  // shorter labels sit on one line.
+  // La puce de rôle utilise une pile verticale : grande ligne de titre par-dessus un indice teinté.
+  // Épouse son contenu ; maxWidth la plafonne pour que le libellé long (« Entreprise non
+  // adhérente ») passe sur deux lignes au lieu de déborder de l'écran, tandis que les
+  // libellés plus courts tiennent sur une ligne.
   roleChip: {
     flexDirection: "column",
     alignItems: "flex-start",
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   roleTitleRow: {
     flexDirection: "row",
-    // Top-align so the icon sits beside the first line when the title wraps.
+    // Aligner en haut pour que l'icône se place à côté de la première ligne quand le titre passe à la ligne.
     alignItems: "flex-start",
     columnGap: 6,
   },

@@ -1,20 +1,22 @@
-// News tab — article feed → reader, shared by all personas (Epic 2).
+// Onglet Actualités — flux d'articles → lecteur, partagé par tous les personas (Epic 2).
 //
-// Layout: a horizontal rail of category pills sits under the large title
-// ("All" + one pill per NewsCategory, single-select), then every article
-// renders as a full-width card in a single column, publication order. Picking
-// a pill filters the whole list in place; "All" restores it.
+// Disposition : un rail horizontal de pastilles de catégorie se trouve sous le
+// grand titre (« Tous » + une pastille par NewsCategory, sélection unique), puis
+// chaque article se rend comme une carte pleine largeur sur une seule colonne,
+// dans l'ordre de publication. Choisir une pastille filtre toute la liste sur
+// place ; « Tous » la restaure.
 //
-// Navigation: NewsScreen is a self-contained native stack (Feed → Article /
-// Locked) via @react-navigation/native-stack, so the reader gets the platform
-// back gestures — iOS left-edge swipe and Android system back — natively.
-// Tapping an article opens the reader. A guest who taps a member-only article
-// is sent to the membership upsell instead — the public/member boundary inside
-// News, which doubles as a conversion surface.
+// Navigation : NewsScreen est une pile native autonome (Feed → Article /
+// Locked) via @react-navigation/native-stack, de sorte que le lecteur obtient
+// nativement les gestes de retour de la plateforme — balayage depuis le bord
+// gauche sur iOS et retour système Android. Toucher un article ouvre le lecteur.
+// Un invité qui touche un article réservé aux adhérents est plutôt redirigé vers
+// l'incitation à l'adhésion — la frontière public/adhérent dans les Actualités,
+// qui sert aussi de surface de conversion.
 //
-// Role gating uses the shared canAccess() so it stays consistent with route
-// guards elsewhere. onApply / onSignIn are forwarded to the upsell by the
-// guest shell; members never hit the locked branch.
+// La restriction par rôle utilise le canAccess() partagé pour rester cohérente
+// avec les gardes de route ailleurs. onApply / onSignIn sont transmis à
+// l'incitation par le shell invité ; les adhérents n'atteignent jamais la branche verrouillée.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -44,43 +46,46 @@ import {
 import { NewsArticleScreen } from "./NewsArticleScreen";
 import { MemberOnlyPrompt } from "./MemberOnlyPrompt";
 
-// Categories users can filter the feed by — the pill rail at the top of the
-// feed. Single-select: "All" shows everything, a category pill narrows the
-// list to that category. Keep in sync with the NewsCategory union in
-// data/news.ts.
+// Catégories par lesquelles les utilisateurs peuvent filtrer le flux — le rail de
+// pastilles en haut du flux. Sélection unique : « Tous » montre tout, une
+// pastille de catégorie restreint la liste à cette catégorie. À garder en phase
+// avec l'union NewsCategory dans data/news.ts.
 type CategoryKey = NewsCategory | "all";
 const CATEGORY_PILLS: { key: CategoryKey; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "Technical", label: "Technical" },
-  { key: "Training", label: "Training" },
+  { key: "all", label: "Tous" },
+  { key: "Technical", label: "Technique" },
+  { key: "Training", label: "Formation" },
   { key: "Communication", label: "Communication" },
-  { key: "Economical", label: "Economy" },
+  { key: "Economical", label: "Économie" },
 ];
 
-// Vertical rhythm between the full-width cards in the feed column.
+// Rythme vertical entre les cartes pleine largeur dans la colonne du flux.
 const ROW_GAP = 18;
 
-// Scroll depth (px) past which the floating back-to-top button fades in. Matches
-// the threshold used on the Library feed for a consistent feel across tabs.
+// Profondeur de défilement (px) au-delà de laquelle le bouton flottant retour en
+// haut apparaît en fondu. Correspond au seuil utilisé sur le flux Bibliothèque
+// pour une sensation cohérente entre les onglets.
 const BACK_TO_TOP_AT = 520;
 
-// The Claude assistant FAB (AssistantChatWidget) owns the bottom-right corner.
-// This button lives in the screen's content area, which already sits ABOVE the
-// tab bar (the bottom inset is absorbed there) — so it's measured from the tab
-// bar's top, not the device edge, and needs no safe-area inset. The FAB rises
-// ASSISTANT_FAB_GAP + ASSISTANT_FAB_SIZE into this space, so the button stacks
-// one 12pt gap above it.
+// Le bouton flottant de l'assistant Claude (AssistantChatWidget) occupe le coin
+// inférieur droit. Ce bouton vit dans la zone de contenu de l'écran, qui se
+// trouve déjà AU-DESSUS de la barre d'onglets (l'inset inférieur y est absorbé) —
+// il est donc mesuré depuis le haut de la barre d'onglets, et non depuis le bord
+// de l'appareil, et n'a besoin d'aucun inset de safe-area. Le bouton flottant
+// s'élève de ASSISTANT_FAB_GAP + ASSISTANT_FAB_SIZE dans cet espace, donc ce
+// bouton s'empile un espace de 12pt au-dessus de lui.
 const BACK_TO_TOP_LIFT = ASSISTANT_FAB_GAP + ASSISTANT_FAB_SIZE + 12;
 
-// The News tab is a native stack so the article reader gets the platform's
-// real back affordances for free: iOS's left-edge swipe-back and Android's
-// system back (button or gesture-nav swipe) both pop the stack natively — no
-// home-rolled BackHandler needed. The bottom tab bar lives above this in the
-// shell, so it stays visible while a screen is pushed.
+// L'onglet Actualités est une pile native pour que le lecteur d'article obtienne
+// gratuitement les vraies affordances de retour de la plateforme : le retour par
+// balayage depuis le bord gauche d'iOS et le retour système d'Android (bouton ou
+// balayage de navigation gestuelle) dépilent tous deux la pile nativement — pas
+// besoin de BackHandler maison. La barre d'onglets du bas vit au-dessus de ceci
+// dans le shell, elle reste donc visible pendant qu'un écran est empilé.
 //
-// Routes carry only an article id — react-navigation params must be
-// serialisable (it warns on objects/functions), so each screen resolves the
-// article from ARTICLES by id rather than receiving the object.
+// Les routes ne transportent qu'un id d'article — les params de react-navigation
+// doivent être sérialisables (il avertit sur les objets/fonctions), donc chaque
+// écran résout l'article depuis ARTICLES par id plutôt que de recevoir l'objet.
 type NewsStackParamList = {
   Feed: undefined;
   Article: { id: number };
@@ -99,19 +104,20 @@ export function NewsScreen({
   themeName?: ThemeName;
   onApply?: () => void;
   onSignIn?: () => void;
-  /** Incremented by the shell when the News tab is re-tapped while already
-   *  active. We use it to pop the stack back to the feed from an open article. */
+  /** Incrémenté par le shell quand l'onglet Actualités est re-touché alors qu'il
+   *  est déjà actif. On l'utilise pour dépiler la pile jusqu'au flux depuis un article ouvert. */
   resetSignal?: number;
-  /** Fired with `true` when a sub-view (article reader, member-only prompt)
-   *  is pushed, `false` back on the feed. The shell uses it to hide the
-   *  floating account avatar on detail pages — it belongs on main pages only. */
+  /** Déclenché avec `true` quand une sous-vue (lecteur d'article, invite réservée
+   *  aux adhérents) est empilée, `false` de retour sur le flux. Le shell l'utilise
+   *  pour masquer l'avatar de compte flottant sur les pages de détail — il
+   *  n'appartient qu'aux pages principales. */
   onDetailChange?: (isDetail: boolean) => void;
 }) {
   const reducedMotion = useReducedMotion();
   const navRef = useNavigationContainerRef<NewsStackParamList>();
 
-  // Re-tapping the active News tab pops the reader/upsell back to the feed.
-  // Skip the first run (mount) so we only react to genuine re-taps.
+  // Re-toucher l'onglet Actualités actif dépile le lecteur/l'incitation jusqu'au flux.
+  // On ignore la première exécution (montage) pour ne réagir qu'aux véritables re-touches.
   const isFirstResetRun = useRef(true);
   useEffect(() => {
     if (isFirstResetRun.current) {
@@ -126,8 +132,8 @@ export function NewsScreen({
   return (
     <NavigationContainer
       ref={navRef}
-      // Report whether we're on a pushed sub-view (anything but the feed) so
-      // the shell can hide the floating avatar on detail pages.
+      // Signaler si l'on est sur une sous-vue empilée (tout sauf le flux) pour
+      // que le shell puisse masquer l'avatar flottant sur les pages de détail.
       onStateChange={(state) => {
         if (!state) return;
         const route = state.routes[state.index];
@@ -136,10 +142,11 @@ export function NewsScreen({
     >
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // each screen draws its own iOS-HIG header
-          // Reduced motion is non-negotiable (P5): collapse the push/pop
-          // transition to an instant cut. The left-edge swipe-back gesture
-          // stays enabled either way — it's an input, not decorative motion.
+          headerShown: false, // chaque écran dessine son propre en-tête iOS-HIG
+          // Le mouvement réduit est non négociable (P5) : on réduit la transition
+          // d'empilement/dépilement à une coupe instantanée. Le geste de retour
+          // par balayage depuis le bord gauche reste activé dans tous les cas —
+          // c'est une entrée, pas un mouvement décoratif.
           animation: reducedMotion ? "none" : "default",
         }}
       >
@@ -159,9 +166,9 @@ export function NewsScreen({
               id={route.params.id}
               themeName={themeName}
               onBack={() => navigation.goBack()}
-              // Prev/next replaces the current article: back (button or swipe)
-              // still returns to the feed and the reader remounts at the top,
-              // matching the pre-stack behaviour.
+              // Précédent/suivant remplace l'article courant : le retour (bouton ou
+              // balayage) ramène toujours au flux et le lecteur se remonte en haut,
+              // conformément au comportement d'avant la pile.
               onNavigateId={(id) => navigation.replace("Article", { id })}
             />
           )}
@@ -182,9 +189,10 @@ export function NewsScreen({
   );
 }
 
-// ArticleRoute — resolves the route's article id into the reader and computes
-// the prev/next neighbours in feed order (prev is null on the first article,
-// next on the last → the in-article nav buttons disable there).
+// ArticleRoute — résout l'id d'article de la route en lecteur et calcule les
+// voisins précédent/suivant dans l'ordre du flux (précédent est null sur le
+// premier article, suivant sur le dernier → les boutons de navigation dans
+// l'article s'y désactivent).
 function ArticleRoute({
   id,
   themeName,
@@ -199,7 +207,7 @@ function ArticleRoute({
   const idx = ARTICLES.findIndex((a) => a.id === id);
   const article = idx >= 0 ? ARTICLES[idx] : null;
 
-  // Defensive: an unknown id (shouldn't happen) just pops back to the feed.
+  // Défensif : un id inconnu (ne devrait pas arriver) dépile simplement jusqu'au flux.
   useEffect(() => {
     if (!article) onBack();
   }, [article, onBack]);
@@ -220,10 +228,10 @@ function ArticleRoute({
   );
 }
 
-// NewsFeed — the feed itself (category rail + single-column cards +
-// pagination). Owns the filter/pagination state; it stays mounted beneath a
-// pushed article (native stack), so scroll position and the active category
-// survive the round-trip.
+// NewsFeed — le flux lui-même (rail de catégories + cartes sur une colonne +
+// pagination). Détient l'état de filtre/pagination ; il reste monté sous un
+// article empilé (pile native), de sorte que la position de défilement et la
+// catégorie active survivent à l'aller-retour.
 function NewsFeed({
   themeName = "light",
   onOpenArticle,
@@ -239,8 +247,9 @@ function NewsFeed({
   const reducedMotion = useReducedMotion();
   const [category, setCategory] = useState<CategoryKey>("all");
 
-  // Floating "back to top" — the feed scroll ref, plus a visibility flag the
-  // scroll handler flips once the user is far enough down to want a shortcut.
+  // « Retour en haut » flottant — la réf de défilement du flux, plus un drapeau de
+  // visibilité que le gestionnaire de défilement bascule une fois que l'utilisateur
+  // est assez bas pour vouloir un raccourci.
   const scrollRef = useRef<ScrollView>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -254,14 +263,14 @@ function NewsFeed({
     if (next !== showBackToTop) setShowBackToTop(next);
   };
 
-  // Visual-only pagination. The arrows move the indicator and toggle their own
-  // disabled state at the ends; they don't actually re-page the feed yet.
+  // Pagination purement visuelle. Les flèches déplacent l'indicateur et basculent
+  // leur propre état désactivé aux extrémités ; elles ne repaginent pas encore réellement le flux.
   const TOTAL_PAGES = 130;
   const [page, setPage] = useState(1);
 
   const canReadMemberContent = canAccess(role, "member-only");
 
-  // The whole feed responds to the rail — no featured/hero exemption.
+  // Tout le flux répond au rail — pas d'exemption pour un article vedette/hero.
   const filtered = useMemo<Article[]>(
     () =>
       category === "all"
@@ -270,16 +279,16 @@ function NewsFeed({
     [category],
   );
 
-  // A guest tapping a member-only article gets the upsell; everyone else the
-  // reader. The public/member boundary inside News.
+  // Un invité qui touche un article réservé aux adhérents obtient l'incitation ;
+  // tous les autres, le lecteur. La frontière public/adhérent dans les Actualités.
   const open = (a: Article) => {
     if (a.memberOnly && !canReadMemberContent) onOpenLocked(a.id);
     else onOpenArticle(a.id);
   };
 
   return (
-    // Page title now lives in the shared AppHeader (shell); content renders
-    // directly beneath it.
+    // Le titre de page vit désormais dans l'AppHeader partagé (shell) ; le
+    // contenu se rend directement en dessous.
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <ScrollView
         ref={scrollRef}
@@ -287,9 +296,9 @@ function NewsFeed({
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
       >
-        {/* Category rail — horizontally scrollable filter pills under the
-            large title. Selection swaps state instantly (no animation), so
-            there is nothing to gate on reduced motion. */}
+        {/* Rail de catégories — pastilles de filtre défilables horizontalement
+            sous le grand titre. La sélection change l'état instantanément (sans
+            animation), il n'y a donc rien à conditionner au mouvement réduit. */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -323,16 +332,16 @@ function NewsFeed({
           ) : (
             <View style={{ paddingVertical: 40, alignItems: "center" }}>
               <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>
-                No articles in this category.
+                Aucun article dans cette catégorie.
               </Text>
               <Text style={{ color: t.text.muted, fontSize: 13, opacity: 0.8, textAlign: "center" }}>
-                Pick another category to see more.
+                Choisissez une autre catégorie pour en voir plus.
               </Text>
             </View>
           )}
         </View>
 
-        {/* Page indicator — visual only. Arrows disable at the first/last page. */}
+        {/* Indicateur de page — visuel uniquement. Les flèches se désactivent à la première/dernière page. */}
         <Pagination
           themeName={themeName}
           page={page}
@@ -343,25 +352,26 @@ function NewsFeed({
         />
       </ScrollView>
 
-      {/* Back-to-top — floats in once scrolled down. Stacked above the Claude
-          assistant FAB (which owns the corner) rather than overlapping it. */}
+      {/* Retour en haut — apparaît en fondu une fois défilé vers le bas. Empilé
+          au-dessus du bouton flottant de l'assistant Claude (qui occupe le coin)
+          plutôt que de le chevaucher. */}
       {showBackToTop ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to top"
+          accessibilityLabel="Retour en haut"
           onPress={() => scrollToTop()}
           style={({ pressed }) => ({
             position: "absolute",
             right: GUTTER,
             bottom: BACK_TO_TOP_LIFT,
-            // Same diameter as the assistant FAB it stacks above.
+            // Même diamètre que le bouton flottant de l'assistant au-dessus duquel il s'empile.
             width: ASSISTANT_FAB_SIZE,
             height: ASSISTANT_FAB_SIZE,
             borderRadius: ASSISTANT_FAB_SIZE / 2,
             backgroundColor: pressed ? t.action.primary.bgPressed : t.action.primary.bg,
             alignItems: "center",
             justifyContent: "center",
-            // Lift it off the list.
+            // Le détacher de la liste.
             shadowColor: "#000",
             shadowOpacity: 0.18,
             shadowOffset: { width: 0, height: 2 },
@@ -377,11 +387,11 @@ function NewsFeed({
 }
 
 // ---------------------------------------------------------------------------
-// CategoryPill — one filter pill in the rail. Selected = brand teal[700] fill
-// (matching the segmented control + primary actions) with a white label;
-// unselected = card surface with a hairline border.
-// The state is exposed to assistive tech via accessibilityState, and the
-// weight bump keeps selection readable beyond the colour flip (P4).
+// CategoryPill — une pastille de filtre dans le rail. Sélectionnée = remplissage
+// teal[700] de la marque (assorti au contrôle segmenté + aux actions primaires)
+// avec un libellé blanc ; non sélectionnée = surface de carte avec une bordure fine.
+// L'état est exposé aux technologies d'assistance via accessibilityState, et le
+// renforcement de graisse garde la sélection lisible au-delà du changement de couleur (P4).
 // ---------------------------------------------------------------------------
 function CategoryPill({
   label,
@@ -403,8 +413,8 @@ function CategoryPill({
       accessibilityState={{ selected }}
       accessibilityLabel={label}
       onPress={onPress}
-      // The 38pt pill alone misses the 44pt touch floor — hitSlop makes up the
-      // vertical shortfall without inflating the visual.
+      // La pastille de 38pt seule rate le plancher tactile de 44pt — hitSlop comble
+      // le déficit vertical sans gonfler le visuel.
       hitSlop={{ top: 8, bottom: 8 }}
       style={({ pressed }) => ({
         height: 38,
@@ -413,7 +423,7 @@ function CategoryPill({
         backgroundColor: selected
           ? primitives.colors.brand.teal[700]
           : pressed ? t.border.subtle : c.cardBg,
-        // Border on both states so the pill doesn't change size on selection.
+        // Bordure dans les deux états pour que la pastille ne change pas de taille à la sélection.
         borderWidth: 1,
         borderColor: selected ? primitives.colors.brand.teal[700] : (c.cardBorder ?? t.border.subtle),
         alignItems: "center",
@@ -435,8 +445,8 @@ function CategoryPill({
 }
 
 // ---------------------------------------------------------------------------
-// CategoryTag — pill carrying the article category. Colour + label (never
-// colour alone, P4). `muted` renders the locked/member-only treatment.
+// CategoryTag — pastille portant la catégorie de l'article. Couleur + libellé
+// (jamais la couleur seule, P4). `muted` rend le traitement verrouillé/réservé aux adhérents.
 // ---------------------------------------------------------------------------
 function CategoryTag({
   label,
@@ -475,9 +485,9 @@ function CategoryTag({
 }
 
 // ---------------------------------------------------------------------------
-// ArticleCard — one full-width card in the single-column feed: 16:9 image,
-// category tag, Raleway headline, date. The excerpt stays out of the card (it
-// reads in the article) but is kept in the accessibility label for context.
+// ArticleCard — une carte pleine largeur dans le flux à une colonne : image 16:9,
+// étiquette de catégorie, titre en Raleway, date. L'extrait reste hors de la carte
+// (il se lit dans l'article) mais est conservé dans le libellé d'accessibilité pour le contexte.
 // ---------------------------------------------------------------------------
 function ArticleCard({
   article,
@@ -496,7 +506,7 @@ function ArticleCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${article.title}.${locked ? " Members only." : ""} ${article.excerpt}`}
+      accessibilityLabel={`${article.title}.${locked ? " Réservé aux adhérents." : ""} ${article.excerpt}`}
       onPress={onPress}
       style={({ pressed }) => ({
         backgroundColor: pressed ? t.border.subtle : c.cardBg,
@@ -515,7 +525,7 @@ function ArticleCard({
         pixelWidth={1200}
         pixelHeight={675}
         themeName={themeName}
-        accessibilityLabel={`Illustration for ${article.title}`}
+        accessibilityLabel={`Illustration pour ${article.title}`}
       />
 
       <View style={{ padding: 14 }}>

@@ -1,27 +1,31 @@
-// FFIE — Doc Library Screen, styled to iOS HIG (large title, rounded search,
-// grouped inset list) via the shared iOS primitives (components/ui/ios).
+// FFIE — Écran Bibliothèque de documents, stylé selon iOS HIG (grand titre,
+// recherche arrondie, liste en cartes groupées) via les primitives iOS partagées
+// (components/ui/ios).
 //
-// Renders the full FFIE documents catalogue (335 docs — see src/data/docs.ts),
-// STRUCTURED into one inset section card per FFIE family (the site's top-level
-// taxonomy), each headed by its name + a live "N docs" count badge — mirroring
-// the client's sectioned documentation layout. On top of sectioning:
-//   - Each section opens collapsed to a preview (SECTION_PREVIEW rows); a
-//     per-section "Show all" reveals the rest of that family.
-//   - Search + filter narrow the corpus AND the section list (empty families
-//     drop out, badge counts update live).
-//   - A "back to top" button floats in once you scroll down.
-//   - Member-only documents carry a lock tag for viewers who can't open them
-//     (guests) — the same LockTag the News cards use.
-// Sections open collapsed, so a plain ScrollView is fine — only the previews
-// (plus any family the user explicitly expands) render.
+// Affiche le catalogue complet des documents FFIE (335 documents — voir
+// src/data/docs.ts), STRUCTURÉ en une carte de section par famille FFIE (la
+// taxonomie de premier niveau du site), chacune coiffée de son nom + un compteur
+// « N docs » en direct — reproduisant la mise en page documentaire sectionnée du
+// client. En plus du sectionnement :
+//   - Chaque section s'ouvre repliée sur un aperçu (SECTION_PREVIEW lignes) ; un
+//     « Tout afficher » par section révèle le reste de cette famille.
+//   - La recherche + le filtre restreignent le corpus ET la liste des sections
+//     (les familles vides disparaissent, les compteurs se mettent à jour en direct).
+//   - Un bouton « retour en haut » apparaît dès qu'on fait défiler vers le bas.
+//   - Les documents réservés aux adhérents portent une étiquette cadenas pour les
+//     visiteurs qui ne peuvent pas les ouvrir (les invités) — le même LockTag que
+//     les cartes Actualités.
+// Les sections s'ouvrent repliées, donc une simple ScrollView suffit — seuls les
+// aperçus (plus toute famille que l'utilisateur déplie explicitement) sont rendus.
 //
-// Design contracts honored:
-//   1. Search field at top (P3) — no autofocus (keyboard-on-mount is rude).
-//   2. Rows ≥48pt (P1) — InsetRow floors minHeight at 48.
-//   3. Offline banner when offline=true (P2).
-//   4. Each row carries a SavedBadge OR a LockTag (icon+label, never colour
-//      alone — P2+P4).
-//   5. Theme + density supplied by caller. 6. Mobile gutter = 16.
+// Contrats de conception respectés :
+//   1. Champ de recherche en haut (P3) — pas d'autofocus (ouvrir le clavier au
+//      montage est impoli).
+//   2. Lignes ≥ 48 pt (P1) — InsetRow plafonne minHeight à 48.
+//   3. Bandeau hors ligne quand offline=true (P2).
+//   4. Chaque ligne porte un SavedBadge OU un LockTag (icône + libellé, jamais la
+//      couleur seule — P2+P4).
+//   5. Thème + densité fournis par l'appelant. 6. Gouttière mobile = 16.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -74,38 +78,41 @@ import {
   useGroupedColors,
 } from "@/components/ui/ios";
 
-// The library's offline filter is two-state, matching the doc's `saved` flag
-// (FFIE-DOC-03 / P2): "show me what's on this device" vs "what I still need to
-// download". Nothing richer is in scope.
+// Le filtre hors ligne de la bibliothèque est à deux états, calqué sur l'indicateur
+// `saved` du document (FFIE-DOC-03 / P2) : « montre-moi ce qui est sur cet appareil »
+// vs « ce qu'il me reste à télécharger ». Rien de plus riche n'est prévu.
 type SavedFilterKey = "saved" | "not-saved";
 
 const FILTER_OPTIONS: { key: SavedFilterKey; label: string }[] = [
-  { key: "saved", label: "Saved offline" },
-  { key: "not-saved", label: "Not saved" },
+  { key: "saved", label: "Enregistré hors ligne" },
+  { key: "not-saved", label: "Non enregistré" },
 ];
 
-// Family (Famille) facet — the FFIE site's top-level taxonomy (FFIE-DOC-04:
-// "filtering ... by category"). Keys ARE the family names, so a selected key
-// maps straight onto each doc's `family`. Built from the canonical order in
-// docs.ts so the chips read in the same order the site lists them.
+// Facette Famille — la taxonomie de premier niveau du site FFIE (FFIE-DOC-04 :
+// « filtrage ... par catégorie »). Les clés SONT les noms de famille, donc une clé
+// sélectionnée se mappe directement sur le `family` de chaque document. Construite
+// à partir de l'ordre canonique de docs.ts pour que les puces s'affichent dans le
+// même ordre que le site.
 const FAMILY_OPTIONS: { key: DocFamily; label: string }[] = DOC_FAMILIES.map(
   (f) => ({ key: f, label: f }),
 );
 
-// Each family section opens showing a preview of SECTION_PREVIEW rows; a
-// per-section "Show all" reveals the rest of that family. Tunable.
+// Chaque section de famille s'ouvre en montrant un aperçu de SECTION_PREVIEW
+// lignes ; un « Tout afficher » par section révèle le reste de cette famille. Réglable.
 const SECTION_PREVIEW = 3;
-// Show the back-to-top button once the user has scrolled roughly a screenful.
+// Afficher le bouton retour-en-haut une fois que l'utilisateur a fait défiler à peu
+// près un écran.
 const BACK_TO_TOP_AT = 520;
-// The Claude assistant FAB (AssistantChatWidget) owns the bottom-right corner.
-// This button lives in the screen's content area (above the tab bar, so the
-// bottom inset is already absorbed) and stacks one 12pt gap above the FAB.
-// Mirrors BACK_TO_TOP_LIFT in NewsScreen.
+// Le bouton flottant de l'assistant Claude (AssistantChatWidget) occupe le coin
+// inférieur droit. Ce bouton vit dans la zone de contenu de l'écran (au-dessus de
+// la barre d'onglets, donc l'inset bas est déjà absorbé) et s'empile 12 pt au-dessus
+// du bouton flottant. Reproduit BACK_TO_TOP_LIFT dans NewsScreen.
 const BACK_TO_TOP_LIFT = ASSISTANT_FAB_GAP + ASSISTANT_FAB_SIZE + 12;
 
-// Thumbnail visuals — a 50×66 box showing the document's real FFIE cover image.
-// While that image loads (or if it fails / we're offline) we render a mock
-// "rendered page" so the row never shows a broken image.
+// Visuels de vignette — une boîte 50×66 montrant la vraie image de couverture FFIE
+// du document. Pendant le chargement de cette image (ou en cas d'échec / hors ligne)
+// on rend une « page rendue » fictive pour que la ligne n'affiche jamais une image
+// cassée.
 const THUMB_WIDTH = 50;
 const THUMB_HEIGHT = 66;
 
@@ -123,30 +130,32 @@ const BODY_DARK = "#C2C8D2";
 const BODY_LIGHT = "#DDE1E8";
 const SUBTITLE = "#9AA2B1";
 
-// Mock-page tone is keyed to the document's FFIE family — a meaningful accent
-// for the fallback (never the ONLY signal: the subtitle says it in words, P4).
+// La teinte de la page fictive est indexée sur la famille FFIE du document — un
+// accent porteur de sens pour le repli (jamais le SEUL signal : le sous-titre le dit
+// en toutes lettres, P4).
 const FAMILY_TONE: Record<DocFamily, ThumbTone> = {
-  "Power Systems": "navy",
-  "Safety / Fire Safety": "amber",
-  "Company Life": "slate",
-  "Connected Buildings": "teal",
-  "Energy Performance": "green",
+  "Courants forts": "navy",
+  "Sûreté / Sécurité Incendie": "amber",
+  "Vie de l'entreprise": "slate",
+  "Bâtiments connectés": "teal",
+  "Performance énergétique": "green",
   Maintenance: "slate",
-  "Document Types": "navy",
-  "Other Documents": "slate",
+  "Types de documents": "navy",
+  "Autres documents": "slate",
 };
 
-// Section-header icon per FFIE family — a quick visual anchor for each card
-// header (the icon column the client's mock shows beside the section name).
+// Icône d'en-tête de section par famille FFIE — un repère visuel rapide pour
+// chaque en-tête de carte (la colonne d'icônes que la maquette du client montre
+// à côté du nom de section).
 const FAMILY_ICON: Record<DocFamily, LucideIcon> = {
-  "Power Systems": Zap,
-  "Safety / Fire Safety": Flame,
-  "Company Life": Building2,
-  "Connected Buildings": Wifi,
-  "Energy Performance": Gauge,
+  "Courants forts": Zap,
+  "Sûreté / Sécurité Incendie": Flame,
+  "Vie de l'entreprise": Building2,
+  "Bâtiments connectés": Wifi,
+  "Performance énergétique": Gauge,
   Maintenance: Wrench,
-  "Document Types": FileText,
-  "Other Documents": Files,
+  "Types de documents": FileText,
+  "Autres documents": Files,
 };
 
 function MockPage({ tone }: { tone: ThumbTone }) {
@@ -172,7 +181,8 @@ function MockPage({ tone }: { tone: ThumbTone }) {
 }
 
 function DocThumbnail({ doc }: { doc: Doc }) {
-  // Show the real FFIE cover; on load failure (offline / 404) drop to the mock.
+  // Afficher la vraie couverture FFIE ; en cas d'échec de chargement (hors ligne / 404)
+  // basculer sur la version fictive.
   const [failed, setFailed] = useState(false);
   const tone = FAMILY_TONE[doc.family];
   const showImage = !!doc.thumbUrl && !failed;
@@ -208,8 +218,9 @@ function DocThumbnail({ doc }: { doc: Doc }) {
   );
 }
 
-// CountBadge — the grey rounded pill on the right of each section header
-// ("N docs"), counting the family's full match set (not just the preview).
+// CountBadge — la pastille grise arrondie à droite de chaque en-tête de section
+// (« N docs »), comptant l'ensemble des correspondances de la famille (pas seulement
+// l'aperçu).
 function CountBadge({ count, themeName }: { count: number; themeName: ThemeName }) {
   const t = themes[themeName];
   return (
@@ -237,9 +248,9 @@ function CountBadge({ count, themeName }: { count: number; themeName: ThemeName 
   );
 }
 
-// SectionHeaderRow — the card-top row that names a family: family icon, the
-// family name (bold), and the live count badge. Sits inside the inset card
-// above the document rows, with a hairline below it.
+// SectionHeaderRow — la ligne en haut de carte qui nomme une famille : icône de
+// famille, nom de la famille (en gras) et le compteur en direct. Se place dans la
+// carte au-dessus des lignes de documents, avec un filet en dessous.
 function SectionHeaderRow({
   icon: Icon,
   title,
@@ -288,9 +299,10 @@ function SectionHeaderRow({
   );
 }
 
-// SectionToggleRow — the per-section "Show all N / Show less" row at the bottom
-// of a family card, shown only when the family has more than SECTION_PREVIEW
-// documents. Mirrors the old global "Show more" affordance, scoped to a family.
+// SectionToggleRow — la ligne « Tout afficher (N) / Afficher moins » par section,
+// en bas d'une carte de famille, affichée uniquement quand la famille compte plus de
+// SECTION_PREVIEW documents. Reprend l'ancien « Afficher plus » global, limité à une
+// famille.
 function SectionToggleRow({
   expanded,
   total,
@@ -307,7 +319,7 @@ function SectionToggleRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={expanded ? "Show fewer documents" : `Show all ${total} documents`}
+      accessibilityLabel={expanded ? "Afficher moins de documents" : `Afficher les ${total} documents`}
       onPress={onPress}
       style={({ pressed }) => ({ backgroundColor: pressed ? t.border.subtle : "transparent" })}
     >
@@ -329,7 +341,7 @@ function SectionToggleRow({
             fontWeight: "600",
           }}
         >
-          {expanded ? "Show less" : `Show all ${total}`}
+          {expanded ? "Afficher moins" : `Tout afficher (${total})`}
         </Text>
         <Icon size={16} color={t.brand.accent} />
       </View>
@@ -342,18 +354,19 @@ type Props = {
   density: DensityMode;
   offline: boolean;
   onDocPress?: (doc: Doc) => void;
-  /** Tapping a member-only doc as a guest opens the membership upsell, whose
-   *  primary CTA calls this — the guest shell points it at the federation
-   *  directory (map + departmental list). Omitted in the member shell (members
-   *  can open every doc, so the upsell never appears). */
+  /** Quand un invité tape un document réservé aux adhérents, l'incitation à
+   *  l'adhésion s'ouvre ; son CTA principal appelle ceci — le shell invité le pointe
+   *  vers l'annuaire des fédérations (carte + liste départementale). Omis dans le
+   *  shell adhérent (les adhérents peuvent ouvrir tous les documents, donc l'incitation
+   *  n'apparaît jamais). */
   onApply?: () => void;
-  /** Secondary CTA on that upsell — "I already have an account" → sign-in. */
+  /** CTA secondaire de cette incitation — « J'ai déjà un compte » → connexion. */
   onSignIn?: () => void;
-  /** Incremented by the shell when the Library tab is re-tapped while already
-   *  active. Pops an open document / upsell back to the list. */
+  /** Incrémenté par le shell quand on retape l'onglet Bibliothèque alors qu'il est
+   *  déjà actif. Referme un document / une incitation ouverts pour revenir à la liste. */
   resetSignal?: number;
-  /** Fired with `true` when a document detail or the upsell is open, `false`
-   *  back on the list. The shell uses it to hide the floating avatar. */
+  /** Déclenché avec `true` quand un détail de document ou l'incitation est ouvert,
+   *  `false` de retour sur la liste. Le shell s'en sert pour masquer l'avatar flottant. */
   onDetailChange?: (isDetail: boolean) => void;
 };
 
@@ -367,7 +380,7 @@ export function DocLibraryScreen({
   resetSignal,
   onDetailChange,
 }: Props) {
-  void density; // grouped rows own their rhythm now
+  void density; // les lignes groupées gèrent désormais leur propre rythme
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
   const { role } = useRole();
@@ -379,25 +392,29 @@ export function DocLibraryScreen({
   const [filterOpen, setFilterOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<Set<SavedFilterKey>>(new Set());
   const [familyFilter, setFamilyFilter] = useState<Set<DocFamily>>(new Set());
-  // A tapped doc opens either its detail (accessible) or the member-only upsell
-  // (a guest tapping a locked doc) — one surface at a time over the list.
+  // Un document tapé ouvre soit son détail (accessible), soit l'incitation à
+  // l'adhésion (un invité tapant un document verrouillé) — une seule surface à la
+  // fois au-dessus de la liste.
   const [active, setActive] = useState<{ kind: "detail" | "locked"; doc: Doc } | null>(null);
-  // Which family sections are expanded past their preview. Reset on any filter
-  // change so a fresh result set always opens collapsed.
+  // Quelles sections de famille sont dépliées au-delà de leur aperçu. Réinitialisé à
+  // tout changement de filtre pour qu'un nouvel ensemble de résultats s'ouvre toujours
+  // replié.
   const [expandedSections, setExpandedSections] = useState<Set<DocFamily>>(new Set());
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  // Guests see locks on member-only docs; members/admins can open everything.
+  // Les invités voient des cadenas sur les documents réservés aux adhérents ; les
+  // adhérents/admins peuvent tout ouvrir.
   const canReadMemberContent = canAccess(role, "member-only");
 
-  // Tell the shell when a sub-view (detail or upsell) is open so it can hide
-  // the floating avatar (main pages only).
+  // Prévenir le shell quand une sous-vue (détail ou incitation) est ouverte pour qu'il
+  // puisse masquer l'avatar flottant (pages principales uniquement).
   useEffect(() => {
     onDetailChange?.(active !== null);
   }, [active, onDetailChange]);
 
-  // Re-tapping the active Library tab pops an open document / upsell back to the
-  // list. Skip the mount run so only genuine re-taps trigger it.
+  // Retaper l'onglet Bibliothèque actif referme un document / une incitation ouverts
+  // pour revenir à la liste. On saute l'exécution au montage pour que seuls de vrais
+  // retaps la déclenchent.
   const isFirstResetRun = useRef(true);
   useEffect(() => {
     if (isFirstResetRun.current) {
@@ -408,20 +425,21 @@ export function DocLibraryScreen({
   }, [resetSignal]);
 
   const openDoc = (doc: Doc) => {
-    // A guest tapping a member-only doc gets the upsell, not a dead end (the
-    // access-model rule: gated content redirects to login + apply, never a 403).
+    // Un invité tapant un document réservé aux adhérents obtient l'incitation, pas un
+    // cul-de-sac (la règle du modèle d'accès : le contenu réservé redirige vers
+    // connexion + adhésion, jamais un 403).
     const locked = doc.memberOnly && !canReadMemberContent;
     setActive({ kind: locked ? "locked" : "detail", doc });
-    onDocPress?.(doc); // preserve any external hook (analytics, etc.)
+    onDocPress?.(doc); // préserve tout hook externe (analytique, etc.)
   };
 
   const scrollToTop = (animated = true) => {
     scrollRef.current?.scrollTo({ y: 0, animated: animated && !reducedMotion });
   };
 
-  // Search + family + status filters narrow the corpus (kept in the site's
-  // order). Within a facet the selected chips are OR'd; the facets are AND'd
-  // (e.g. "Maintenance" AND "Saved offline").
+  // La recherche + les filtres famille + statut restreignent le corpus (gardé dans
+  // l'ordre du site). Au sein d'une facette les puces sélectionnées sont en OU ; les
+  // facettes sont en ET (p. ex. « Maintenance » ET « Enregistré hors ligne »).
   const filtered = useMemo<Doc[]>(() => {
     const q = query.trim().toLowerCase();
     const hasStatusFilter = statusFilter.size > 0;
@@ -439,15 +457,15 @@ export function DocLibraryScreen({
     });
   }, [query, statusFilter, familyFilter]);
 
-  // Any change to the result set collapses every section back to its preview.
+  // Tout changement de l'ensemble des résultats replie chaque section sur son aperçu.
   useEffect(() => {
     setExpandedSections(new Set());
   }, [query, statusFilter, familyFilter]);
 
-  // Group the filtered corpus into family sections, in the canonical family
-  // order, dropping families with no matches (so search/filter narrows the
-  // section list too). Each section carries its full match list; the preview
-  // cap is applied at render time.
+  // Regroupe le corpus filtré en sections de familles, dans l'ordre canonique des
+  // familles, en écartant les familles sans correspondance (pour que la recherche/le
+  // filtre restreigne aussi la liste des sections). Chaque section porte sa liste
+  // complète de correspondances ; le plafond d'aperçu est appliqué au rendu.
   const sections = useMemo(
     () =>
       DOC_FAMILIES.map((family) => ({
@@ -474,7 +492,7 @@ export function DocLibraryScreen({
   const activeFilterCount = statusFilter.size + familyFilter.size;
   const cachedCount = useMemo(() => DOCS.filter((d) => d.saved).length, []);
 
-  // Toggle a key in/out of a Set-valued filter (immutably).
+  // Bascule une clé dans/hors d'un filtre à valeur d'ensemble (de façon immuable).
   const toggleIn = <K,>(set: React.Dispatch<React.SetStateAction<Set<K>>>) => (key: K) =>
     set((prev) => {
       const next = new Set(prev);
@@ -483,18 +501,19 @@ export function DocLibraryScreen({
       return next;
     });
 
-  // The two facets stacked in the filter sheet: Family (FFIE taxonomy) then
-  // Offline (device cache state). Keys are strings at the sheet boundary; the
-  // typed Sets live here. Family leads — it's the primary way to browse.
+  // Les deux facettes empilées dans la feuille de filtre : Famille (taxonomie FFIE)
+  // puis Hors ligne (état du cache de l'appareil). Les clés sont des chaînes à la
+  // frontière de la feuille ; les ensembles typés vivent ici. La famille mène — c'est
+  // la principale façon de naviguer.
   const filterSections: FilterSection[] = [
     {
-      label: "Family",
+      label: "Famille",
       options: FAMILY_OPTIONS,
       selected: familyFilter as Set<string>,
       onToggle: toggleIn(setFamilyFilter) as (key: string) => void,
     },
     {
-      label: "Offline",
+      label: "Hors ligne",
       options: FILTER_OPTIONS,
       selected: statusFilter as Set<string>,
       onToggle: toggleIn(setStatusFilter) as (key: string) => void,
@@ -512,9 +531,9 @@ export function DocLibraryScreen({
   }
 
   if (active?.kind === "locked") {
-    // Guest tapped a member-only doc → the shared upsell. Its primary CTA
-    // (onApply) is pointed at the federation directory (map + departmental
-    // list) by the guest shell; the secondary CTA opens sign-in.
+    // L'invité a tapé un document réservé aux adhérents → l'incitation partagée. Son
+    // CTA principal (onApply) est pointé vers l'annuaire des fédérations (carte + liste
+    // départementale) par le shell invité ; le CTA secondaire ouvre la connexion.
     return (
       <MemberOnlyPrompt
         themeName={themeName}
@@ -527,8 +546,8 @@ export function DocLibraryScreen({
   }
 
   return (
-    // Page title now lives in the shared AppHeader (shell); content renders
-    // directly beneath it.
+    // Le titre de page vit désormais dans l'AppHeader partagé (shell) ; le contenu se
+    // rend directement en dessous.
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <ScrollView
         ref={scrollRef}
@@ -539,7 +558,7 @@ export function DocLibraryScreen({
         contentContainerStyle={{ paddingBottom: 32, paddingTop: 18 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* iOS-style rounded search field + inline filter button */}
+        {/* Champ de recherche arrondi style iOS + bouton de filtre en ligne */}
         <View
           style={{
             paddingHorizontal: GUTTER,
@@ -549,9 +568,9 @@ export function DocLibraryScreen({
             columnGap: 10,
           }}
         >
-          {/* The whole bar is a Pressable that focuses the input, so taps on the
-              icon / padding (not just the narrow text region) bring up the
-              keyboard. */}
+          {/* Toute la barre est un Pressable qui donne le focus au champ, pour que les
+              taps sur l'icône / la marge (et pas seulement l'étroite zone de texte)
+              fassent apparaître le clavier. */}
           <Pressable
             onPress={() => searchRef.current?.focus()}
             style={{
@@ -570,13 +589,13 @@ export function DocLibraryScreen({
               ref={searchRef}
               value={query}
               onChangeText={setQuery}
-              placeholder="Search documents"
+              placeholder="Rechercher des documents"
               placeholderTextColor={t.text.placeholder}
               style={{ flex: 1, alignSelf: "stretch", color: t.text.body, fontSize: 16 }}
               returnKeyType="search"
               autoCorrect={false}
               autoCapitalize="none"
-              accessibilityLabel="Search a document"
+              accessibilityLabel="Rechercher un document"
             />
             {query.length > 0 ? (
               <SearchClearButton themeName={themeName} onPress={() => setQuery("")} />
@@ -589,13 +608,13 @@ export function DocLibraryScreen({
             onPress={() => setFilterOpen(true)}
             accessibilityLabel={
               activeFilterCount > 0
-                ? `Filter documents, ${activeFilterCount} active`
-                : "Filter documents"
+                ? `Filtrer les documents, ${activeFilterCount} actif${activeFilterCount === 1 ? "" : "s"}`
+                : "Filtrer les documents"
             }
           />
         </View>
 
-        {/* Result count — mirrors the FFIE site's "335 documents" line. */}
+        {/* Nombre de résultats — reprend la ligne « 335 documents » du site FFIE. */}
         <Text
           accessibilityRole="header"
           style={{
@@ -610,7 +629,7 @@ export function DocLibraryScreen({
           {filtered.length} document{filtered.length === 1 ? "" : "s"}
         </Text>
 
-        {/* Offline banner — P2 no-dead-end */}
+        {/* Bandeau hors ligne — P2 pas-de-cul-de-sac */}
         {offline ? (
           <View
             accessible
@@ -631,22 +650,22 @@ export function DocLibraryScreen({
             <WifiOff size={18} color={t.feedback.subtle.offline.fg} style={{ marginTop: 1 }} />
             <View style={{ flex: 1 }}>
               <Text style={{ color: t.feedback.subtle.offline.fg, fontWeight: "600", fontSize: 13 }}>
-                Offline
+                Hors ligne
               </Text>
               <Text style={{ color: t.feedback.subtle.offline.fg, fontSize: 13, opacity: 0.9, marginTop: 2 }}>
-                {cachedCount} documents available in cache. Search still works.
+                {cachedCount} documents disponibles en cache. La recherche fonctionne toujours.
               </Text>
             </View>
           </View>
         ) : null}
 
-        {/* Document list — one inset section card per FFIE family, each headed
-            by its name + a live count badge (the client's sectioned layout). */}
+        {/* Liste de documents — une carte de section par famille FFIE, chacune coiffée
+            de son nom + un compteur en direct (la mise en page sectionnée du client). */}
         {sections.length === 0 ? (
           <View style={{ padding: 48, alignItems: "center" }}>
-            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>No documents.</Text>
+            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>Aucun document.</Text>
             <Text style={{ color: t.text.muted, fontSize: 13, opacity: 0.8, textAlign: "center" }}>
-              Try "Notec", "Mesh" or "electrification".
+              Essayez « Notec », « Mesh » ou « électrification ».
             </Text>
           </View>
         ) : (
@@ -679,10 +698,10 @@ export function DocLibraryScreen({
                       showChevron={false}
                       accessibilityLabel={`${doc.title}. ${docSubtitle(doc)}. ${
                         locked
-                          ? "Members only"
+                          ? "Réservé aux adhérents"
                           : doc.saved
-                            ? "Saved offline"
-                            : "Not saved offline"
+                            ? "Enregistré hors ligne"
+                            : "Non enregistré hors ligne"
                       }`}
                       onPress={() => openDoc(doc)}
                       trailing={
@@ -709,25 +728,26 @@ export function DocLibraryScreen({
         )}
       </ScrollView>
 
-      {/* Back-to-top — floats in once scrolled down. Stacked above the Claude
-          assistant FAB (which owns the corner) rather than overlapping it. */}
+      {/* Retour en haut — apparaît une fois défilé vers le bas. Empilé au-dessus du
+          bouton flottant de l'assistant Claude (qui occupe le coin) plutôt que de le
+          chevaucher. */}
       {showBackToTop ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to top"
+          accessibilityLabel="Retour en haut"
           onPress={() => scrollToTop()}
           style={({ pressed }) => ({
             position: "absolute",
             right: GUTTER,
             bottom: BACK_TO_TOP_LIFT,
-            // Same diameter as the assistant FAB it stacks above.
+            // Même diamètre que le bouton flottant de l'assistant au-dessus duquel il s'empile.
             width: ASSISTANT_FAB_SIZE,
             height: ASSISTANT_FAB_SIZE,
             borderRadius: ASSISTANT_FAB_SIZE / 2,
             backgroundColor: pressed ? t.action.primary.bgPressed : t.action.primary.bg,
             alignItems: "center",
             justifyContent: "center",
-            // Lift it off the list.
+            // Le détacher de la liste.
             shadowColor: "#000",
             shadowOpacity: 0.18,
             shadowOffset: { width: 0, height: 2 },

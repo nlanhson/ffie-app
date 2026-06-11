@@ -1,15 +1,17 @@
-// Welcome / Path Selection — v2.
+// Bienvenue / Sélection de parcours — v2.
 //
-// Layout (Mobbin-style poster + bottom card):
-//   - Full-bleed home-banner-bg.jpg behind everything.
-//   - Thin scrim so the top-left header reads on the dark sky band.
-//   - Header: small FFIE logo + wordmark, anchored top-left.
-//   - Bottom card: white, rounded top corners only, "Get started" heading
-//     + one-line subtitle, then two stacked CTAs (Log in / Browse freely).
+// Disposition (affiche façon Mobbin + carte en bas) :
+//   - home-banner-bg.jpg en pleine page derrière tout le reste.
+//   - Fin voile pour que l'en-tête en haut à gauche se lise sur la bande de ciel sombre.
+//   - En-tête : petit logo FFIE + logotype, ancré en haut à gauche.
+//   - Carte du bas : blanche, coins supérieurs arrondis seulement, titre
+//     « Commencer » + sous-titre d'une ligne, puis deux CTA empilés
+//     (Se connecter / Naviguer librement).
 //
-// Sign-up is deliberately omitted — FFIE federation members are admitted
-// by FFIE staff, not self-onboarded on the app. If self-signup is later
-// enabled, add a ghost "Sign up" button under the primary "Log in" CTA.
+// L'inscription est délibérément omise — les adhérents des fédérations FFIE sont
+// admis par le personnel de la FFIE, pas auto-inscrits sur l'app. Si l'auto-
+// inscription est activée plus tard, ajoutez un bouton fantôme « S'inscrire »
+// sous le CTA principal « Se connecter ».
 
 import React from "react";
 import { ArrowRight } from "lucide-react-native";
@@ -43,45 +45,46 @@ export function PathSelectionScreen({
 
   return (
     <View style={styles.root}>
-      {/* This screen is a fixed dark photo in every theme, so the status bar
-          must always use light (white) content — independent of the app's
-          theme-driven global StatusBar. The deepest-mounted StatusBar wins
-          while this screen is shown, then reverts on navigate-away. */}
+      {/* Cet écran est une photo sombre fixe dans tous les thèmes ; la barre
+          d'état doit donc toujours utiliser un contenu clair (blanc) —
+          indépendamment de la StatusBar globale pilotée par le thème de l'app.
+          La StatusBar montée le plus en profondeur l'emporte tant que cet écran
+          est affiché, puis revient à la navigation suivante. */}
       <StatusBar style="light" />
       <ImageBackground source={BG} resizeMode="cover" style={StyleSheet.absoluteFill} />
-      {/* Subtle scrim — keeps the white header text readable on the
-          image without dulling the photo. */}
+      {/* Voile subtil — garde le texte d'en-tête blanc lisible sur l'image sans
+          ternir la photo. */}
       <View style={styles.scrim} pointerEvents="none" />
 
       <View style={styles.layout}>
         <SafeAreaView edges={["top"]} style={styles.posterArea}>
-          {/* Centered logo + welcome text sit roughly in the upper third
-              of the visible image, above the white card. */}
+          {/* Le logo centré + le texte de bienvenue se placent à peu près dans le
+              tiers supérieur de l'image visible, au-dessus de la carte blanche. */}
           <View style={{ flex: 1 }} />
           <View style={styles.poster}>
             <FFIELogo size={104} themeName="dark" />
-            <Text style={styles.posterTitle}>Welcome to FFIE</Text>
+            <Text style={styles.posterTitle}>Bienvenue à la FFIE</Text>
           </View>
           <View style={{ flex: 1.4 }} />
         </SafeAreaView>
 
         <View style={[styles.card, Platform.OS === "android" && styles.cardAndroid]}>
-          <Text style={styles.cardHeading}>Get started</Text>
+          <Text style={styles.cardHeading}>Commencer</Text>
           <Text style={styles.subtitle}>
-            Members and visitors alike — everyone has their own path from here.
+            Adhérents comme visiteurs — chacun a son propre parcours à partir d'ici.
           </Text>
 
           <View style={styles.actions}>
             <PrimaryAction
-              label="Sign in"
-              accessibilityLabel="Sign in as an FFIE member"
+              label="Se connecter"
+              accessibilityLabel="Se connecter en tant qu'adhérent FFIE"
               onPress={() => onSelect("member")}
               bg={t.action.primary.bg}
               bgPressed={t.action.primary.bgPressed}
             />
             <SecondaryAction
-              label="Browse freely"
-              accessibilityLabel="Continue as a visitor"
+              label="Naviguer librement"
+              accessibilityLabel="Continuer en tant que visiteur"
               onPress={() => onSelect("discover")}
             />
           </View>
@@ -181,9 +184,10 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingBottom: 8,
   },
-  // Android's bottom safe-area inset is much smaller than iOS's home-indicator
-  // inset, so the empty SafeAreaView spacer below the CTAs leaves the card
-  // hugging the screen edge. Add breathing room on Android only (iOS is fine).
+  // La marge de zone sûre du bas d'Android est bien plus petite que celle de
+  // l'indicateur d'accueil d'iOS ; l'espaceur SafeAreaView vide sous les CTA
+  // laisse donc la carte coller au bord de l'écran. On ajoute de l'air sur
+  // Android seulement (iOS est correct).
   cardAndroid: {
     paddingBottom: 28,
   },

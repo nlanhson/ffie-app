@@ -1,13 +1,13 @@
-// Skeleton routing — maps a tab key to its loading placeholder, and the
-// TabSkeletonGate that shows that placeholder for a brief beat before the real
-// screen swaps in.
+// Routage des squelettes — associe une clé d'onglet à son espace réservé de chargement, et
+// le TabSkeletonGate qui affiche cet espace réservé pendant un bref instant avant que le
+// vrai écran ne s'y substitue.
 //
-// Why a timed gate at v1: the tab screens read from local mock data, so there's
-// no real network wait to hang the skeleton on. The gate simulates the brief
-// "loading phase" each tab will genuinely have once content comes from the FFIE
-// API — keeping the skeleton component in place so the swap is wired and the
-// motion is tuned. When real async loading lands, drive `ready` off the fetch
-// state instead of a timer (see TabSkeletonGate).
+// Pourquoi une barrière temporisée en v1 : les écrans d'onglet lisent des données simulées
+// locales, il n'y a donc pas de véritable attente réseau sur laquelle accrocher le squelette.
+// La barrière simule la brève « phase de chargement » que chaque onglet aura réellement une
+// fois le contenu issu de l'API FFIE — gardant le composant squelette en place pour que la
+// substitution soit câblée et le mouvement réglé. Quand le vrai chargement asynchrone
+// arrivera, piloter `ready` à partir de l'état de fetch plutôt que d'un minuteur (voir TabSkeletonGate).
 
 import React, { useEffect, useState } from "react";
 import type { ThemeName } from "@tokens";
@@ -19,8 +19,8 @@ import { PartnersSkeleton } from "./PartnersSkeleton";
 import { ProfileSkeleton } from "./ProfileSkeleton";
 import { DiscoverSkeleton } from "./DiscoverSkeleton";
 
-// How long the skeleton holds before the real screen appears. Short enough to
-// never feel like a stall, long enough for the shimmer to register as intent.
+// Combien de temps le squelette tient avant que le vrai écran apparaisse. Assez court pour
+// ne jamais donner l'impression d'un blocage, assez long pour que le scintillement se lise comme une intention.
 const DEFAULT_DELAY_MS = 450;
 
 export function skeletonForTab(tab: TabKey, themeName: ThemeName): React.ReactNode {
@@ -41,17 +41,17 @@ export function skeletonForTab(tab: TabKey, themeName: ThemeName): React.ReactNo
 }
 
 // ---------------------------------------------------------------------------
-// TabSkeletonGate — renders `skeleton` until the loading beat elapses, then the
-// real screen. Mount it with `key={activeTab}` so switching tabs remounts the
-// gate and replays the loading phase for the newly-selected tab.
+// TabSkeletonGate — rend `skeleton` jusqu'à ce que le temps de chargement s'écoule, puis le
+// vrai écran. Le monter avec `key={activeTab}` pour que changer d'onglet remonte la barrière
+// et rejoue la phase de chargement pour l'onglet nouvellement sélectionné.
 //
-// The real children element is created by the caller but isn't mounted (its
-// effects/data work don't run) until the gate flips to `ready` — so the
-// skeleton owns the first frame cleanly.
+// L'élément enfant réel est créé par l'appelant mais n'est pas monté (ses effets/son travail
+// de données ne s'exécutent pas) tant que la barrière n'a pas basculé à `ready` — ainsi le
+// squelette possède proprement la première frame.
 //
-// `delayMs <= 0` skips the skeleton entirely: the screen renders on the first
-// frame, no placeholder. Use it for tabs with nothing to load (e.g. the Home
-// hero, which is a static header — a timed skeleton there just adds a stall).
+// `delayMs <= 0` saute entièrement le squelette : l'écran se rend dès la première frame, sans
+// espace réservé. À utiliser pour les onglets sans rien à charger (par ex. le hero d'Accueil,
+// qui est un en-tête statique — un squelette temporisé y ajoute juste un blocage).
 // ---------------------------------------------------------------------------
 export function TabSkeletonGate({
   skeleton,
@@ -65,7 +65,7 @@ export function TabSkeletonGate({
   const [ready, setReady] = useState(delayMs <= 0);
 
   useEffect(() => {
-    if (delayMs <= 0) return; // already ready — no skeleton frame
+    if (delayMs <= 0) return; // déjà prêt — pas de frame de squelette
     const id = setTimeout(() => setReady(true), delayMs);
     return () => clearTimeout(id);
   }, [delayMs]);

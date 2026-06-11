@@ -1,24 +1,26 @@
-// Profile tab — member account, qualifications & settings.
+// Onglet Profil — compte adhérent, qualifications et réglages.
 //
-// Opens on a navy "identity hero" (avatar + name + job title + member line),
-// mirroring the Home hero pattern: a fixed navy brand surface that bleeds up
-// behind the status bar. The shell (App.tsx) suppresses the persistent
-// AppHeader on this tab so the hero owns the top — one navy region, not two.
+// S'ouvre sur un « hero d'identité » bleu marine (avatar + nom + intitulé de
+// poste + ligne adhérent), reprenant le motif du hero de l'Accueil : une
+// surface de marque bleu marine fixe qui déborde derrière la barre d'état. La
+// coquille (App.tsx) masque l'AppHeader persistant sur cet onglet pour que le
+// hero occupe seul le haut — une seule région bleu marine, pas deux.
 //
-// Beneath it, grouped inset lists (iOS Settings look, via the shared ios.tsx
-// primitives) host, in order:
-//   • My company     — company name, region, SIRET (read-only account facts)
-//   • Qualifications — trade certifications + a "Valid" badge each
-//   • Push notifications / Alert types — the master switch + per-category
-//     toggles (colour-coded dots). Local UI state only — there is no
-//     notifications backend in v1 (see NotificationsScreen / CLAUDE.md).
-//   • Preferences    — region displayed, interests (stubs)
-//   • Account        — edit profile, change password, sign out
+// En dessous, des listes groupées encartées (look Réglages iOS, via les
+// primitives partagées de ios.tsx) accueillent, dans l'ordre :
+//   • Mon entreprise  — raison sociale, région, SIRET (faits de compte en lecture seule)
+//   • Qualifications  — certifications métier + un badge « Valide » chacune
+//   • Notifications push / Types d'alertes — l'interrupteur principal + les bascules
+//     par catégorie (pastilles colorées). État d'UI local uniquement — il n'y a pas de
+//     backend de notifications en v1 (voir NotificationsScreen / CLAUDE.md).
+//   • Préférences     — région affichée, centres d'intérêt (ébauches)
+//   • Compte          — modifier le profil, changer le mot de passe, se déconnecter
 //
-// Identity + company + qualifications come from src/data/member.ts so the app
-// reads coherently wherever the signed-in member appears (Home hero, here).
-// Rows delegate to the parent via onRowPress; "signout" is handled by the
-// shell (clears the mock session + returns to login), the rest are stubs.
+// L'identité + l'entreprise + les qualifications viennent de src/data/member.ts
+// pour que l'app reste cohérente partout où l'adhérent connecté apparaît (hero
+// de l'Accueil, ici). Les lignes délèguent au parent via onRowPress ; « signout »
+// est géré par la coquille (efface la session simulée + retour à la connexion),
+// le reste sont des ébauches.
 
 import React, { useState } from "react";
 import {
@@ -66,10 +68,10 @@ import {
 } from "@/screens/settings/ProfileSettingsSheets";
 
 // --- fixed brand-surface colours (teal hero, shared with HomeHeader) --------
-const SURFACE = HEADER_SURFACE; // brand teal behind the identity hero
+const SURFACE = HEADER_SURFACE; // turquoise de marque derrière le hero d'identité
 const WHITE = primitives.colors.white;
-const AVATAR = primitives.colors.white; // white monogram chip — matches the header logo chip
-const INITIALS = primitives.colors.brand.teal[800]; // #045764 — AAA on the white avatar
+const AVATAR = primitives.colors.white; // pastille de monogramme blanche — assortie à la pastille du logo de l'en-tête
+const INITIALS = primitives.colors.brand.teal[800]; // #045764 — AAA sur l'avatar blanc
 
 function withAlpha(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
@@ -79,18 +81,20 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const ROLE_LINE = withAlpha(WHITE, 0.72); // muted job-title line on navy
-const TOP_GAP = Platform.OS === "android" ? 14 : 12; // matches Home/AppHeader
+const ROLE_LINE = withAlpha(WHITE, 0.72); // ligne d'intitulé de poste atténuée sur le bleu marine
+const TOP_GAP = Platform.OS === "android" ? 14 : 12; // assorti à Home/AppHeader
 
-// Apple's real iOS 26 "Liquid Glass" (UIGlassEffect) is only present on iOS 26+.
-// isLiquidGlassAvailable() is false on Android and older iOS, where GlassView
-// would silently fall back to a plain View — so we branch on it ourselves to
-// render an intentional frosted token capsule instead (see GlassSwitch). Read
-// once at module load: a device's OS can't change mid-session.
+// Le véritable « Liquid Glass » d'iOS 26 (UIGlassEffect) n'existe que sur iOS 26+.
+// isLiquidGlassAvailable() vaut false sur Android et les iOS plus anciens, où
+// GlassView retomberait silencieusement sur une simple View — on branche donc
+// nous-mêmes dessus pour afficher à la place une capsule de jeton givrée
+// intentionnelle (voir GlassSwitch). Lu une seule fois au chargement du module :
+// l'OS d'un appareil ne peut pas changer en cours de session.
 const LIQUID_GLASS = isLiquidGlassAvailable();
 
-// Default ON-state for every alert category except partner offers, matching
-// the design. Local-only — no persistence/back-end in v1.
+// État ACTIVÉ par défaut pour chaque catégorie d'alerte sauf les offres
+// partenaires, conformément à la maquette. Local uniquement — pas de
+// persistance/backend en v1.
 type AlertKey = "news" | "events" | "regulatory" | "trainings" | "partners";
 
 export function ProfileScreen({
@@ -106,8 +110,9 @@ export function ProfileScreen({
   const { role } = useRole();
   const m = currentMember;
 
-  // Notification toggles — local UI state. The master switch gates the whole
-  // alert group; when off, the per-category switches read as disabled.
+  // Bascules de notification — état d'UI local. L'interrupteur principal commande
+  // tout le groupe d'alertes ; quand il est éteint, les interrupteurs par catégorie
+  // apparaissent désactivés.
   const [pushEnabled, setPushEnabled] = useState(true);
   const [alerts, setAlerts] = useState<Record<AlertKey, boolean>>({
     news: true,
@@ -119,10 +124,11 @@ export function ProfileScreen({
   const toggleAlert = (key: AlertKey) =>
     setAlerts((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Editable account state — local to this session (v1 is mocked UI; the
-  // settings sheets validate and apply here but don't sync to a server). The
-  // Home hero still reads the original currentMember, so edits here aren't
-  // reflected there until a real profile store lands.
+  // État de compte modifiable — local à cette session (la v1 est une UI simulée ;
+  // les feuilles de réglages valident et appliquent ici mais ne se synchronisent
+  // pas à un serveur). Le hero de l'Accueil lit toujours le currentMember d'origine,
+  // donc les modifications faites ici n'y sont pas répercutées tant qu'un vrai
+  // magasin de profil n'est pas en place.
   const [profile, setProfile] = useState<EditableProfile & { region: string }>({
     fullName: m.fullName,
     jobTitle: m.jobTitle,
@@ -134,13 +140,13 @@ export function ProfileScreen({
     "training",
     "events",
   ]);
-  // Which settings sheet is open (one at a time).
+  // Quelle feuille de réglages est ouverte (une à la fois).
   const [sheet, setSheet] = useState<"none" | "edit" | "password" | "region" | "interests">(
     "none"
   );
   const closeSheet = () => setSheet("none");
 
-  // Monogram derived from the (editable) name so the avatar stays in sync.
+  // Monogramme dérivé du nom (modifiable) pour que l'avatar reste synchronisé.
   const initials =
     profile.fullName
       .split(/\s+/)
@@ -151,43 +157,44 @@ export function ProfileScreen({
 
   const interestsSummary =
     interests.length === INTEREST_OPTIONS.length
-      ? "All"
+      ? "Tous"
       : interests.length > 0
-        ? `${interests.length} selected`
-        : "None";
+        ? `${interests.length} sélectionné${interests.length > 1 ? "s" : ""}`
+        : "Aucun";
 
   const handlePress = (rowKey: string) => onRowPress?.(rowKey);
 
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Light status-bar content (clock / signal) over the navy hero. */}
+      {/* Contenu de barre d'état clair (horloge / signal) par-dessus le hero bleu marine. */}
       <StatusBar style="light" />
 
-      {/* Teal backstop behind the status bar so a top-overscroll bounce reveals
-          the header colour, not the page below (same trick as HomeScreen). It
-          only shows ABOVE the hero — the page-coloured wrapper below the hero
-          paints over it for all the content. */}
+      {/* Fond turquoise derrière la barre d'état pour qu'un rebond de sur-défilement
+          en haut révèle la couleur de l'en-tête, pas la page en dessous (même
+          astuce que HomeScreen). Il n'apparaît qu'AU-DESSUS du hero — le conteneur
+          aux couleurs de la page sous le hero le recouvre pour tout le contenu. */}
       <View
         pointerEvents="none"
         style={{ position: "absolute", top: 0, left: 0, right: 0, height: 200, backgroundColor: SURFACE }}
       />
 
-      {/* contentInsetAdjustmentBehavior="never": the hero applies the top
-          safe-area inset itself, so iOS must not also auto-inset the scroll
-          content (that would double-count it). flexGrow lets the page-coloured
-          content wrapper fill to the bottom even when the list is short. */}
+      {/* contentInsetAdjustmentBehavior="never" : le hero applique lui-même
+          l'inset de zone sûre du haut, donc iOS ne doit pas non plus insérer
+          automatiquement le contenu défilant (cela le compterait en double).
+          flexGrow permet au conteneur de contenu aux couleurs de la page de
+          remplir jusqu'en bas même quand la liste est courte. */}
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* ---- Identity hero (navy) ------------------------------------- */}
+        {/* ---- Hero d'identité (bleu marine) --------------------------- */}
         <View style={[styles.hero, { paddingTop: insets.top + TOP_GAP }]}>
           <View
             style={styles.avatar}
             accessible
             accessibilityRole="image"
-            accessibilityLabel={`${profile.fullName}, monogram`}
+            accessibilityLabel={`${profile.fullName}, monogramme`}
           >
             <Text style={styles.avatarText}>{initials}</Text>
           </View>
@@ -199,24 +206,25 @@ export function ProfileScreen({
               {profile.jobTitle}
             </Text>
             <Text style={styles.memberLine} numberOfLines={1}>
-              {role === "admin" ? "Admin" : "Member"} · N° {m.memberNo} · {profile.region}
+              {role === "admin" ? "Admin" : "Adhérent"} · N° {m.memberNo} · {profile.region}
             </Text>
           </View>
         </View>
 
-        {/* Page-coloured wrapper for everything BELOW the hero. This paints over
-            the teal backstop so the header colour wraps the identity block only;
-            the grouped content sits on the normal page background like the other
-            tabs. flexGrow fills any remaining height below the last group. */}
+        {/* Conteneur aux couleurs de la page pour tout ce qui est SOUS le hero.
+            Il recouvre le fond turquoise pour que la couleur de l'en-tête
+            n'entoure que le bloc d'identité ; le contenu groupé repose sur le
+            fond de page normal comme les autres onglets. flexGrow remplit toute
+            hauteur restante sous le dernier groupe. */}
         <View style={{ flexGrow: 1, backgroundColor: c.pageBg, paddingBottom: 32 }}>
-          {/* Small gap above the first group so the teal header reads as a
-              distinct band before the grouped content begins. */}
+          {/* Petit espace au-dessus du premier groupe pour que l'en-tête turquoise
+              se lise comme une bande distincte avant le début du contenu groupé. */}
           <View style={{ height: 12 }} />
 
-          {/* ---- My company (read-only account facts) -------------------- */}
-          <InsetGroup header="My company" themeName={themeName}>
-          <FactRow icon={Building2} title="Company name" value={profile.companyName} themeName={themeName} />
-          <FactRow icon={MapPin} title="Region" value={profile.region} themeName={themeName} />
+          {/* ---- Mon entreprise (faits de compte en lecture seule) ------- */}
+          <InsetGroup header="Mon entreprise" themeName={themeName}>
+          <FactRow icon={Building2} title="Raison sociale" value={profile.companyName} themeName={themeName} />
+          <FactRow icon={MapPin} title="Région" value={profile.region} themeName={themeName} />
           <FactRow icon={Hash} title="SIRET" value={m.company.siret} themeName={themeName} isLast />
         </InsetGroup>
 
@@ -231,22 +239,22 @@ export function ProfileScreen({
               trailing={q.valid ? <ValidBadge themeName={themeName} /> : undefined}
               themeName={themeName}
               isLast={i === m.qualifications.length - 1}
-              accessibilityLabel={`${q.label}, ${q.valid ? "valid" : "not valid"}`}
+              accessibilityLabel={`${q.label}, ${q.valid ? "valide" : "non valide"}`}
             />
           ))}
         </InsetGroup>
 
-        {/* ---- Push notifications (master switch) ---------------------- */}
-        <InsetGroup header="Push notifications" themeName={themeName}>
+        {/* ---- Notifications push (interrupteur principal) ------------- */}
+        <InsetGroup header="Notifications push" themeName={themeName}>
           <InsetRow
             leading={<LeadingDot color={t.brand.accent} />}
             leadingWidth={LEAD_DOT_W}
-            title="Enable notifications"
+            title="Activer les notifications"
             trailing={
               <GlassSwitch
                 value={pushEnabled}
                 onToggle={() => setPushEnabled((p) => !p)}
-                accessibilityLabel="Enable notifications"
+                accessibilityLabel="Activer les notifications"
                 themeName={themeName}
               />
             }
@@ -255,10 +263,10 @@ export function ProfileScreen({
           />
         </InsetGroup>
 
-        {/* ---- Alert types (per-category toggles) --------------------- */}
+        {/* ---- Types d'alertes (bascules par catégorie) --------------- */}
         <InsetGroup
-          header="Alert types"
-          footer="Turn off notifications above to pause every alert at once."
+          header="Types d'alertes"
+          footer="Désactivez les notifications ci-dessus pour suspendre toutes les alertes d'un coup."
           themeName={themeName}
         >
           {ALERT_ROWS.map((row, i) => (
@@ -282,12 +290,12 @@ export function ProfileScreen({
           ))}
         </InsetGroup>
 
-        {/* ---- Preferences -------------------------------------------- */}
-        <InsetGroup header="Preferences" themeName={themeName}>
+        {/* ---- Préférences -------------------------------------------- */}
+        <InsetGroup header="Préférences" themeName={themeName}>
           <InsetRow
             leading={<LeadingIcon icon={Globe} color={t.text.muted} />}
             leadingWidth={LEAD_ICON_W}
-            title="Region displayed"
+            title="Région affichée"
             value={profile.region}
             themeName={themeName}
             onPress={() => setSheet("region")}
@@ -295,7 +303,7 @@ export function ProfileScreen({
           <InsetRow
             leading={<LeadingIcon icon={SlidersHorizontal} color={t.text.muted} />}
             leadingWidth={LEAD_ICON_W}
-            title="Interests"
+            title="Centres d'intérêt"
             value={interestsSummary}
             themeName={themeName}
             isLast
@@ -303,26 +311,26 @@ export function ProfileScreen({
           />
         </InsetGroup>
 
-        {/* ---- Account ------------------------------------------------ */}
-        <InsetGroup header="Account" themeName={themeName}>
+        {/* ---- Compte ------------------------------------------------ */}
+        <InsetGroup header="Compte" themeName={themeName}>
           <InsetRow
             leading={<LeadingIcon icon={SquarePen} color={t.text.muted} />}
             leadingWidth={LEAD_ICON_W}
-            title="Edit profile"
+            title="Modifier le profil"
             themeName={themeName}
             onPress={() => setSheet("edit")}
           />
           <InsetRow
             leading={<LeadingIcon icon={Lock} color={t.text.muted} />}
             leadingWidth={LEAD_ICON_W}
-            title="Change password"
+            title="Changer le mot de passe"
             themeName={themeName}
             onPress={() => setSheet("password")}
           />
           <InsetRow
             leading={<LeadingIcon icon={LogOut} color={t.feedback.danger} />}
             leadingWidth={LEAD_ICON_W}
-            title="Sign out"
+            title="Se déconnecter"
             themeName={themeName}
             isLast
             destructive
@@ -332,13 +340,13 @@ export function ProfileScreen({
         </InsetGroup>
 
           <Text style={{ textAlign: "center", fontSize: 12, color: t.text.muted, opacity: 0.7 }}>
-            FFIE mobile v0.7 · design preview
+            FFIE mobile v0.7 · aperçu du design
           </Text>
         </View>
       </ScrollView>
 
-      {/* Settings editors — functional but local/mocked (no backend in v1).
-          One open at a time, gated on `sheet`. */}
+      {/* Éditeurs de réglages — fonctionnels mais locaux/simulés (pas de backend
+          en v1). Un seul ouvert à la fois, commandé par `sheet`. */}
       <EditProfileSheet
         visible={sheet === "edit"}
         initial={{
@@ -384,14 +392,16 @@ export function ProfileScreen({
 }
 
 // ---------------------------------------------------------------------------
-// Leading-visual widths — fed to InsetRow.leadingWidth so the hairline
-// separators inset to line up under the row title (the iOS detail).
+// Largeurs des visuels de tête — passées à InsetRow.leadingWidth pour que les
+// séparateurs fins s'insèrent et s'alignent sous le titre de la ligne (le
+// détail iOS).
 // ---------------------------------------------------------------------------
 const LEAD_ICON_W = 24;
 const LEAD_DOT_W = 12;
 
-// A plain (un-tiled) line icon in a fixed-width box, so different leading
-// glyphs align and separators land consistently under the title.
+// Une icône de ligne simple (non encadrée) dans une boîte de largeur fixe, pour
+// que les différents glyphes de tête s'alignent et que les séparateurs tombent
+// de façon cohérente sous le titre.
 function LeadingIcon({ icon: Icon, color }: { icon: LucideIcon; color: string }) {
   return (
     <View style={{ width: LEAD_ICON_W, alignItems: "center" }}>
@@ -400,7 +410,7 @@ function LeadingIcon({ icon: Icon, color }: { icon: LucideIcon; color: string })
   );
 }
 
-// A small colour-coded status dot (alert categories / push master).
+// Une petite pastille de statut colorée (catégories d'alertes / interrupteur push principal).
 function LeadingDot({ color }: { color: string }) {
   return (
     <View style={{ width: LEAD_DOT_W, alignItems: "center" }}>
@@ -409,21 +419,22 @@ function LeadingDot({ color }: { color: string }) {
   );
 }
 
-// A notification toggle that floats on a Liquid-Glass tray.
+// Une bascule de notification qui flotte sur un plateau Liquid Glass.
 //
-// On iOS 26 the capsule is Apple's native UIGlassEffect (via expo-glass-effect's
-// GlassView): it refracts whatever scrolls behind it and lenses/morphs under
-// touch (`isInteractive`). The Switch on top is the ordinary native control —
-// the glass is purely the surface it sits on, so behaviour/accessibility are
-// unchanged. We pin `colorScheme` to the app's own theme instead of "auto" so
-// the glass doesn't follow the OS appearance independently of our toggle.
+// Sur iOS 26, la capsule est l'UIGlassEffect natif d'Apple (via le GlassView
+// d'expo-glass-effect) : elle réfracte tout ce qui défile derrière elle et se
+// déforme/lentille sous le toucher (`isInteractive`). Le Switch au-dessus est le
+// contrôle natif ordinaire — le verre n'est que la surface sur laquelle il
+// repose, donc le comportement/l'accessibilité sont inchangés. On fixe
+// `colorScheme` au thème de l'app plutôt qu'à « auto » pour que le verre ne suive
+// pas l'apparence de l'OS indépendamment de notre bascule.
 //
-// On Android / iOS < 26 (LIQUID_GLASS === false) GlassView has no system effect
-// to render, so we substitute a token-built frosted capsule — a faint accent
-// fill + hairline border — so the toggle still reads as an intentional tray
-// rather than a bare switch. We never drop GlassView's own opacity below 1
-// (the module warns it breaks the effect); the disabled state is carried by the
-// Switch alone.
+// Sur Android / iOS < 26 (LIQUID_GLASS === false), GlassView n'a aucun effet
+// système à rendre, on lui substitue donc une capsule givrée construite à partir
+// de jetons — un léger remplissage d'accent + une bordure fine — pour que la
+// bascule se lise toujours comme un plateau intentionnel plutôt qu'un interrupteur
+// nu. On ne descend jamais l'opacité propre de GlassView sous 1 (le module avertit
+// que cela casse l'effet) ; l'état désactivé est porté par le Switch seul.
 function GlassSwitch({
   value,
   onToggle,
@@ -444,7 +455,7 @@ function GlassSwitch({
       onValueChange={onToggle}
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
-      // iOS-style switch colours — teal "on" track (brand accent), neutral off.
+      // Couleurs d'interrupteur façon iOS — piste « activée » turquoise (accent de marque), neutre désactivée.
       trackColor={{ false: t.border.strong, true: t.brand.accent }}
       thumbColor={WHITE}
       ios_backgroundColor={t.border.strong}
@@ -464,7 +475,7 @@ function GlassSwitch({
     );
   }
 
-  // Fallback (Android / iOS < 26): a frosted token capsule, no native glass.
+  // Repli (Android / iOS < 26) : une capsule de jeton givrée, sans verre natif.
   return (
     <View
       style={[
@@ -481,8 +492,8 @@ function GlassSwitch({
   );
 }
 
-// Read-only "fact" row — plain leading icon, label, right-aligned value, no
-// chevron (informational, not tappable).
+// Ligne « fait » en lecture seule — icône de tête simple, libellé, valeur alignée
+// à droite, pas de chevron (informatif, non cliquable).
 function FactRow({
   icon,
   title,
@@ -510,9 +521,9 @@ function FactRow({
   );
 }
 
-// "Valid" badge — low-emphasis green pill (no icon), used in Qualifications.
-// Reads the success subtle tokens so it matches StatusPill's palette without
-// pulling in its icon/animation machinery.
+// Badge « Valide » — pastille verte discrète (sans icône), utilisée dans les
+// Qualifications. Lit les jetons « success subtle » pour correspondre à la
+// palette de StatusPill sans en reprendre la machinerie d'icône/animation.
 function ValidBadge({ themeName }: { themeName: ThemeName }) {
   const sub = themes[themeName].feedback.subtle.success;
   return (
@@ -535,20 +546,20 @@ function ValidBadge({ themeName }: { themeName: ThemeName }) {
           letterSpacing: 0.1,
         }}
       >
-        Valid
+        Valide
       </Text>
     </View>
   );
 }
 
-// Alert categories + their dot tone. Order matches the design.
+// Catégories d'alertes + leur teinte de pastille. L'ordre correspond à la maquette.
 type AlertTone = "accent" | "warning" | "danger" | "success" | "muted";
 const ALERT_ROWS: { key: AlertKey; title: string; tone: AlertTone }[] = [
-  { key: "news", title: "FFIE news", tone: "accent" },
-  { key: "events", title: "Event reminders", tone: "warning" },
-  { key: "regulatory", title: "Regulatory alerts", tone: "danger" },
-  { key: "trainings", title: "New trainings", tone: "success" },
-  { key: "partners", title: "Partner offers", tone: "muted" },
+  { key: "news", title: "Actualités FFIE", tone: "accent" },
+  { key: "events", title: "Rappels d'événements", tone: "warning" },
+  { key: "regulatory", title: "Alertes réglementaires", tone: "danger" },
+  { key: "trainings", title: "Nouvelles formations", tone: "success" },
+  { key: "partners", title: "Offres partenaires", tone: "muted" },
 ];
 
 function dotColor(tone: AlertTone, t: (typeof themes)[ThemeName]): string {
@@ -567,10 +578,11 @@ function dotColor(tone: AlertTone, t: (typeof themes)[ThemeName]): string {
 }
 
 const styles = StyleSheet.create({
-  // Liquid-Glass tray hugging the notification Switch. A fully-rounded pill with
-  // just enough padding to read as a capsule around the control; borderRadius +
-  // overflow:hidden keep both the native glass and the fallback fill clipped to
-  // the pill. Native UIGlassEffect supplies its own depth, so no shadow here.
+  // Plateau Liquid Glass épousant le Switch de notification. Une pastille
+  // entièrement arrondie avec juste assez de marge pour se lire comme une capsule
+  // autour du contrôle ; borderRadius + overflow:hidden gardent à la fois le verre
+  // natif et le remplissage de repli rognés à la pastille. L'UIGlassEffect natif
+  // fournit sa propre profondeur, donc pas d'ombre ici.
   glassCapsule: {
     borderRadius: primitives.radii.full,
     paddingHorizontal: 7,
@@ -579,10 +591,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
   },
-  // Compact identity bar — tuned to the same vertical rhythm as AppHeader on the
-  // other tabs (paddingBottom 16, ~52pt content row) so the teal band reads as a
-  // header, not a tall hero. A 44pt avatar + tight three-line identity fits that
-  // height while keeping every detail.
+  // Barre d'identité compacte — réglée sur le même rythme vertical que l'AppHeader
+  // des autres onglets (paddingBottom 16, rangée de contenu d'environ 52pt) pour que
+  // la bande turquoise se lise comme un en-tête, pas comme un grand hero. Un avatar
+  // de 44pt + une identité serrée sur trois lignes tiennent dans cette hauteur tout
+  // en conservant chaque détail.
   hero: {
     backgroundColor: SURFACE,
     paddingHorizontal: GUTTER,
@@ -623,7 +636,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   memberLine: {
-    // White (not the old teal accent, which would vanish on the teal hero).
+    // Blanc (pas l'ancien accent turquoise, qui disparaîtrait sur le hero turquoise).
     color: WHITE,
     fontSize: 12,
     lineHeight: 15,

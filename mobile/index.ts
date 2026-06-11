@@ -1,13 +1,14 @@
-// Install the global default font (Raleway) before anything renders. Must be
-// first — it re-wraps react-native's Text export. See the file header for why
-// the old Text.defaultProps approach no longer works under React 19.
+// Installe la police par défaut globale (Raleway) avant tout rendu. Doit être
+// en premier — elle ré-enveloppe l'export Text de react-native. Voir l'en-tête
+// du fichier pour comprendre pourquoi l'ancienne approche Text.defaultProps ne
+// fonctionne plus sous React 19.
 import './src/theme/installGlobalFont';
 
 import { registerRootComponent } from 'expo';
 
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+// registerRootComponent appelle AppRegistry.registerComponent('main', () => App);
+// Cela garantit aussi que l'environnement est correctement configuré, que l'on
+// charge l'app dans Expo Go ou dans un build natif.
 registerRootComponent(App);

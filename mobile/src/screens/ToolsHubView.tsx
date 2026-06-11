@@ -1,24 +1,26 @@
-// ToolsHubView — the "Tools" segment of the Tools tab (the default landing).
+// ToolsHubView — le segment « Outils » de l'onglet Outils (l'atterrissage par défaut).
 //
-// Mirrors the client "Tools FFIE" mockup: a launcher grid of tool tiles grouped
-// into two sections ("Calculations & sizing", "Help with compliance"). The
-// tiles REUSE the Home hub's card treatment (raised white card with a soft
-// elevation, a rounded-square icon tile carrying a faint brand-navy wash, a bold
-// title) — see components/home/QuickAccessGrid + homeColors. The page itself
-// takes the Home dashboard look too (recessed grey behind the cards), since the
-// white-card chrome reads against grey, not against the list screens' white.
+// Reproduit la maquette client « Outils FFIE » : une grille de lancement de
+// tuiles d'outils regroupées en deux sections (« Calculs & dimensionnement »,
+// « Aide à la conformité »). Les tuiles RÉUTILISENT le traitement de carte du hub
+// Accueil (carte blanche surélevée avec une légère élévation, une tuile d'icône
+// carrée arrondie portant un léger lavis bleu marine de marque, un titre en gras)
+// — voir components/home/QuickAccessGrid + homeColors. La page elle-même adopte
+// aussi l'allure du tableau de bord de l'Accueil (gris en creux derrière les
+// cartes), car le chrome de carte blanche se lit sur du gris, et non sur le blanc
+// des écrans de liste.
 //
-// Tile behaviour (data lives in data/tools.ts):
-//   • Power calculation → the working Power & current sheet (members only).
-//   • Falling tension   → the working Voltage drop sheet (members only).
-//   • everything else   → rendered DISABLED: a flat, greyed, non-tappable tile
-//     with a "Coming soon" caption. FFIE hasn't shipped these tools yet, so the
-//     tile honestly reads as unavailable rather than faking a destination
-//     (CLAUDE.md). The caption (not dimming alone) carries the meaning, so the
-//     state survives for colour-blind / low-vision users.
-//   A guest tapping a LIVE calculator tile still gets a calm "members only"
-//   sheet — the app's gating convention (inform & invite, never 403), distinct
-//   from the coming-soon state above.
+// Comportement des tuiles (les données vivent dans data/tools.ts) :
+//   • Calcul de puissance → la feuille Puissance & courant fonctionnelle (réservée aux adhérents).
+//   • Chute de tension    → la feuille Chute de tension fonctionnelle (réservée aux adhérents).
+//   • tout le reste       → rendu DÉSACTIVÉ : une tuile plate, grisée, non
+//     touchable avec une légende « Bientôt ». La FFIE n'a pas encore livré ces
+//     outils, donc la tuile se lit honnêtement comme indisponible plutôt que de
+//     feindre une destination (CLAUDE.md). La légende (pas l'atténuation seule)
+//     porte le sens, de sorte que l'état survit pour les utilisateurs daltoniens / malvoyants.
+//   Un invité qui touche une tuile de calculateur ACTIVE obtient quand même une
+//   feuille calme « réservé aux adhérents » — la convention de restriction de
+//   l'app (informer & inviter, jamais 403), distincte de l'état « bientôt » ci-dessus.
 
 import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
@@ -34,25 +36,26 @@ import { PowerCalculatorSheet, VoltageDropSheet } from "./CalculatorsView";
 import { TOOL_SECTIONS, type ToolSection, type ToolTile } from "@/data/tools";
 import type { CalculatorKind } from "@/data/calculators";
 
-// Gap between tiles, matching the Home QuickAccess grid.
+// Espace entre les tuiles, assorti à la grille QuickAccess de l'Accueil.
 const GRID_GAP = 12;
 
 export function ToolsHubView({ themeName = "light" }: { themeName?: ThemeName }) {
   const { role } = useRole();
   const isMember = canAccess(role, "member-only");
 
-  // Which working calculator sheet is open (members only); and the title of the
-  // calculator a guest tapped (null = closed), which opens the members-only
-  // gate. "Coming soon" tiles aren't interactive, so they need no state.
+  // Quelle feuille de calculateur fonctionnelle est ouverte (réservée aux
+  // adhérents) ; et le titre du calculateur qu'un invité a touché (null = fermé),
+  // qui ouvre la restriction réservée aux adhérents. Les tuiles « Bientôt » ne
+  // sont pas interactives, elles n'ont donc besoin d'aucun état.
   const [openKind, setOpenKind] = useState<CalculatorKind | null>(null);
   const [gatedTitle, setGatedTitle] = useState<string | null>(null);
 
-  // Only the live calculator tiles are pressable; disabled "soon" tiles never
-  // call this.
+  // Seules les tuiles de calculateur actives sont touchables ; les tuiles « bientôt »
+  // désactivées n'appellent jamais ceci.
   const onTilePress = (tile: ToolTile) => {
     if (tile.action.type !== "calculator") return;
-    // Calculators are member-only — gate guests with a calm sheet rather than
-    // opening the tool.
+    // Les calculateurs sont réservés aux adhérents — on restreint les invités avec
+    // une feuille calme plutôt que d'ouvrir l'outil.
     if (!isMember) {
       setGatedTitle(tile.title);
       return;
@@ -73,8 +76,8 @@ export function ToolsHubView({ themeName = "light" }: { themeName?: ThemeName })
         ))}
       </View>
 
-      {/* Working calculators — reused from CalculatorsView so the tool is
-          identical wherever it's launched from. */}
+      {/* Calculateurs fonctionnels — réutilisés depuis CalculatorsView pour que
+          l'outil soit identique d'où qu'il soit lancé. */}
       <PowerCalculatorSheet
         visible={openKind === "power"}
         themeName={themeName}
@@ -86,16 +89,17 @@ export function ToolsHubView({ themeName = "light" }: { themeName?: ThemeName })
         onClose={() => setOpenKind(null)}
       />
 
-      {/* Members-only invite for a guest who tapped a (live) calculator tile. */}
+      {/* Invitation réservée aux adhérents pour un invité ayant touché une tuile de calculateur (active). */}
       <MembersOnlySheet title={gatedTitle} themeName={themeName} onClose={() => setGatedTitle(null)} />
     </>
   );
 }
 
 // ---------------------------------------------------------------------------
-// ToolSectionBlock — one titled section: an uppercase header and its tiles laid
-// out two-up. Tiles render in rows of two so paired cards stretch to the same
-// height (matching the Home QuickAccess grid), regardless of how the label wraps.
+// ToolSectionBlock — une section titrée : un en-tête en majuscules et ses tuiles
+// disposées à deux colonnes. Les tuiles se rendent par rangées de deux pour que
+// les cartes appariées s'étirent à la même hauteur (assorti à la grille
+// QuickAccess de l'Accueil), quelle que soit la façon dont le libellé se replie.
 // ---------------------------------------------------------------------------
 function ToolSectionBlock({
   section,
@@ -141,7 +145,7 @@ function ToolSectionBlock({
                 onPress={() => onTilePress(tile)}
               />
             ))}
-            {/* Keep a lone trailing card half-width if a section is odd. */}
+            {/* Garder une carte finale isolée à mi-largeur si une section est impaire. */}
             {row.length === 1 ? <View style={{ flex: 1 }} /> : null}
           </View>
         ))}
@@ -151,11 +155,12 @@ function ToolSectionBlock({
 }
 
 // ---------------------------------------------------------------------------
-// ToolCard — a single launcher tile. Live (calculator) tiles reuse the Home
-// ShortcutCard treatment: raised white card, faint brand-navy icon tile, bold
-// title. "Coming soon" tiles render DISABLED instead: flat (no elevation),
-// greyed, non-tappable, with a "Coming soon" caption that carries the meaning
-// without relying on dimming alone.
+// ToolCard — une tuile de lancement unique. Les tuiles actives (calculateur)
+// réutilisent le traitement ShortcutCard de l'Accueil : carte blanche surélevée,
+// léger lavis bleu marine de marque sur la tuile d'icône, titre en gras. Les
+// tuiles « Bientôt » se rendent DÉSACTIVÉES à la place : plates (sans élévation),
+// grisées, non touchables, avec une légende « Bientôt » qui porte le sens sans
+// s'appuyer sur l'atténuation seule.
 // ---------------------------------------------------------------------------
 function ToolCard({
   tile,
@@ -170,12 +175,12 @@ function ToolCard({
   const c = useHomeColors(themeName);
   const Icon = tile.icon;
 
-  // Not-yet-built tools: a plain (non-Pressable) View so it can't be tapped,
-  // greyed and flat, captioned "Coming soon".
+  // Outils pas encore construits : une simple View (non-Pressable) pour qu'elle
+  // ne puisse pas être touchée, grisée et plate, légendée « Bientôt ».
   if (tile.action.type === "soon") {
     return (
       <View
-        accessibilityLabel={`${tile.title}. Coming soon.`}
+        accessibilityLabel={`${tile.title}. Bientôt.`}
         accessibilityState={{ disabled: true }}
         style={{
           flex: 1,
@@ -188,7 +193,7 @@ function ToolCard({
           opacity: 0.6,
         }}
       >
-        {/* Muted, neutral icon tile (no brand wash) — reads as inactive. */}
+        {/* Tuile d'icône neutre et atténuée (sans lavis de marque) — se lit comme inactive. */}
         <View style={[styles.iconTile, { backgroundColor: t.surface.subtle, borderColor: t.border.subtle }]}>
           <Icon size={22} color={t.text.muted} strokeWidth={1.9} />
         </View>
@@ -216,7 +221,7 @@ function ToolCard({
             marginTop: 6,
           }}
         >
-          Coming soon
+          Bientôt
         </Text>
       </View>
     );
@@ -227,7 +232,7 @@ function ToolCard({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={tile.title}
-      accessibilityHint="Opens the calculator"
+      accessibilityHint="Ouvre le calculateur"
       style={({ pressed }): ViewStyle => ({
         flex: 1,
         backgroundColor: c.cardBg,
@@ -240,9 +245,9 @@ function ToolCard({
         ...(CARD_SHADOW as ViewStyle),
       })}
     >
-      {/* Icon tile — same faint brand-navy wash + border as the Home cards.
-          The glyph itself is dimmed (alpha < 1) so the dark navy stroke doesn't
-          over-pull the eye against the pale tile. */}
+      {/* Tuile d'icône — même léger lavis bleu marine de marque + bordure que les
+          cartes de l'Accueil. Le glyphe lui-même est atténué (alpha < 1) pour que
+          le trait bleu marine foncé n'attire pas trop l'œil contre la tuile pâle. */}
       <View
         style={[
           styles.iconTile,
@@ -272,11 +277,12 @@ function ToolCard({
 }
 
 // ---------------------------------------------------------------------------
-// MembersOnlySheet — the calm gate shown when a guest taps a (live) calculator
-// tile: the tool's title, an honest one-liner, and a "Members only" pill. A
-// page sheet matching the calculators' own modals. (`title` null = closed.)
+// MembersOnlySheet — la restriction calme affichée quand un invité touche une
+// tuile de calculateur (active) : le titre de l'outil, une phrase honnête, et une
+// pastille « Réservé aux adhérents ». Une page sheet assortie aux modales propres
+// des calculateurs. (`title` null = fermé.)
 //
-// Reduced motion (P5): snaps in with no slide when the OS setting is on.
+// Mouvement réduit (P5) : apparaît d'un coup sans glissement quand le réglage de l'OS est activé.
 // ---------------------------------------------------------------------------
 function MembersOnlySheet({
   title,
@@ -299,11 +305,11 @@ function MembersOnlySheet({
       onRequestClose={onClose}
     >
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-        {/* Close affordance — top-trailing X (≥44pt touch target). */}
+        {/* Affordance de fermeture — X en haut à droite (cible tactile ≥44pt). */}
         <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 8, paddingTop: 4 }}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Close"
+            accessibilityLabel="Fermer"
             onPress={onClose}
             hitSlop={8}
             style={({ pressed }) => ({
@@ -333,11 +339,11 @@ function MembersOnlySheet({
             {title}
           </Text>
           <Text style={{ color: t.text.muted, fontSize: 15, lineHeight: 23, marginTop: 12 }}>
-            This tool is reserved for FFIE members. Sign in or join the
-            federation to use it.
+            Cet outil est réservé aux adhérents de la FFIE. Connectez-vous ou
+            adhérez à la fédération pour l'utiliser.
           </Text>
 
-          {/* Status pill — text carries the meaning, not colour alone (P). */}
+          {/* Pastille de statut — le texte porte le sens, pas la couleur seule (P). */}
           <View
             style={{
               marginTop: 18,
@@ -360,7 +366,7 @@ function MembersOnlySheet({
                 textTransform: "uppercase",
               }}
             >
-              Members only
+              Réservé aux adhérents
             </Text>
           </View>
         </View>
@@ -369,9 +375,10 @@ function MembersOnlySheet({
   );
 }
 
-// Token colour at reduced alpha — the same helper the Home cards use to render
-// the navy icon tile as a faint brand wash + border (tokens carry no alpha
-// variants). Kept local to avoid widening the Home module's surface.
+// Couleur de token à alpha réduit — le même utilitaire que les cartes de
+// l'Accueil emploient pour rendre la tuile d'icône bleu marine en léger lavis de
+// marque + bordure (les tokens ne portent pas de variantes alpha). Gardé local
+// pour ne pas élargir la surface du module Accueil.
 function tint(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.slice(0, 2), 16);

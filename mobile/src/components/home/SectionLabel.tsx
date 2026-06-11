@@ -1,10 +1,12 @@
-// SectionLabel — the small uppercase eyebrow that heads each Home dashboard
-// section ("QUICK ACCESS", "PUBLIC SPACE", "RECENT NEWS"). Optional trailing
-// "See all" action on the right for sections that have an overflow surface.
+// SectionLabel — la petite étiquette en majuscules qui coiffe chaque section du
+// tableau de bord Accueil (« ACCÈS RAPIDE », « ESPACE PUBLIC », « ACTUALITÉS
+// RÉCENTES »). Action « Tout voir » optionnelle à droite pour les sections qui
+// disposent d'une surface de débordement.
 //
-// Marked as an accessibility header so screen-reader users can navigate the
-// dashboard section-by-section (the visual is a muted eyebrow, but it IS the
-// structural heading for the group beneath it).
+// Marquée comme en-tête d'accessibilité afin que les utilisateurs de lecteur
+// d'écran puissent naviguer dans le tableau de bord section par section (le
+// visuel est une étiquette discrète, mais c'est BIEN le titre structurel du
+// groupe situé en dessous).
 
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -21,7 +23,7 @@ export function SectionLabel({
 }: {
   title: string;
   themeName?: ThemeName;
-  /** Optional right-aligned action (e.g. "See all"). */
+  /** Action optionnelle alignée à droite (ex. « Tout voir »). */
   actionLabel?: string;
   onActionPress?: () => void;
 }) {
@@ -55,7 +57,7 @@ export function SectionLabel({
       {hasAction ? (
         <Pressable
           onPress={onActionPress}
-          // Lift the small text target to a >=44pt hit area (WCAG 2.5.5).
+          // Élargit la petite cible texte à une zone tactile ≥ 44 pt (WCAG 2.5.5).
           hitSlop={{ top: 14, bottom: 14, left: 12, right: 12 }}
           accessibilityRole="button"
           accessibilityLabel={`${actionLabel}, ${title}`}

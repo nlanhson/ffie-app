@@ -1,19 +1,22 @@
-// In-app PDF reader — renders a document's real PDF inside the app instead of
-// handing it to an external browser (FFIE-DOC-02: "documents can be opened in
-// the application"). Same react-native-webview that powers YouTubeEmbed, so it
-// works in Expo Go; a custom dev/TestFlight build needs a rebuild to include the
-// native module.
+// Lecteur PDF intégré — affiche le vrai PDF d'un document dans l'app au lieu de
+// le confier à un navigateur externe (FFIE-DOC-02 : « les documents peuvent être
+// ouverts dans l'application »). Même react-native-webview que celui qui alimente
+// YouTubeEmbed, donc il fonctionne dans Expo Go ; un build dev/TestFlight
+// personnalisé nécessite une reconstruction pour inclure le module natif.
 //
-// Platform note (honest, not a bug): iOS WKWebView renders a remote PDF inline,
-// so we load the file URL directly. Android's system WebView can't, so we wrap
-// the URL in Google's hosted document viewer — which only works for PUBLICLY
-// reachable PDFs. Today exactly one FFIE doc exposes a public file URL (the
-// electrification plan); the rest are HTML detail pages and never reach here
-// (DocDetailScreen sends those to the in-app browser instead). When the backend
-// starts syncing real member-doc file URLs, they all flow through this reader.
+// Note de plateforme (honnête, pas un bug) : le WKWebView d'iOS affiche un PDF
+// distant en ligne, on charge donc l'URL du fichier directement. Le WebView
+// système d'Android ne le peut pas, on enveloppe donc l'URL dans la visionneuse
+// de documents hébergée par Google — qui ne fonctionne que pour les PDF
+// PUBLIQUEMENT accessibles. Aujourd'hui, exactement un document FFIE expose une
+// URL de fichier publique (le plan d'électrification) ; les autres sont des pages
+// de détail HTML et n'arrivent jamais ici (DocDetailScreen les envoie plutôt au
+// navigateur intégré). Quand le backend commencera à synchroniser de vraies URL
+// de fichiers de documents adhérents, elles passeront toutes par ce lecteur.
 //
-// No dead end (Principle 2): if the embed fails (offline, 404, a member file
-// behind auth), we fall back to a clear card with a "open in browser" action.
+// Pas d'impasse (Principe 2) : si l'intégration échoue (hors ligne, 404, un
+// fichier adhérent derrière une authentification), on retombe sur une carte
+// claire avec une action « ouvrir dans le navigateur ».
 
 import React, { useState } from "react";
 import {
@@ -38,13 +41,13 @@ export function PdfViewerScreen({
   onBack,
   onShare,
 }: {
-  /** The document's real PDF file URL (doc.sourceUrl). */
+  /** L'URL du vrai fichier PDF du document (doc.sourceUrl). */
   uri: string;
-  /** Document title — shown in the nav bar and used as the back affordance. */
+  /** Titre du document — affiché dans la barre de navigation et utilisé comme option de retour. */
   title: string;
   themeName?: ThemeName;
   onBack: () => void;
-  /** Optional share action, mirrored from the detail screen. */
+  /** Action de partage facultative, reprise de l'écran de détail. */
   onShare?: () => void;
 }) {
   const t = themes[themeName];
@@ -53,8 +56,8 @@ export function PdfViewerScreen({
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
-  // Android can't render a remote PDF inline — route it through Google's viewer
-  // (public PDFs only). iOS loads the file directly.
+  // Android ne peut pas afficher un PDF distant en ligne — on le fait passer par la
+  // visionneuse de Google (PDF publics uniquement). iOS charge le fichier directement.
   const displayUri =
     Platform.OS === "android"
       ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(uri)}`
@@ -64,13 +67,13 @@ export function PdfViewerScreen({
     WebBrowser.openBrowserAsync(uri, {
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
     }).catch(() => {
-      // browser unavailable — no-op
+      // navigateur indisponible — sans effet
     });
   };
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Slim nav bar: back + (optional) share — matches DocDetailScreen. */}
+      {/* Fine barre de navigation : retour + partage (facultatif) — assortie à DocDetailScreen. */}
       <View
         style={{
           flexDirection: "row",
@@ -82,7 +85,7 @@ export function PdfViewerScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Close document"
+          accessibilityLabel="Fermer le document"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -104,7 +107,7 @@ export function PdfViewerScreen({
         {onShare ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Share this document"
+            accessibilityLabel="Partager ce document"
             onPress={onShare}
             hitSlop={8}
             style={({ pressed }) => ({
@@ -122,7 +125,7 @@ export function PdfViewerScreen({
         )}
       </View>
 
-      {/* Reader, or the honest fallback if the embed can't load. */}
+      {/* Lecteur, ou le repli honnête si l'intégration ne peut pas se charger. */}
       {failed ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, rowGap: 14 }}>
           <View
@@ -141,14 +144,14 @@ export function PdfViewerScreen({
             accessibilityRole="header"
             style={{ color: t.text.body, fontSize: 17, fontWeight: "600", textAlign: "center" }}
           >
-            Preview unavailable
+            Aperçu indisponible
           </Text>
           <Text style={{ color: t.text.muted, fontSize: 14, textAlign: "center", lineHeight: 20 }}>
-            This PDF can't be displayed here. You can open it in your browser.
+            Ce PDF ne peut pas être affiché ici. Vous pouvez l'ouvrir dans votre navigateur.
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Open document in browser"
+            accessibilityLabel="Ouvrir le document dans le navigateur"
             onPress={openInBrowser}
             style={({ pressed }) => ({
               marginTop: 4,
@@ -161,7 +164,7 @@ export function PdfViewerScreen({
             })}
           >
             <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "600" }}>
-              Open in browser
+              Ouvrir dans le navigateur
             </Text>
           </Pressable>
         </View>
@@ -174,13 +177,13 @@ export function PdfViewerScreen({
             onError={() => setFailed(true)}
             onHttpError={() => setFailed(true)}
             style={{ flex: 1, backgroundColor: c.pageBg }}
-            // PDFs are static — JS off keeps the reader lean; gview needs it on.
+            // Les PDF sont statiques — JS désactivé garde le lecteur léger ; gview en a besoin activé.
             javaScriptEnabled={Platform.OS === "android"}
             domStorageEnabled={Platform.OS === "android"}
             setSupportMultipleWindows={false}
           />
 
-          {/* Loading overlay until the first paint. */}
+          {/* Surcouche de chargement jusqu'au premier rendu. */}
           {loading ? (
             <View
               pointerEvents="none"
@@ -191,7 +194,7 @@ export function PdfViewerScreen({
             >
               <ActivityIndicator color={t.brand.accent} />
               <Text style={{ color: t.text.muted, fontSize: 13, marginTop: 10 }}>
-                Loading document…
+                Chargement du document…
               </Text>
             </View>
           ) : null}

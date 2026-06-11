@@ -1,9 +1,9 @@
-// LibrarySkeleton — loading placeholder for DocLibraryScreen. Mirrors it:
-// large title, the rounded search field + filter button, a result-count line,
-// then ONE grouped inset card of document rows (PDF-thumbnail leading, two text
-// lines, a trailing "saved"/lock badge), a "show more" button, and the bottom
-// pagination. Same gutters, thumb size, row min-height, and page rhythm — so
-// nothing shifts when the real paginated list lands.
+// LibrarySkeleton — espace réservé de chargement pour DocLibraryScreen. Le reflète :
+// grand titre, le champ de recherche arrondi + bouton de filtre, une ligne de compteur de
+// résultats, puis UNE carte encartée groupée de lignes de document (vignette PDF en tête, deux
+// lignes de texte, un badge « enregistré »/cadenas de fin), un bouton « voir plus », et la
+// pagination du bas. Mêmes gouttières, taille de vignette, hauteur minimale de ligne et rythme
+// de page — pour que rien ne se décale quand la vraie liste paginée arrive.
 
 import React from "react";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
@@ -18,11 +18,11 @@ import {
 
 const THUMB_WIDTH = 50;
 const THUMB_HEIGHT = 66;
-// The screen opens showing INITIAL_VISIBLE rows before "Show more".
+// L'écran s'ouvre en affichant INITIAL_VISIBLE lignes avant « Voir plus ».
 const VISIBLE_ROWS = 10;
 
-// One grouped-list document row: thumbnail + title/subtitle + trailing badge,
-// with the iOS hairline separator inset past the thumbnail.
+// Une ligne de document en liste groupée : vignette + titre/sous-titre + badge de fin,
+// avec le séparateur en fine ligne iOS décalé au-delà de la vignette.
 function DocRowSkeleton({
   isLast,
   themeName,
@@ -78,7 +78,7 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 18 }} scrollEnabled={false}>
 
-          {/* Search field + filter button */}
+          {/* Champ de recherche + bouton de filtre */}
           <View
             style={{
               paddingHorizontal: GUTTER,
@@ -92,12 +92,12 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
             <SkeletonBlock width={searchH} height={searchH} radius={10} themeName={themeName} />
           </View>
 
-          {/* Result-count line ("335 documents") */}
+          {/* Ligne de compteur de résultats (« 335 documents ») */}
           <View style={{ paddingHorizontal: GUTTER + 4, marginBottom: 14 }}>
             <SkeletonBlock width={104} height={13} themeName={themeName} />
           </View>
 
-          {/* One grouped inset card for the current (paged) slice. */}
+          {/* Une carte encartée groupée pour la tranche (paginée) courante. */}
           <View
             style={{
               marginHorizontal: GUTTER,
@@ -113,12 +113,12 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
             ))}
           </View>
 
-          {/* "Show more" button */}
+          {/* Bouton « Voir plus » */}
           <View style={{ alignItems: "center", marginTop: 16 }}>
             <SkeletonBlock width={170} height={40} radius={20} themeName={themeName} />
           </View>
 
-          {/* Pagination — arrows + page tokens */}
+          {/* Pagination — flèches + jetons de page */}
           <View
             style={{
               flexDirection: "row",

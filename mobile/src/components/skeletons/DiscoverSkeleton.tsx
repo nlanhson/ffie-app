@@ -1,7 +1,7 @@
-// DiscoverSkeleton — loading placeholder for DiscoverScreen (Trades). Mirrors
-// it: large title + intro paragraph, the domains accordion (titles + "+" with
-// hairlines), two full-width feature cards, the "professions of tomorrow"
-// heading + intro, the 2-column training grid, and the "See more" button.
+// DiscoverSkeleton — espace réservé de chargement pour DiscoverScreen (Métiers). Le
+// reflète : grand titre + paragraphe d'introduction, l'accordéon des domaines (titres + « + »
+// avec fines lignes), deux cartes de mise en avant pleine largeur, le titre + l'introduction
+// « les métiers de demain », la grille de formations sur 2 colonnes, et le bouton « Voir plus ».
 
 import React from "react";
 import { ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -70,19 +70,19 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }} scrollEnabled={false}>
 
-          {/* Trades / Videos / Calculators segmented control. */}
+          {/* Contrôle segmenté Métiers / Vidéos / Calculateurs. */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 18 }}>
             <SkeletonBlock width="100%" height={40} radius={primitives.radii.md} themeName={themeName} />
           </View>
 
-          {/* Intro paragraph */}
+          {/* Paragraphe d'introduction */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 2, rowGap: 6 }}>
             <SkeletonTextLine width="100%" height={14} themeName={themeName} />
             <SkeletonTextLine width="95%" height={14} themeName={themeName} />
             <SkeletonTextLine width="60%" height={14} themeName={themeName} />
           </View>
 
-          {/* Domains accordion */}
+          {/* Accordéon des domaines */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 22 }}>
             <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: t.border.default }} />
             {Array.from({ length: 5 }).map((_, i) => (
@@ -105,13 +105,13 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
             ))}
           </View>
 
-          {/* Feature cards */}
+          {/* Cartes de mise en avant */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 24, rowGap: 14 }}>
             <FeatureCardSkeleton themeName={themeName} />
             <FeatureCardSkeleton themeName={themeName} />
           </View>
 
-          {/* "Professions of tomorrow" heading + intro */}
+          {/* Titre « Les métiers de demain » + introduction */}
           <View style={{ paddingHorizontal: GUTTER, marginTop: 34, rowGap: 10 }}>
             <SkeletonTextLine width="70%" height={20} themeName={themeName} />
             <View style={{ rowGap: 6, marginTop: 4 }}>
@@ -120,7 +120,7 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
             </View>
           </View>
 
-          {/* Training grid */}
+          {/* Grille de formations */}
           <View
             style={{
               flexDirection: "row",
@@ -136,7 +136,7 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
             ))}
           </View>
 
-          {/* "See more training" button */}
+          {/* Bouton « Voir plus de formations » */}
           <View style={{ alignItems: "center", marginTop: 22 }}>
             <SkeletonBlock width={220} height={48} radius={primitives.radii.md} themeName={themeName} />
           </View>

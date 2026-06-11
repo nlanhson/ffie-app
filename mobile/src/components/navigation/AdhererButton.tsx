@@ -1,15 +1,15 @@
-// AdhererButton — the persistent account avatar (top-right), shown on every
-// page in both shells. A circular avatar-style button whose icon and
-// destination depend on the role:
-//   - Guest (non-member): a user-plus glyph → opens the federation directory
-//     (BecomeMemberScreen: the map + departmental list, with a "Sign in"
-//     login button at its bottom).
-//   - Member: a plain user glyph → opens the personal Profile / settings page.
+// AdhererButton — l'avatar de compte persistant (en haut à droite), affiché sur chaque
+// page dans les deux coquilles. Un bouton circulaire façon avatar dont l'icône et la
+// destination dépendent du rôle :
+//   - Invité (non adhérent) : une icône user-plus → ouvre l'annuaire des fédérations
+//     (BecomeMemberScreen : la carte + la liste départementale, avec un bouton de
+//     connexion « Se connecter » en bas).
+//   - Adhérent : une icône user simple → ouvre la page Profil / réglages personnelle.
 //
-// The shell owns what "open" means (it passes onPress); this component is just
-// the floating disc. Anchored to the top-right safe area (mirrors the
-// RoleDebugSwitcher dock), it sits in the empty space to the right of each
-// screen's left-aligned large title, so it never overlaps the title text.
+// La coquille décide ce que « ouvrir » signifie (elle passe onPress) ; ce composant n'est
+// que le disque flottant. Ancré à la safe area en haut à droite (reflète le dock du
+// RoleDebugSwitcher), il se place dans l'espace vide à droite du grand titre aligné à
+// gauche de chaque écran, donc il ne chevauche jamais le texte du titre.
 
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
@@ -17,12 +17,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { User, UserPlus } from "lucide-react-native";
 import { primitives, themes, type ThemeName } from "@tokens";
 
-// Gap below the safe-area top edge. Android's status inset sits tighter, so it
-// gets a touch more breathing room than iOS (same rationale as the debug chip).
+// Écart sous le bord supérieur de la safe area. L'inset de statut d'Android est plus serré,
+// il reçoit donc un peu plus de respiration qu'iOS (même logique que la puce de débogage).
 const TOP_GAP = Platform.OS === "android" ? 12 : 2;
-// Inset from the screen's right edge — matches the page gutter.
+// Retrait depuis le bord droit de l'écran — correspond à la gouttière de page.
 const EDGE = 16;
-// Avatar diameter. 40 + hitSlop keeps the touch target comfortably ≥44pt.
+// Diamètre de l'avatar. 40 + hitSlop garde la cible tactile confortablement ≥44pt.
 const SIZE = 40;
 
 export function AdhererButton({
@@ -31,7 +31,7 @@ export function AdhererButton({
   onPress,
 }: {
   themeName?: ThemeName;
-  // "guest" → user-plus (join); "member" → plain user (profile).
+  // « guest » → user-plus (adhérer) ; « member » → user simple (profil).
   variant?: "guest" | "member";
   onPress: () => void;
 }) {
@@ -40,11 +40,11 @@ export function AdhererButton({
 
   const isMember = variant === "member";
   const Icon = isMember ? User : UserPlus;
-  const label = isMember ? "My profile" : "Join the FFIE";
+  const label = isMember ? "Mon profil" : "Adhérer à la FFIE";
 
   return (
-    // box-none: the host spans the top strip but only the disc is tappable, so
-    // taps elsewhere fall through to the screen underneath.
+    // box-none : l'hôte couvre la bande supérieure mais seul le disque est cliquable, donc
+    // les appuis ailleurs passent à travers vers l'écran en dessous.
     <View
       style={[styles.host, { top: insets.top + TOP_GAP }]}
       pointerEvents="box-none"
@@ -60,8 +60,8 @@ export function AdhererButton({
             backgroundColor: pressed
               ? t.action.primary.bgPressed
               : t.action.primary.bg,
-            // Page-coloured ring so the disc reads as a distinct floating
-            // element over whatever content scrolls beneath it.
+            // Anneau couleur-page pour que le disque se lise comme un élément flottant
+            // distinct par-dessus le contenu qui défile en dessous.
             borderColor: t.surface.default,
           },
         ]}
@@ -77,9 +77,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: EDGE,
-    // Dock the disc to the right edge of the top strip.
+    // Ancrer le disque au bord droit de la bande supérieure.
     alignItems: "flex-end",
-    // Sit above tab content (Native Modals still render above this).
+    // Se placer au-dessus du contenu des onglets (les Modals natives s'affichent quand même au-dessus).
     zIndex: 1000,
     elevation: 1000,
   },

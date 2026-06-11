@@ -1,13 +1,14 @@
-// FFIE Splash — minimal v1.4 white background.
+// Écran de démarrage FFIE — fond blanc minimal v1.4.
 //
-// v1.4 — solid white background, FFIE logo centered on screen.
-// The image and gradient have been removed. Logo fades in once and then
-// holds visible for ~550ms before emitting onReady (giving the brand
-// room to land even on a fast device).
+// v1.4 — fond blanc uni, logo FFIE centré à l'écran.
+// L'image et le dégradé ont été supprimés. Le logo apparaît en fondu une fois
+// puis reste visible ~550 ms avant d'émettre onReady (laissant à la marque le
+// temps de s'installer même sur un appareil rapide).
 //
-// Motion: single logo fade (320ms easing.decelerate). Reduced-motion snaps
-// to visible. Dwell hold of 550ms after the enter animation completes
-// before onReady fires — applies in both normal and reduced-motion cases.
+// Mouvement : un seul fondu du logo (320 ms easing.decelerate). En mouvement
+// réduit, il bascule directement vers visible. Maintien de 550 ms après la fin
+// de l'animation d'entrée avant que onReady ne se déclenche — s'applique aussi
+// bien en cas normal qu'en mouvement réduit.
 
 import React, { useEffect, useRef } from "react";
 import {
@@ -20,12 +21,13 @@ import {
 import { primitives, type ThemeName } from "@tokens";
 import { FFIELogo } from "@/components/ui/FFIELogo";
 
-// Kept for the accessibilityLabel so screen-reader users still hear the
-// federation identity even though the text isn't on-screen.
-const FEDERATION = "French Federation of Electrical Integrators";
+// Conservé pour l'accessibilityLabel afin que les utilisateurs de lecteur
+// d'écran entendent quand même l'identité de la fédération même si le texte
+// n'est pas à l'écran.
+const FEDERATION = "Fédération Française des Intégrateurs Électriciens";
 
-// How long the logo stays visible after the enter animation finishes,
-// before we emit onReady and let the OnboardingFlow advance.
+// Combien de temps le logo reste visible après la fin de l'animation d'entrée,
+// avant que l'on émette onReady et laisse l'OnboardingFlow avancer.
 const DWELL_AFTER_ENTER_MS = 550;
 
 export function SplashScreen({
@@ -35,7 +37,7 @@ export function SplashScreen({
   themeName?: ThemeName;
   onReady?: () => void;
 }) {
-  void themeName; // visual treatment is theme-agnostic
+  void themeName; // le traitement visuel est indépendant du thème
 
   const logoFade = useRef(new Animated.Value(0)).current;
 
@@ -53,7 +55,7 @@ export function SplashScreen({
       if (cancelled) return;
 
       if (reduced) {
-        // Snap to visible. Still honor the dwell so the brand registers.
+        // Bascule vers visible. On respecte tout de même le maintien pour que la marque s'imprime.
         logoFade.setValue(1);
         fireReady();
         return;
@@ -75,7 +77,7 @@ export function SplashScreen({
     };
   }, [logoFade, onReady]);
 
-  // Translate-up by 8 → 0 paired with fade.
+  // Translation vers le haut de 8 → 0 associée au fondu.
   const enterTransform = {
     opacity: logoFade,
     transform: [

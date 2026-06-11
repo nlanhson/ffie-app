@@ -1,8 +1,8 @@
-// NewsSkeleton — loading placeholder for NewsScreen. Mirrors its layout 1:1:
-// large title, the horizontal category pill rail, then a single column of
-// full-width article cards (16:9 image + tag + headline + date), and the
-// bottom pagination. Same gutters / aspect ratios as NewsScreen, so nothing
-// shifts when the real feed lands.
+// NewsSkeleton — espace réservé de chargement pour NewsScreen. Reflète sa mise en page au
+// pixel près : grand titre, le rail horizontal de pastilles de catégorie, puis une seule
+// colonne de cartes d'article pleine largeur (image 16:9 + étiquette + titre + date), et la
+// pagination du bas. Mêmes gouttières / ratios d'aspect que NewsScreen, donc rien ne se
+// décale quand le vrai fil arrive.
 
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -17,11 +17,11 @@ import {
 
 const ROW_GAP = 18;
 
-// Varied pill widths so the rail reads as labels, not a uniform strip.
+// Largeurs de pastilles variées pour que le rail se lise comme des libellés, pas une bande uniforme.
 const PILL_WIDTHS = [56, 96, 88, 130, 92];
 
-// One full-width card placeholder: 16:9 image, a small tag, a 2-line title,
-// a date.
+// Un espace réservé de carte pleine largeur : image 16:9, une petite étiquette, un titre
+// sur 2 lignes, une date.
 function ArticleCardSkeleton({ themeName }: { themeName: ThemeName }) {
   const c = useGroupedColors(themeName);
   return (
@@ -51,13 +51,13 @@ export function NewsSkeleton({ themeName = "light" }: { themeName?: ThemeName })
   const c = useGroupedColors(themeName);
 
   return (
-    // Title is shown by the persistent AppHeader (shell); the skeleton fills
-    // only the content area beneath it.
+    // Le titre est affiché par l'AppHeader persistant (coquille) ; le squelette ne remplit
+    // que la zone de contenu en dessous.
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }} scrollEnabled={false}>
-          {/* Category pill rail. Clipped at the
-              screen edge like the real rail's scroll overflow. */}
+          {/* Rail de pastilles de catégorie. Rogné au bord de l'écran comme le
+              débordement de défilement du vrai rail. */}
           <View
             style={{
               flexDirection: "row",
@@ -79,14 +79,14 @@ export function NewsSkeleton({ themeName = "light" }: { themeName?: ThemeName })
             ))}
           </View>
 
-          {/* Single-column article cards */}
+          {/* Cartes d'article sur une seule colonne */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 4, rowGap: ROW_GAP }}>
             {Array.from({ length: 3 }).map((_, i) => (
               <ArticleCardSkeleton key={i} themeName={themeName} />
             ))}
           </View>
 
-          {/* Pagination — arrows + page tokens */}
+          {/* Pagination — flèches + jetons de page */}
           <View
             style={{
               flexDirection: "row",

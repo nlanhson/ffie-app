@@ -1,17 +1,19 @@
-// Membership application form — Karim's lead-capture surface.
+// Formulaire de demande d'adhésion — la surface de captation de leads de Karim.
 //
-// Reached from the Join-FFIE screen's "Apply for membership" CTA (opened as a
-// slide-up modal by the guest shell). Collects the minimum FFIE needs to
-// review eligibility and confirm a rate: company identity (name + SIRET),
-// a contact, an email to reply to, and an optional company size that drives
-// the dues band. No payment is taken — submitting hands off to the
-// confirmation/pending screen.
+// Atteint depuis le CTA « Demander l'adhésion » de l'écran Rejoindre la FFIE
+// (ouvert en modal glissant vers le haut par la coquille invité). Recueille le
+// minimum dont la FFIE a besoin pour examiner l'éligibilité et confirmer un
+// tarif : l'identité de l'entreprise (raison sociale + SIRET), un contact, un
+// e-mail de réponse, et un effectif facultatif qui détermine la tranche de
+// cotisation. Aucun paiement n'est pris — l'envoi passe la main à l'écran de
+// confirmation/en attente.
 //
-// Validation runs on submit (not per-keystroke): required fields must be
-// present, SIRET must be 14 digits, email must look like an email, and the
-// eligibility box must be ticked. Errors surface inline via the Input's
-// error slot. The submit button shows a brief loading state so the handoff
-// to the confirmation screen doesn't feel instant/unreal.
+// La validation se fait à l'envoi (pas à chaque frappe) : les champs obligatoires
+// doivent être renseignés, le SIRET doit comporter 14 chiffres, l'e-mail doit
+// ressembler à un e-mail, et la case d'éligibilité doit être cochée. Les erreurs
+// s'affichent en ligne via le slot d'erreur de l'Input. Le bouton d'envoi montre
+// un bref état de chargement pour que le passage à l'écran de confirmation ne
+// paraisse pas instantané/irréel.
 
 import React, { useState } from "react";
 import {
@@ -65,14 +67,14 @@ export function MembershipApplicationScreen({
 
   const validate = (): Errors => {
     const e: Errors = {};
-    if (!companyName.trim()) e.companyName = "Enter your company name.";
+    if (!companyName.trim()) e.companyName = "Saisissez la raison sociale de votre entreprise.";
     const siretDigits = siret.replace(/\s/g, "");
-    if (!siretDigits) e.siret = "Enter your SIRET number.";
-    else if (!/^\d{14}$/.test(siretDigits)) e.siret = "The SIRET has 14 digits.";
-    if (!contactName.trim()) e.contactName = "Enter a contact name.";
-    if (!email.trim()) e.email = "Enter an email address.";
-    else if (!EMAIL_RE.test(email.trim())) e.email = "Enter a valid email address.";
-    if (!consent) e.consent = "Please confirm before submitting.";
+    if (!siretDigits) e.siret = "Saisissez votre numéro de SIRET.";
+    else if (!/^\d{14}$/.test(siretDigits)) e.siret = "Le SIRET comporte 14 chiffres.";
+    if (!contactName.trim()) e.contactName = "Saisissez le nom d'un contact.";
+    if (!email.trim()) e.email = "Saisissez une adresse e-mail.";
+    else if (!EMAIL_RE.test(email.trim())) e.email = "Saisissez une adresse e-mail valide.";
+    if (!consent) e.consent = "Veuillez confirmer avant d'envoyer.";
     return e;
   };
 
@@ -82,8 +84,8 @@ export function MembershipApplicationScreen({
     if (Object.keys(e).length > 0) return;
 
     setSubmitting(true);
-    // Simulate the network round-trip so the CTA shows its loading state
-    // before the flow swaps to the confirmation screen.
+    // Simule l'aller-retour réseau pour que le CTA affiche son état de chargement
+    // avant que le flux ne bascule vers l'écran de confirmation.
     setTimeout(() => {
       onSubmit({
         companyName: companyName.trim(),
@@ -104,7 +106,7 @@ export function MembershipApplicationScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Retour"
           onPress={onBack}
           hitSlop={8}
           style={({ pressed }) => ({
@@ -118,7 +120,7 @@ export function MembershipApplicationScreen({
           })}
         >
           <ChevronLeft size={26} color={t.brand.accent} />
-          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Back</Text>
+          <Text style={{ color: t.brand.accent, fontSize: 16 }}>Retour</Text>
         </Pressable>
 
         <ScrollView
@@ -136,20 +138,20 @@ export function MembershipApplicationScreen({
               letterSpacing: -0.5,
             }}
           >
-            Membership application
+            Demande d'adhésion
           </Text>
           <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 8, lineHeight: 22 }}>
-            Tell us about your company. FFIE reviews each application and confirms your
-            annual dues by email — no payment is required at this stage.
+            Parlez-nous de votre entreprise. La FFIE examine chaque demande et confirme
+            votre cotisation annuelle par e-mail — aucun paiement n'est requis à ce stade.
           </Text>
 
           <View style={{ marginTop: 24, rowGap: 16 }}>
             <Input
-              label="Company name"
+              label="Raison sociale"
               required
               value={companyName}
               onChangeText={setCompanyName}
-              placeholder="e.g. Marchand Electrical"
+              placeholder="ex. Électricité Marchand"
               error={errors.companyName}
               themeName={themeName}
               returnKeyType="next"
@@ -159,44 +161,44 @@ export function MembershipApplicationScreen({
               required
               value={siret}
               onChangeText={setSiret}
-              placeholder="14-digit company number"
-              helperText="Used to verify that your company is registered in France."
+              placeholder="Numéro d'entreprise à 14 chiffres"
+              helperText="Sert à vérifier que votre entreprise est immatriculée en France."
               error={errors.siret}
               themeName={themeName}
               returnKeyType="next"
             />
             <Input
-              label="Contact name"
+              label="Nom du contact"
               required
               value={contactName}
               onChangeText={setContactName}
-              placeholder="Your full name"
+              placeholder="Votre nom complet"
               error={errors.contactName}
               themeName={themeName}
               returnKeyType="next"
             />
             <Input
-              label="Email address"
+              label="Adresse e-mail"
               required
               type="email"
               value={email}
               onChangeText={setEmail}
-              placeholder="you@company.fr"
-              helperText="We'll send the status of your application to this address."
+              placeholder="vous@entreprise.fr"
+              helperText="Nous enverrons le statut de votre demande à cette adresse."
               error={errors.email}
               themeName={themeName}
               returnKeyType="next"
             />
             <Input
-              label="Phone number (optional)"
+              label="Numéro de téléphone (facultatif)"
               value={phone}
               onChangeText={setPhone}
-              placeholder="Optional"
+              placeholder="Facultatif"
               themeName={themeName}
               returnKeyType="done"
             />
 
-            {/* Company size — optional segmented chips. Drives the dues band. */}
+            {/* Effectif — pastilles segmentées facultatives. Détermine la tranche de cotisation. */}
             <View>
               <Text
                 style={{
@@ -207,7 +209,7 @@ export function MembershipApplicationScreen({
                   marginBottom: 8,
                 }}
               >
-                Company size (optional)
+                Effectif (facultatif)
               </Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 8, rowGap: 8 }}>
                 {SIZE_OPTIONS.map((opt) => {
@@ -217,7 +219,7 @@ export function MembershipApplicationScreen({
                       key={opt.key}
                       accessibilityRole="button"
                       accessibilityState={{ selected: sel }}
-                      accessibilityLabel={`${opt.label} employees`}
+                      accessibilityLabel={`${opt.label} salariés`}
                       onPress={() => setCompanySize(sel ? undefined : opt.key)}
                       style={({ pressed }) => ({
                         paddingHorizontal: 16,
@@ -247,15 +249,15 @@ export function MembershipApplicationScreen({
                 })}
               </View>
               <Text style={{ color: t.text.muted, fontSize: 12, marginTop: 8, lineHeight: 17 }}>
-                Annual dues depend on the company size. FFIE confirms your exact rate during the review.
+                La cotisation annuelle dépend de l'effectif. La FFIE confirme votre tarif exact lors de l'examen.
               </Text>
             </View>
 
-            {/* Eligibility consent — required to submit. */}
+            {/* Consentement d'éligibilité — obligatoire pour envoyer. */}
             <Pressable
               accessibilityRole="checkbox"
               accessibilityState={{ checked: consent }}
-              accessibilityLabel="I confirm that my company is registered in France and that the information is accurate"
+              accessibilityLabel="Je confirme que mon entreprise est immatriculée en France et que les informations sont exactes"
               onPress={() => {
                 setConsent((v) => !v);
                 if (errors.consent) setErrors((e) => ({ ...e, consent: undefined }));
@@ -287,7 +289,7 @@ export function MembershipApplicationScreen({
                   lineHeight: 19,
                 }}
               >
-                I confirm that my company is registered in France and that the information above is accurate.
+                Je confirme que mon entreprise est immatriculée en France et que les informations ci-dessus sont exactes.
               </Text>
             </Pressable>
 
@@ -298,9 +300,9 @@ export function MembershipApplicationScreen({
               loading={submitting}
               disabled={submitting}
               onPress={handleSubmit}
-              accessibilityLabel="Submit membership application"
+              accessibilityLabel="Envoyer la demande d'adhésion"
             >
-              {submitting ? "Submitting…" : "Submit application"}
+              {submitting ? "Envoi en cours…" : "Envoyer la demande"}
             </Button>
           </View>
         </ScrollView>

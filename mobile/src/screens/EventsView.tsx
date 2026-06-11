@@ -1,15 +1,16 @@
-// EventsView — body of the Events tab: a swipeable weekly calendar up top,
-// then the list of FFIE events below it. Rendered inside the News tab's feed
-// scroll (it brings its own gutter, not its own ScrollView).
+// EventsView — corps de l'onglet Événements : un calendrier hebdomadaire balayable en
+// haut, puis la liste des événements FFIE en dessous. Rendu dans le défilement du flux de
+// l'onglet Actualités (il apporte sa propre gouttière, pas sa propre ScrollView).
 //
-// Rows mirror the FFIE web events list: an accent date block + a vertical
-// accent rule, the event title, and the FFIE mark. Tapping a row opens its
-// detail screen via onOpenEvent.
+// Les lignes reproduisent la liste des événements du web FFIE : un bloc de date accentué
+// + un filet vertical accentué, le titre de l'événement et la marque FFIE. Taper une
+// ligne ouvre son écran de détail via onOpenEvent.
 //
-// Member-only events (event.memberOnly) are gated exactly like member-only News
-// articles: a guest sees the row greyed out with a lock, and tapping it routes
-// to the membership upsell (onOpenLocked) instead of the detail. No event is
-// flagged member-only yet — the capability is wired and ready.
+// Les événements réservés aux adhérents (event.memberOnly) sont filtrés exactement comme
+// les articles d'Actualités réservés aux adhérents : un invité voit la ligne grisée avec
+// un cadenas, et taper la ligne redirige vers l'incitation à l'adhésion (onOpenLocked)
+// plutôt que vers le détail. Aucun événement n'est encore marqué réservé aux adhérents —
+// la capacité est câblée et prête.
 
 import React, { useMemo } from "react";
 import { Lock } from "lucide-react-native";
@@ -22,11 +23,11 @@ import { FFIELogo } from "@/components/ui/FFIELogo";
 import { canAccess, useRole } from "@/auth/roleContext";
 import { EVENTS, type FfieEvent } from "@/data/events";
 
-// Short month labels for the date block (matches the web list's compact
-// date treatment).
+// Libellés de mois abrégés pour le bloc de date (correspond au traitement de date
+// compact de la liste web).
 const MONTHS_SHORT = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "janv.", "févr.", "mars", "avr.", "mai", "juin",
+  "juil.", "août", "sept.", "oct.", "nov.", "déc.",
 ];
 
 function parseIso(iso: string): { day: number; month: number } {
@@ -41,7 +42,7 @@ export function EventsView({
 }: {
   themeName?: ThemeName;
   onOpenEvent: (id: number) => void;
-  /** A guest tapping a member-only event lands here (the membership upsell). */
+  /** Un invité tapant un événement réservé aux adhérents atterrit ici (l'incitation à l'adhésion). */
   onOpenLocked: (id: number) => void;
 }) {
   const t = themes[themeName];
@@ -49,14 +50,14 @@ export function EventsView({
   const { role } = useRole();
   const canReadMemberContent = canAccess(role, "member-only");
 
-  // Dates that should show a dot on the calendar.
+  // Dates qui doivent afficher un point sur le calendrier.
   const eventDates = useMemo(() => new Set(EVENTS.map((e) => e.date)), []);
 
   return (
     <View style={{ paddingHorizontal: GUTTER, paddingTop: 8 }}>
       <WeekCalendar themeName={themeName} eventDates={eventDates} />
 
-      {/* Divider between the calendar and the list. */}
+      {/* Séparateur entre le calendrier et la liste. */}
       <View
         style={{
           height: StyleSheet.hairlineWidth,
@@ -67,7 +68,7 @@ export function EventsView({
       />
 
       {EVENTS.map((event, i) => {
-        // Member-only event + a guest → greyed out, tap goes to the upsell.
+        // Événement réservé aux adhérents + un invité → grisé, le tap mène à l'incitation.
         const locked = !!event.memberOnly && !canReadMemberContent;
         return (
           <EventRow
@@ -103,9 +104,9 @@ function EventRow({
   const t = themes[themeName];
   const { day, month } = parseIso(event.date);
 
-  // Locked = greyed out: the accent (date block + rule) drops to muted, the
-  // title dims, and a lock tag appears. Colour is never the only signal — the
-  // lock icon + "Members" label carry it too (P4).
+  // Verrouillé = grisé : l'accent (bloc de date + filet) passe en atténué, le titre
+  // s'estompe, et une étiquette cadenas apparaît. La couleur n'est jamais le seul signal —
+  // l'icône cadenas + le libellé « Adhérents » le portent aussi (P4).
   const accentColor = locked ? t.text.muted : t.brand.accent;
   const ruleColor = locked ? t.border.default : t.brand.accent;
   const titleColor = locked ? t.text.muted : t.text.body;
@@ -113,8 +114,8 @@ function EventRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${event.title}, on ${MONTHS_SHORT[month]} ${day}.${
-        locked ? " Members only." : ""
+      accessibilityLabel={`${event.title}, le ${day} ${MONTHS_SHORT[month]}.${
+        locked ? " Réservé aux adhérents." : ""
       }`}
       onPress={onPress}
       style={({ pressed }) => ({
@@ -127,7 +128,7 @@ function EventRow({
         opacity: locked ? 0.6 : 1,
       })}
     >
-      {/* Date block — day over short month. */}
+      {/* Bloc de date — le jour au-dessus du mois abrégé. */}
       <View style={{ width: 52, alignItems: "flex-end" }}>
         <Text
           style={{
@@ -156,7 +157,7 @@ function EventRow({
         </Text>
       </View>
 
-      {/* Vertical rule. */}
+      {/* Filet vertical. */}
       <View
         style={{
           width: 3,
@@ -168,7 +169,7 @@ function EventRow({
         }}
       />
 
-      {/* Title + (when locked) a members-only tag. */}
+      {/* Titre + (si verrouillé) une étiquette réservé aux adhérents. */}
       <View style={{ flex: 1 }}>
         <Text
           numberOfLines={2}
@@ -194,13 +195,13 @@ function EventRow({
                 fontWeight: "500",
               }}
             >
-              Members
+              Adhérents
             </Text>
           </View>
         ) : null}
       </View>
 
-      {/* FFIE mark. */}
+      {/* Marque FFIE. */}
       <View style={{ marginLeft: 12 }}>
         <FFIELogo size={42} themeName={themeName} />
       </View>

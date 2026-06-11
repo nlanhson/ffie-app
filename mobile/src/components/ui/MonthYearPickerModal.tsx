@@ -1,25 +1,26 @@
-// MonthYearPickerModal — wraps the OS date picker so the user can jump the
-// Events week-calendar to a chosen month/year. Uses the *system* picker
-// (@react-native-community/datetimepicker), so it looks and feels native on
-// each platform:
+// MonthYearPickerModal — enveloppe le sélecteur de date de l'OS pour que l'utilisateur
+// puisse faire sauter le calendrier-semaine des Événements à un mois/année choisi. Utilise
+// le sélecteur *système* (@react-native-community/datetimepicker), qui a donc l'aspect et
+// le comportement natifs sur chaque plateforme :
 //
-//   • iOS     → the wheel spinner sits in a bottom sheet with Cancel / OK.
-//               (iOS has no month-year-only mode, so it's a full date spinner;
-//               we only use the month + year — the caller snaps to that week.)
-//   • Android → the OS dialog presents itself; we just translate its result.
+//   • iOS     → la molette se trouve dans une feuille du bas avec Annuler / OK.
+//               (iOS n'a pas de mode mois-année seul, donc c'est une molette de date
+//               complète ; on n'utilise que le mois + l'année — l'appelant cale sur cette semaine.)
+//   • Android → la boîte de dialogue de l'OS se présente d'elle-même ; on ne fait que traduire son résultat.
 //
-// Reduced motion (P5): the iOS sheet uses no slide animation when the user has
-// reduced motion enabled.
+// Mouvement réduit (P5) : la feuille iOS n'utilise aucune animation de glissement quand
+// l'utilisateur a activé le mouvement réduit.
 //
-// IMPORTANT — like FederationMap, the native picker is loaded with a guarded
-// `require()` rather than a static `import`: the library calls
-// `TurboModuleRegistry.getEnforcing('RNCDatePicker')` the moment its JS
-// evaluates, which *throws* on any binary that doesn't have the module linked
-// (Expo Go, or a dev client built before `@react-native-community/datetimepicker`
-// was added). We therefore (a) check `TurboModuleRegistry.get` first and only
-// `require` when the module is actually linked, and (b) fall back to a short
-// "rebuild required" notice otherwise. Run `npx expo run:ios` (or rebuild the
-// dev client) to link it; production/EAS builds include it automatically.
+// IMPORTANT — comme FederationMap, le sélecteur natif est chargé avec un
+// `require()` protégé plutôt qu'un `import` statique : la bibliothèque appelle
+// `TurboModuleRegistry.getEnforcing('RNCDatePicker')` dès que son JS s'évalue,
+// ce qui *lève une exception* sur tout binaire qui n'a pas le module lié
+// (Expo Go, ou un dev client construit avant l'ajout de
+// `@react-native-community/datetimepicker`). On (a) vérifie donc d'abord
+// `TurboModuleRegistry.get` et ne fait `require` que quand le module est réellement lié,
+// et (b) on se replie sinon sur un court avis « reconstruction requise ». Exécuter
+// `npx expo run:ios` (ou reconstruire le dev client) pour le lier ; les builds
+// production/EAS l'incluent automatiquement.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -33,7 +34,7 @@ import {
   Text,
   View,
 } from "react-native";
-// Type-only import — erased at compile time, so it never touches the native module.
+// Import de type uniquement — effacé à la compilation, il ne touche donc jamais le module natif.
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { primitives, themes, type ThemeName } from "@tokens";
 import { ralewayFamily } from "@/theme/fonts";
@@ -50,11 +51,11 @@ type PickerComponent = React.ComponentType<{
   style?: object;
 }>;
 
-// Resolve the native picker LAZILY (first render), wrapped in try/catch. The
-// library's spec does `TurboModuleRegistry.getEnforcing('RNCDatePicker')` on
-// import, which throws on a binary that lacks the module — so we require it at
-// runtime (when the TurboModule proxy is ready) and fall back to null if it
-// throws. A module-top `.get` runs too early in bundle eval to be reliable.
+// Résout le sélecteur natif PARESSEUSEMENT (au premier rendu), enveloppé dans try/catch.
+// La spec de la bibliothèque fait `TurboModuleRegistry.getEnforcing('RNCDatePicker')` à
+// l'import, ce qui lève une exception sur un binaire dépourvu du module — on le require donc
+// à l'exécution (quand le proxy TurboModule est prêt) et on se replie sur null s'il lève.
+// Un `.get` en tête de module s'exécute trop tôt dans l'évaluation du bundle pour être fiable.
 function loadPicker(): PickerComponent | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -72,9 +73,9 @@ export function MonthYearPickerModal({
   themeName = "light",
 }: {
   visible: boolean;
-  /** Date the picker opens on (the currently displayed month). */
+  /** Date sur laquelle le sélecteur s'ouvre (le mois actuellement affiché). */
   value: Date;
-  /** Called with the picked date when the user confirms. */
+  /** Appelé avec la date choisie quand l'utilisateur confirme. */
   onConfirm: (date: Date) => void;
   onClose: () => void;
   themeName?: ThemeName;
@@ -82,21 +83,21 @@ export function MonthYearPickerModal({
   const t = themes[themeName];
   const reducedMotion = useReducedMotion();
 
-  // Resolve the native picker once, lazily (runtime ready by first render).
+  // Résout le sélecteur natif une fois, paresseusement (l'exécution est prête au premier rendu).
   const DateTimePicker = useMemo(loadPicker, []);
 
-  // iOS edits a draft until OK; Android commits straight from the dialog.
+  // iOS modifie un brouillon jusqu'à OK ; Android valide directement depuis la boîte de dialogue.
   const [draft, setDraft] = useState(value);
   useEffect(() => {
     if (visible) setDraft(value);
   }, [visible, value]);
 
-  // iOS open/close animation (declared before the early returns to keep hook
-  // order stable). A single 0→1 progress value drives BOTH the backdrop's
-  // opacity (the tinted black fades) and the sheet's translateY (it slides) —
-  // opacity + transform only, so it rides the native driver. We keep the modal
-  // mounted through the exit so the fade-out can play before it unmounts.
-  // Reduced motion (P5): snap, no fade/slide.
+  // Animation d'ouverture/fermeture iOS (déclarée avant les retours anticipés pour garder
+  // l'ordre des hooks stable). Une unique valeur de progression 0→1 pilote À LA FOIS
+  // l'opacité de l'arrière-plan (le noir teinté s'estompe) et le translateY de la feuille
+  // (elle glisse) — opacité + transform seulement, elle roule donc sur le pilote natif. On
+  // garde la modale montée pendant la sortie pour que le fondu de sortie puisse se jouer
+  // avant qu'elle se démonte. Mouvement réduit (P5) : transition instantanée, sans fondu/glissement.
   const anim = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const [mounted, setMounted] = useState(visible);
   const [sheetH, setSheetH] = useState(0);
@@ -111,7 +112,7 @@ export function MonthYearPickerModal({
       Animated.timing(anim, {
         toValue: 1,
         duration: 260,
-        easing: Easing.bezier(0.32, 0.72, 0, 1), // iOS drawer curve
+        easing: Easing.bezier(0.32, 0.72, 0, 1), // courbe du tiroir iOS
         useNativeDriver: true,
       }).start();
     } else {
@@ -122,7 +123,7 @@ export function MonthYearPickerModal({
       }
       Animated.timing(anim, {
         toValue: 0,
-        duration: 200, // exit a touch faster than enter
+        duration: 200, // sortie un brin plus rapide que l'entrée
         easing: Easing.bezier(0.32, 0.72, 0, 1),
         useNativeDriver: true,
       }).start(({ finished }) => {
@@ -131,8 +132,8 @@ export function MonthYearPickerModal({
     }
   }, [visible, reducedMotion, anim]);
 
-  // Native module missing (un-rebuilt binary): show a graceful notice instead
-  // of crashing. Production builds always have it.
+  // Module natif manquant (binaire non reconstruit) : afficher un avis élégant au lieu
+  // de planter. Les builds de production l'ont toujours.
   if (!DateTimePicker) {
     if (!visible) return null;
     return (
@@ -154,7 +155,7 @@ export function MonthYearPickerModal({
             }}
           >
             <Text style={{ color: t.text.body, fontSize: 15, lineHeight: 21 }}>
-              The date picker requires a rebuild of the app.
+              Le sélecteur de date nécessite une reconstruction de l'application.
             </Text>
           </View>
         </Pressable>
@@ -162,8 +163,8 @@ export function MonthYearPickerModal({
     );
   }
 
-  // Android: the OS owns the dialog. Render the picker only while visible and
-  // map its callback back onto confirm/close.
+  // Android : l'OS possède la boîte de dialogue. Rendre le sélecteur uniquement quand
+  // visible et remapper son callback vers confirm/close.
   if (Platform.OS !== "ios") {
     if (!visible) return null;
     return (
@@ -179,21 +180,21 @@ export function MonthYearPickerModal({
     );
   }
 
-  // iOS: inline wheel spinner in a bottom sheet. Modal animation is "none" — we
-  // drive the backdrop fade + sheet slide ourselves so the tinted black fades
-  // (rather than sliding up with the sheet).
+  // iOS : molette en ligne dans une feuille du bas. L'animation de la Modal est « none » —
+  // on pilote nous-mêmes le fondu de l'arrière-plan + le glissement de la feuille pour que
+  // le noir teinté s'estompe (plutôt que de remonter avec la feuille).
   const translateY = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [sheetH || 600, 0], // 600 = pre-measurement fallback (stays offscreen)
+    outputRange: [sheetH || 600, 0], // 600 = repli avant mesure (reste hors écran)
   });
 
   return (
     <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose}>
-      {/* Tinted black backdrop — fades in/out via opacity. */}
+      {/* Arrière-plan noir teinté — apparaît/disparaît en fondu via l'opacité. */}
       <Animated.View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)", opacity: anim }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel="Fermer"
           onPress={onClose}
           style={{ flex: 1 }}
         />
@@ -220,7 +221,7 @@ export function MonthYearPickerModal({
           }}
         >
           <Pressable onPress={onClose} hitSlop={8}>
-            <Text style={{ color: t.text.muted, fontSize: 16 }}>Cancel</Text>
+            <Text style={{ color: t.text.muted, fontSize: 16 }}>Annuler</Text>
           </Pressable>
           <Text
             style={{
@@ -230,7 +231,7 @@ export function MonthYearPickerModal({
               fontWeight: "700",
             }}
           >
-            Choose month
+            Choisir le mois
           </Text>
           <Pressable onPress={() => onConfirm(draft)} hitSlop={8}>
             <Text
@@ -250,7 +251,7 @@ export function MonthYearPickerModal({
           value={draft}
           mode="date"
           display="spinner"
-          locale="en-US"
+          locale="fr-FR"
           textColor={t.text.body}
           themeVariant={themeName === "dark" ? "dark" : "light"}
           onChange={(_e: DateTimePickerEvent, d?: Date) => {

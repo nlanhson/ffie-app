@@ -1,9 +1,9 @@
-// HomeSkeleton — loading placeholder for HomeScreen. Mirrors the navy hero
-// header (HomeHeader) AND the dashboard sheet below it (the lifted grey sheet
-// with the Quick access grid, the two Public space gradient cards + FFB card,
-// and the Recent news rail), so the layout doesn't jump when the real screen
-// swaps in. Metrics here track HomeScreen / the home components — keep them in
-// sync when the dashboard layout changes.
+// HomeSkeleton — espace réservé de chargement pour HomeScreen. Reflète l'en-tête hero bleu
+// marine (HomeHeader) ET la feuille de tableau de bord en dessous (la feuille grise soulevée
+// avec la grille Accès rapide, les deux cartes en dégradé Espace public + la carte FFB, et le
+// rail Actualités récentes), pour que la mise en page ne saute pas quand le vrai écran s'y
+// substitue. Les métriques ici suivent HomeScreen / les composants d'accueil — les garder
+// synchronisées quand la mise en page du tableau de bord change.
 
 import React from "react";
 import { Platform, ScrollView, View } from "react-native";
@@ -15,12 +15,12 @@ import { SHEET, useHomeColors } from "@/components/home/homeColors";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { SkeletonBlock, SkeletonCircle, SkeletonGroup } from "@/components/ui/Skeleton";
 
-const NAVY = HEADER_SURFACE; // matches HomeHeader's surface
-const TOP_GAP = Platform.OS === "android" ? 10 : 8; // matches HomeHeader
+const NAVY = HEADER_SURFACE; // correspond à la surface de HomeHeader
+const TOP_GAP = Platform.OS === "android" ? 10 : 8; // correspond à HomeHeader
 const GRID_GAP = 12;
 const NEWS_CARD_W = 264;
 
-// A muted section-eyebrow placeholder (mirrors SectionLabel's metrics).
+// Un espace réservé de sur-titre de section atténué (reflète les métriques de SectionLabel).
 function LabelPlaceholder({ themeName }: { themeName: ThemeName }) {
   return (
     <SkeletonBlock
@@ -40,7 +40,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <StatusBar style="light" />
-      {/* Navy backstop behind the status bar (mirrors HomeScreen). */}
+      {/* Fond bleu marine derrière la barre de statut (reflète HomeScreen). */}
       <View
         pointerEvents="none"
         style={{ position: "absolute", top: 0, left: 0, right: 0, height: 400, backgroundColor: NAVY }}
@@ -52,16 +52,16 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
           scrollEnabled={false}
           showsVerticalScrollIndicator={false}
         >
-          {/* Navy hero placeholder — matches HomeHeader's metrics. */}
+          {/* Espace réservé du hero bleu marine — correspond aux métriques de HomeHeader. */}
           <View
             style={{
               backgroundColor: NAVY,
               paddingHorizontal: GUTTER,
               paddingTop: insets.top + TOP_GAP,
-              paddingBottom: 38, // matches HomeHeader's root paddingBottom
+              paddingBottom: 38, // correspond au paddingBottom racine de HomeHeader
             }}
           >
-            {/* Brand row: logo chip + wordmark | two action discs */}
+            {/* Ligne de marque : puce de logo + logotype | deux disques d'action */}
             <View
               style={{
                 flexDirection: "row",
@@ -80,8 +80,8 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               </View>
             </View>
 
-            {/* Identity block: greeting, name, pill — heights/margins mirror
-                HomeHeader's text metrics so nothing shifts on the swap-in. */}
+            {/* Bloc d'identité : salutation, nom, pastille — les hauteurs/marges reflètent
+                les métriques de texte de HomeHeader pour que rien ne se décale à la substitution. */}
             <View style={{ marginTop: 18 }}>
               <SkeletonBlock width={48} height={14} radius={primitives.radii.sm} themeName={themeName} />
               <SkeletonBlock width={196} height={28} radius={primitives.radii.sm} themeName={themeName} style={{ marginTop: 8 }} />
@@ -89,7 +89,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
             </View>
           </View>
 
-          {/* Dashboard sheet — mirrors HomeScreen's lifted grey sheet. */}
+          {/* Feuille de tableau de bord — reflète la feuille grise soulevée de HomeScreen. */}
           <View
             style={{
               flex: 1,
@@ -101,7 +101,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               paddingBottom: SHEET.padBottom,
             }}
           >
-            {/* Quick access — 2×2 grid */}
+            {/* Accès rapide — grille 2×2 */}
             <View style={{ marginBottom: 28 }}>
               <LabelPlaceholder themeName={themeName} />
               <View style={{ paddingHorizontal: GUTTER, rowGap: GRID_GAP }}>
@@ -117,7 +117,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               </View>
             </View>
 
-            {/* Public space — two gradient cards + FFB affiliation card */}
+            {/* Espace public — deux cartes en dégradé + carte d'affiliation FFB */}
             <View style={{ marginBottom: 28 }}>
               <LabelPlaceholder themeName={themeName} />
               <View style={{ flexDirection: "row", columnGap: GRID_GAP, paddingHorizontal: GUTTER }}>
@@ -132,7 +132,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               </View>
             </View>
 
-            {/* Recent news — horizontal rail */}
+            {/* Actualités récentes — rail horizontal */}
             <View>
               <LabelPlaceholder themeName={themeName} />
               <View style={{ flexDirection: "row", columnGap: 14, paddingHorizontal: GUTTER }}>

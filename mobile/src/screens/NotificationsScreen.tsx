@@ -1,17 +1,18 @@
-// Notifications — minimal pass-through settings page (option A).
+// Notifications — page de réglages minimale en passe-plat (option A).
 //
-// FFIE-PUSH-01 says members should be able to receive federation alerts.
-// We don't yet have `expo-notifications` wired up, and the back-office
-// notification taxonomy (FFIE-BO-07) isn't defined yet — so building
-// 4 category toggles here would be premature.
+// FFIE-PUSH-01 indique que les adhérents doivent pouvoir recevoir les alertes de
+// la fédération. `expo-notifications` n'est pas encore branché, et la taxonomie
+// des notifications du back-office (FFIE-BO-07) n'est pas encore définie — donc
+// construire ici 4 bascules de catégorie serait prématuré.
 //
-// This page does the honest minimum: explain what FFIE sends, surface
-// the OS-level permission state (managed by the device), and offer a
-// deep-link button that opens the system settings page for this app.
-// Upgrade to per-category opt-outs once the back-office contract lands.
+// Cette page fait le minimum honnête : expliquer ce que la FFIE envoie, exposer
+// l'état d'autorisation au niveau de l'OS (géré par l'appareil), et proposer un
+// bouton de lien profond qui ouvre la page des réglages système pour cette app.
+// À faire évoluer vers des désinscriptions par catégorie une fois le contrat du
+// back-office en place.
 //
-// Wrapping into a slide-up Modal is the caller's job — see App.tsx
-// MemberShell.
+// L'enveloppe dans un Modal glissant vers le haut est le travail de l'appelant —
+// voir App.tsx MemberShell.
 
 import React from "react";
 import {
@@ -35,34 +36,34 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
     try {
       await Linking.openSettings();
     } catch {
-      // Silently fail — the deep link is best-effort. The user can
-      // still navigate to Settings → FFIE manually on iOS / Android.
+      // Échoue silencieusement — le lien profond est au mieux-effort. L'utilisateur
+      // peut tout de même aller dans Réglages → FFIE manuellement sur iOS / Android.
     }
   };
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.root}>
-      {/* White screen — keep dark status-bar icons even when opened over the
-          navy Home hero (which sets them light). */}
+      {/* Écran blanc — garde les icônes de barre d'état sombres même lorsqu'ouvert
+          par-dessus le hero bleu marine de l'Accueil (qui les met claires). */}
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.content}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel="Retour"
           onPress={onBack}
           hitSlop={16}
           style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
         >
           <ChevronLeft size={20} color={t.text.muted} />
-          <Text style={styles.backLabel}>Back</Text>
+          <Text style={styles.backLabel}>Retour</Text>
         </Pressable>
 
         <View style={styles.header}>
           <Text style={styles.title}>Notifications</Text>
           <Text style={styles.subtitle}>
-            FFIE sends alerts about federation news, document updates and urgent
-            regulatory changes. Manage the alerts received on this device from
-            your system settings.
+            La FFIE envoie des alertes sur les actualités de la fédération, les mises
+            à jour de documents et les changements réglementaires urgents. Gérez les
+            alertes reçues sur cet appareil depuis vos réglages système.
           </Text>
         </View>
 
@@ -71,24 +72,25 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
             <BellRing size={20} color={t.brand.accent} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.statusLabel}>Status</Text>
-            <Text style={styles.statusValue}>Managed by your device</Text>
+            <Text style={styles.statusLabel}>Statut</Text>
+            <Text style={styles.statusValue}>Géré par votre appareil</Text>
           </View>
         </View>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Open notification settings in your device's system settings"
+          accessibilityLabel="Ouvrir les réglages de notification dans les réglages système de votre appareil"
           onPress={openSystemSettings}
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
         >
-          <Text style={styles.ctaLabel}>Open device settings</Text>
+          <Text style={styles.ctaLabel}>Ouvrir les réglages de l'appareil</Text>
           <ExternalLink size={18} color="#FFFFFF" />
         </Pressable>
 
         <Text style={styles.footer}>
-          Per-category settings — federation news, document updates, regulatory
-          alerts — will appear here once configured by FFIE.
+          Les réglages par catégorie — actualités de la fédération, mises à jour de
+          documents, alertes réglementaires — apparaîtront ici une fois configurés
+          par la FFIE.
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -1,18 +1,18 @@
-// Sign-in flow — "I already have an account" → login → authenticated.
+// Parcours de connexion — « J'ai déjà un compte » → connexion → authentifié.
 //
-// Reuses the exact LoginScreen from the onboarding login path so the guest
-// "I already have an account" CTA behaves like the Welcome-screen login:
-// enter your identifier + password, Connect, and the shell promotes the
-// session to member.
+// Réutilise exactement le LoginScreen du parcours de connexion de l'onboarding
+// pour que le CTA invité « J'ai déjà un compte » se comporte comme la connexion
+// de l'écran d'accueil : saisissez votre identifiant + mot de passe, Se
+// connecter, et la coquille promeut la session en adhérent.
 //
-// ONE slide-up Modal hosting LoginScreen. (The earlier version swapped an
-// email step and an OTP step inside this modal; the password-based
-// LoginScreen replaced both, so there is no longer an internal step to
-// switch — a single screen authenticates directly.)
+// UNE seule Modal qui glisse vers le haut hébergeant LoginScreen. (La version
+// précédente alternait une étape e-mail et une étape OTP dans cette modale ; le
+// LoginScreen à mot de passe a remplacé les deux, il n'y a donc plus d'étape
+// interne à basculer — un seul écran authentifie directement.)
 //
-// v1 mock: any well-formed identifier + password authenticates; SSO too.
-// Production: verify credentials against the FFIE auth API before
-// onAuthenticated.
+// Maquette v1 : tout identifiant + mot de passe bien formés authentifient ; le
+// SSO aussi. Production : vérifiez les identifiants auprès de l'API
+// d'authentification FFIE avant onAuthenticated.
 
 import React from "react";
 import { Modal } from "react-native";
@@ -28,7 +28,7 @@ export function SignInFlow({
   visible: boolean;
   onClose: () => void;
   onAuthenticated: (identifier: string) => void;
-  // "Not yet a member? Join the FFIE" — routes to the membership funnel.
+  // « Pas encore adhérent ? Adhérer à la FFIE » — redirige vers le tunnel d'adhésion.
   onJoin?: () => void;
 }) {
   return (

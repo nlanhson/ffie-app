@@ -1,9 +1,9 @@
-// PartnersSkeleton — loading placeholder for PartnersScreen. Mirrors the new
-// segmented showcase: the Ecosystem / Lab_FFIE / Partners toggle, then the
-// default (Ecosystem) segment's grouped lists — Distributors (2), Manufacturers
-// (3) and Member federation (1). Each row is a square logo chip, two text
-// lines, and a trailing chevron. Same gutters / chip size / row min-height as
-// the real screen so the swap to content doesn't shift the layout.
+// PartnersSkeleton — espace réservé de chargement pour PartnersScreen. Reflète la nouvelle
+// vitrine segmentée : le sélecteur Écosystème / Lab_FFIE / Partenaires, puis les listes
+// groupées du segment par défaut (Écosystème) — Distributeurs (2), Fabricants (3) et
+// Fédération adhérente (1). Chaque ligne est une puce de logo carrée, deux lignes de texte,
+// et un chevron de fin. Mêmes gouttières / taille de puce / hauteur minimale de ligne que
+// le vrai écran pour que la substitution au contenu ne décale pas la mise en page.
 
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -13,8 +13,8 @@ import { SkeletonBlock, SkeletonGroup, SkeletonTextLine } from "@/components/ui/
 
 const TILE = 46;
 
-// One grouped-list partner row: logo chip, two text lines, trailing chevron.
-// Hairline separator inset past the chip (matches PartnerRow).
+// Une ligne de partenaire en liste groupée : puce de logo, deux lignes de texte, chevron de fin.
+// Séparateur en fine ligne décalé au-delà de la puce (correspond à PartnerRow).
 function PartnerRowSkeleton({
   isLast,
   themeName,
@@ -56,7 +56,7 @@ function PartnerRowSkeleton({
   );
 }
 
-// One section: uppercase header placeholder + a grouped card of rows.
+// Une section : espace réservé d'en-tête en majuscules + une carte groupée de lignes.
 function GroupSkeleton({
   rows,
   headerWidth,
@@ -97,7 +97,7 @@ export function PartnersSkeleton({ themeName = "light" }: { themeName?: ThemeNam
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }} scrollEnabled={false}>
-          {/* Segmented control */}
+          {/* Contrôle segmenté */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
             <SkeletonBlock
               width="100%"
@@ -107,7 +107,7 @@ export function PartnersSkeleton({ themeName = "light" }: { themeName?: ThemeNam
             />
           </View>
 
-          {/* Default (Ecosystem) segment: Distributors / Manufacturers / Member federation */}
+          {/* Segment par défaut (Écosystème) : Distributeurs / Fabricants / Fédération adhérente */}
           <GroupSkeleton rows={2} headerWidth={96} themeName={themeName} />
           <GroupSkeleton rows={3} headerWidth={120} themeName={themeName} />
           <GroupSkeleton rows={1} headerWidth={132} themeName={themeName} />

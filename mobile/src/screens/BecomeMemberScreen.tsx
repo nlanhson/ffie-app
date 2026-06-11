@@ -1,19 +1,21 @@
-// Become-a-member tab — the "Join FFIE" page.
+// Onglet « Devenir adhérent » — la page « Adhérer à la FFIE ».
 //
-// FFIE's membership model is federated: you join through your *departmental*
-// federation, not a single national form. So the page is a directory — a
-// subtitle pointing people to their department, then the full list of
-// departmental federations as a searchable, grouped-inset list (same
-// data-driven pattern as the Library). Each row expands to reveal that
-// federation's local contacts (Chairman, Secretary General, phone, address).
+// Le modèle d'adhésion de la FFIE est fédéré : on adhère via sa fédération
+// *départementale*, et non via un unique formulaire national. La page est donc
+// un annuaire — un sous-titre orientant chacun vers son département, puis la
+// liste complète des fédérations départementales sous forme de liste groupée
+// en encadrés et consultable par recherche (même modèle piloté par les données
+// que la Bibliothèque). Chaque ligne se déplie pour révéler les contacts
+// locaux de la fédération (Président, Secrétaire Général, téléphone, adresse).
 //
-// Structure:
-//   - Large title + subtitle ("go to your departmental federation below")
-//   - Departmental federation directory (search + expandable rows, show more)
-//   - Eligibility note
+// Structure :
+//   - Grand titre + sous-titre (« rendez-vous auprès de votre fédération départementale ci-dessous »)
+//   - Annuaire des fédérations départementales (recherche + lignes dépliables, afficher plus)
+//   - Note d'éligibilité
 //
-// Federation contact details come from data/federations.ts. Entries not yet
-// filled expand to a clean "details coming" state — nothing fabricated.
+// Les coordonnées des fédérations proviennent de data/federations.ts. Les
+// entrées non encore renseignées se déplient sur un état « détails à venir »
+// propre — rien n'est inventé.
 
 import React, { useMemo, useState } from "react";
 import {
@@ -66,9 +68,9 @@ import {
 
 const GUTTER = semantics.spacing.gutter.mobile;
 
-// Initial map view centred on metropolitan France. The overseas federations
-// (Réunion, Guadeloupe, Nouvelle-Calédonie) sit far outside this frame — their
-// pins exist; zoom/pan out to reach them.
+// Vue initiale de la carte centrée sur la France métropolitaine. Les fédérations
+// d'outre-mer (Réunion, Guadeloupe, Nouvelle-Calédonie) se trouvent bien au-delà
+// de ce cadre — leurs repères existent ; dézoomez ou faites défiler pour les atteindre.
 const FRANCE_REGION = {
   latitude: 46.6,
   longitude: 2.5,
@@ -77,8 +79,9 @@ const FRANCE_REGION = {
 };
 const MAP_HEIGHT = 220;
 
-// One pin per federation that has a coordinate. Built once — the source list is
-// static. `area` is the headline (e.g. department), `name` the full label.
+// Un repère par fédération disposant de coordonnées. Construit une seule fois —
+// la liste source est statique. `area` est l'intitulé principal (p. ex. le
+// département), `name` le libellé complet.
 const FEDERATION_PINS: FederationPin[] = FEDERATIONS_WITH_COORDS.map((f) => ({
   id: f.id,
   lat: f.lat as number,
@@ -87,14 +90,15 @@ const FEDERATION_PINS: FederationPin[] = FEDERATIONS_WITH_COORDS.map((f) => ({
   description: f.name,
 }));
 
-// Top padding for the page content above the safe-area inset. On Android we
-// match the Debug chip's offset (its TOP_GAP = 24) so the title lines up with
-// it; iOS keeps the tighter 12.
+// Marge supérieure du contenu de la page au-dessus de la zone de sécurité. Sur
+// Android, on reprend le décalage de la pastille de Debug (son TOP_GAP = 24) afin
+// que le titre s'aligne dessus ; iOS conserve la valeur plus serrée de 12.
 const PAGE_TOP_PADDING = Platform.OS === "android" ? 24 : 12;
 
-// Reduced-motion: read once and subscribe. Gates the chevron spin + the
-// expand/collapse height animation so vestibular-sensitive users get an
-// instant snap instead of motion (harm prevention, non-negotiable).
+// Mouvement réduit : lecture initiale puis abonnement. Conditionne la rotation du
+// chevron et l'animation de hauteur au dépliage/repliage, afin que les personnes
+// sensibles aux troubles vestibulaires obtiennent un basculement instantané plutôt
+// qu'un mouvement (prévention des risques, non négociable).
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   React.useEffect(() => {
@@ -115,8 +119,8 @@ function useReducedMotion(): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// ContactLine — one labelled detail inside an expanded federation. Tappable
-// when it resolves to an action (tel:, mailto:, https:).
+// ContactLine — un détail étiqueté à l'intérieur d'une fédération dépliée.
+// Cliquable lorsqu'il correspond à une action (tel:, mailto:, https:).
 // ---------------------------------------------------------------------------
 function ContactLine({
   icon: Icon,
@@ -154,8 +158,8 @@ function ContactLine({
 }
 
 // ---------------------------------------------------------------------------
-// FederationRow — accordion row. Area + federation name, with a chevron that
-// rotates down when open. Tapping reveals the contact panel.
+// FederationRow — ligne en accordéon. Département + nom de la fédération, avec un
+// chevron qui pivote vers le bas à l'ouverture. Le tap révèle le panneau de contact.
 // ---------------------------------------------------------------------------
 function FederationRow({
   federation,
@@ -169,34 +173,35 @@ function FederationRow({
   federation: Federation;
   themeName: ThemeName;
   reducedMotion: boolean;
-  /** Controlled by the parent so only one row is open at a time (accordion). */
+  /** Contrôlé par le parent afin qu'une seule ligne soit ouverte à la fois (accordéon). */
   open: boolean;
   onToggle: () => void;
-  /** Reports the row's y offset (within the list card) so a map-pin tap can
-   *  scroll the list to it. */
+  /** Reporte le décalage y de la ligne (au sein de la carte de liste) pour qu'un
+   *  tap sur un repère de carte puisse y faire défiler la liste. */
   onMeasure?: (y: number) => void;
-  /** Hands the parent a live handle to the card's outer view, so a map-pin tap
-   *  can measure its *current* position (the cached offset goes stale while the
-   *  previously-open card is collapsing). */
+  /** Fournit au parent une référence vivante vers la vue extérieure de la carte,
+   *  pour qu'un tap sur un repère de carte puisse mesurer sa position *actuelle*
+   *  (le décalage mis en cache devient obsolète pendant que la carte
+   *  précédemment ouverte se replie). */
   registerRef?: (node: View | null) => void;
 }) {
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
-  // One progress value (0 = closed, 1 = open) drives the panel height, its
-  // fade, and the chevron together. Non-native so we can animate `height`;
-  // a single row's worth of JS-driven animation is cheap.
+  // Une seule valeur de progression (0 = fermé, 1 = ouvert) pilote ensemble la
+  // hauteur du panneau, son fondu et le chevron. Non native pour pouvoir animer
+  // `height` ; une animation pilotée par JS sur une seule ligne reste peu coûteuse.
   const progress = React.useRef(new Animated.Value(open ? 1 : 0)).current;
-  // Natural height of the panel content, measured off-flow so we can animate
-  // the container between 0 and it.
+  // Hauteur naturelle du contenu du panneau, mesurée hors flux afin de pouvoir
+  // animer le conteneur entre 0 et cette valeur.
   const [contentHeight, setContentHeight] = useState(0);
 
-  // Drive from the controlled `open` prop — a row may be closed by the parent
-  // (when another row opens), not only by its own tap.
+  // Pilotage par la prop contrôlée `open` — une ligne peut être fermée par le
+  // parent (à l'ouverture d'une autre), pas uniquement par son propre tap.
   React.useEffect(() => {
     Animated.timing(progress, {
       toValue: open ? 1 : 0,
       duration: reducedMotion ? 0 : primitives.motion.duration.slow,
-      easing: Easing.bezier(0.4, 0, 0.2, 1), // standard ease — smooth in/out
+      easing: Easing.bezier(0.4, 0, 0.2, 1), // ease standard — entrée/sortie en douceur
       useNativeDriver: false,
     }).start();
   }, [open, reducedMotion, progress]);
@@ -209,13 +214,14 @@ function FederationRow({
     inputRange: [0, 1],
     outputRange: [0, contentHeight],
   });
-  // Fade the content over the first ~60% of the travel so it's fully visible
-  // before the slide finishes (and gone early on close) — no lingering ghost.
+  // Fondu du contenu sur les ~60 % premiers du trajet pour qu'il soit pleinement
+  // visible avant la fin du glissement (et disparu tôt à la fermeture) — sans
+  // image fantôme persistante.
   const panelOpacity = progress.interpolate({
     inputRange: [0, 0.6, 1],
     outputRange: [0, 1, 1],
   });
-  // The open card lifts: shadow (iOS) + elevation (Android) grow with progress.
+  // La carte ouverte se soulève : l'ombre (iOS) et l'élévation (Android) croissent avec la progression.
   const cardShadowOpacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0, 0.18] });
   const cardElevation = progress.interpolate({ inputRange: [0, 1], outputRange: [0, 6] });
 
@@ -237,8 +243,9 @@ function FederationRow({
         elevation: cardElevation,
       }}
     >
-      {/* Inner clip — rounds + clips the header press tint and the expanding
-          panel, while the shadow lives on the (unclipped) card above. */}
+      {/* Découpe intérieure — arrondit et rogne la teinte d'appui de l'en-tête
+          ainsi que le panneau qui se déplie, tandis que l'ombre reste portée par
+          la carte (non rognée) au-dessus. */}
       <View
         style={{
           borderRadius: primitives.radii.lg,
@@ -251,7 +258,7 @@ function FederationRow({
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${federation.area}. ${federation.name}`}
-        accessibilityHint={open ? "Collapse the federation's contact details" : "Show the federation's contact details"}
+        accessibilityHint={open ? "Masquer les coordonnées de la fédération" : "Afficher les coordonnées de la fédération"}
         onPress={onToggle}
         style={({ pressed }) => ({
           backgroundColor: pressed ? t.border.subtle : "transparent",
@@ -263,7 +270,7 @@ function FederationRow({
             alignItems: "center",
             columnGap: 12,
             paddingHorizontal: GUTTER,
-            minHeight: 48, // P1 touch-target floor
+            minHeight: 48, // plancher de cible tactile P1
             paddingVertical: 12,
           }}
         >
@@ -293,9 +300,9 @@ function FederationRow({
         </View>
       </Pressable>
 
-      {/* Expanded contact panel — height-animated reveal. The content is kept
-          mounted and measured off-flow (absolute) so the container can slide
-          smoothly between 0 and its natural height. */}
+      {/* Panneau de contact déplié — révélation animée en hauteur. Le contenu
+          reste monté et mesuré hors flux (absolute) afin que le conteneur puisse
+          glisser en douceur entre 0 et sa hauteur naturelle. */}
       <Animated.View
         style={{ height: panelHeight, opacity: panelOpacity, overflow: "hidden" }}
         pointerEvents={open ? "auto" : "none"}
@@ -318,7 +325,7 @@ function FederationRow({
         >
           {hasDetails ? (
             <View style={{ rowGap: 10 }}>
-              {/* Named contacts — role + name, then their email/phone */}
+              {/* Contacts nommés — rôle + nom, puis leur e-mail/téléphone */}
               {federation.members?.map((m, i) => (
                 <View key={`${m.role}-${i}`} style={{ rowGap: 6 }}>
                   <Text style={{ fontSize: 13.5, color: t.text.muted, lineHeight: 19 }}>
@@ -361,11 +368,11 @@ function FederationRow({
               ) : null}
             </View>
           ) : (
-            // No fabricated coordinates — clean placeholder until FFIE provides
-            // this federation's contact block.
+            // Aucune coordonnée inventée — espace réservé propre jusqu'à ce que la
+            // FFIE fournisse le bloc de contact de cette fédération.
             <Text style={{ fontSize: 13, color: t.text.muted, lineHeight: 19 }}>
-              The contact details for this departmental federation will appear here.
-              FFIE is finalising the directory.
+              Les coordonnées de cette fédération départementale apparaîtront ici.
+              La FFIE finalise l'annuaire.
             </Text>
           )}
         </View>
@@ -381,11 +388,13 @@ export function BecomeMemberScreen({
   onLogin,
 }: {
   themeName?: ThemeName;
-  // When opened as a modal (from the floating Join button) a close button
-  // is shown top-right. Omitted when the screen is hosted in a tab.
+  // Lorsqu'elle est ouverte en modale (depuis le bouton flottant Adhérer), un
+  // bouton de fermeture s'affiche en haut à droite. Omis quand l'écran est
+  // hébergé dans un onglet.
   onClose?: () => void;
-  // When set, an "Already a member? Sign in" button is pinned to the bottom
-  // for existing members to reach the email → OTP sign-in. Omitted in a tab.
+  // Lorsqu'il est défini, un bouton « Déjà adhérent ? Se connecter » est épinglé
+  // en bas pour permettre aux adhérents existants d'accéder à la connexion
+  // e-mail → OTP. Omis dans un onglet.
   onLogin?: () => void;
 }) {
   const t = themes[themeName];
@@ -394,22 +403,25 @@ export function BecomeMemberScreen({
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
   const [query, setQuery] = useState("");
-  // Accordion: at most one federation expanded at a time. Opening a new row
-  // collapses the previously open one.
+  // Accordéon : au plus une fédération dépliée à la fois. Ouvrir une nouvelle
+  // ligne replie celle précédemment ouverte.
   const [openId, setOpenId] = useState<number | null>(null);
-  // Show a short list by default; "Show more" reveals the rest. A live search
-  // bypasses the cap so every match is visible.
+  // Affiche une liste courte par défaut ; « Afficher plus » révèle le reste. Une
+  // recherche en direct contourne le plafond pour rendre chaque correspondance visible.
   const [showAll, setShowAll] = useState(false);
-  // Measured height of the pinned login footer (when shown), so the floating
-  // "back to top" button can sit above it instead of overlapping it.
+  // Hauteur mesurée du pied de page de connexion épinglé (lorsqu'il est affiché),
+  // afin que le bouton flottant « retour en haut » se place au-dessus plutôt que
+  // de le chevaucher.
   const [footerH, setFooterH] = useState(0);
 
-  // The federation list scrolls inside this fixed-height window so the page can
-  // still scroll as a whole around it (nested scroll). ~half the screen.
+  // La liste des fédérations défile à l'intérieur de cette fenêtre à hauteur fixe
+  // pour que la page puisse tout de même défiler dans son ensemble autour d'elle
+  // (défilement imbriqué). ~la moitié de l'écran.
   const listWindowHeight = Math.max(300, Math.round(windowHeight * 0.5));
 
-  // Two scrolls: the whole page (pageRef) and the inner list window (scrollRef).
-  // "Back to top" surfaces once the user has scrolled deep in the list.
+  // Deux défilements : la page entière (pageRef) et la fenêtre de liste interne
+  // (scrollRef). « Retour en haut » apparaît une fois que l'utilisateur a fait
+  // défiler en profondeur dans la liste.
   const pageRef = React.useRef<ScrollView>(null);
   const scrollRef = React.useRef<ScrollView>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -425,7 +437,7 @@ export function BecomeMemberScreen({
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = e.nativeEvent.contentOffset.y;
-    // Hysteresis so the button doesn't flicker around the threshold.
+    // Hystérésis pour que le bouton ne clignote pas autour du seuil.
     if (y > 700 && !showBackToTop) setShowBackToTop(true);
     else if (y < 500 && showBackToTop) setShowBackToTop(false);
   };
@@ -436,20 +448,22 @@ export function BecomeMemberScreen({
   };
 
   const toggleFederation = (id: number) => {
-    // Each row animates its own height; opening one and closing the previously
-    // open one run in parallel off their `open` prop.
+    // Chaque ligne anime sa propre hauteur ; l'ouverture de l'une et la fermeture
+    // de celle précédemment ouverte s'exécutent en parallèle selon leur prop `open`.
     setOpenId((prev) => (prev === id ? null : id));
   };
 
-  // Map-pin → list bridge. Each row reports its y offset within the list card;
-  // the list card reports its own offset within the scroll content. Tapping a
-  // pin clears any search, expands the full list, opens that row, and scrolls
-  // to it (after a beat so the newly-mounted/expanded row has laid out).
+  // Pont repère de carte → liste. Chaque ligne reporte son décalage y au sein de
+  // la carte de liste ; la carte de liste reporte son propre décalage au sein du
+  // contenu défilant. Taper un repère efface toute recherche, déplie la liste
+  // complète, ouvre la ligne correspondante et y fait défiler (après un court
+  // instant, le temps que la ligne nouvellement montée/dépliée se soit positionnée).
   const listTop = React.useRef(0);
   const rowOffsets = React.useRef<Record<number, number>>({});
-  // Live handles to the scroll content and to each card, so a pin tap can read
-  // the card's *current* position rather than a cached offset (which is stale
-  // while the previously-open card is still collapsing above it).
+  // Références vivantes vers le contenu défilant et vers chaque carte, pour qu'un
+  // tap sur un repère puisse lire la position *actuelle* de la carte plutôt qu'un
+  // décalage mis en cache (obsolète tant que la carte précédemment ouverte se
+  // replie encore au-dessus).
   const listContentRef = React.useRef<View>(null);
   const rowRefs = React.useRef<Record<number, View | null>>({});
 
@@ -458,11 +472,13 @@ export function BecomeMemberScreen({
     setShowAll(true);
     setOpenId(id);
 
-    // The reliable fix: don't scroll on a fixed timer (the target card is still
-    // moving while the previously-open card collapses above it — scroll then
-    // and you land on a mid-animation position, seeing only the card's bottom).
-    // Instead poll the card's *live* position via measureLayout until it stops
-    // changing, then scroll once to align its top with the window's top edge.
+    // La solution fiable : ne pas faire défiler sur un minuteur fixe (la carte
+    // cible bouge encore tant que la carte précédemment ouverte se replie au-dessus
+    // — défiler à ce moment-là vous fait atterrir sur une position en pleine
+    // animation, ne montrant que le bas de la carte). À la place, on interroge la
+    // position *vivante* de la carte via measureLayout jusqu'à ce qu'elle cesse de
+    // changer, puis on défile une seule fois pour aligner son haut avec le bord
+    // supérieur de la fenêtre.
     const scrollToCached = () => {
       const y = listTop.current + (rowOffsets.current[id] ?? 0);
       scrollRef.current?.scrollTo({ y: Math.max(0, y), animated: !reducedMotion });
@@ -471,7 +487,7 @@ export function BecomeMemberScreen({
     let lastY = Number.NaN;
     let stable = 0;
     let tries = 0;
-    const MAX_TRIES = 24; // ~0.75s ceiling at ~32ms/poll
+    const MAX_TRIES = 24; // plafond ~0,75 s à ~32 ms/interrogation
 
     const attempt = () => {
       tries += 1;
@@ -481,15 +497,16 @@ export function BecomeMemberScreen({
         scrollToCached();
         return;
       }
-      // New architecture (Fabric): measureLayout takes the *ref* of the
-      // ancestor to measure against, not a findNodeHandle() number.
+      // Nouvelle architecture (Fabric) : measureLayout prend la *référence* de
+      // l'ancêtre par rapport auquel mesurer, et non un numéro findNodeHandle().
       (node as any).measureLayout(
         listNode,
         (_x: number, y: number) => {
           stable = Math.abs(y - lastY) < 0.5 ? stable + 1 : 0;
           lastY = y;
-          // Settled (two matching reads), reduced motion, or hit the ceiling →
-          // commit the scroll. Otherwise wait a frame and re-measure.
+          // Stabilisé (deux lectures concordantes), mouvement réduit, ou plafond
+          // atteint → on valide le défilement. Sinon, on attend une frame et on
+          // re-mesure.
           if (reducedMotion || stable >= 2 || tries >= MAX_TRIES) {
             scrollRef.current?.scrollTo({ y: Math.max(0, y), animated: !reducedMotion });
           } else {
@@ -500,14 +517,15 @@ export function BecomeMemberScreen({
       );
     };
 
-    // Let the open/close animations start (and any newly-revealed rows mount)
-    // before the first measurement.
+    // Laisser les animations d'ouverture/fermeture démarrer (et les lignes
+    // nouvellement révélées se monter) avant la première mesure.
     setTimeout(attempt, reducedMotion ? 30 : 80);
   };
 
-  // Recenter the map on whichever federation is open. Fires on every openId
-  // change, so opening a row, switching to another, or tapping a pin all move
-  // the map to that location. Closing a row leaves the map where it is.
+  // Recentre la carte sur la fédération actuellement ouverte. Se déclenche à
+  // chaque changement de openId, de sorte qu'ouvrir une ligne, passer à une autre
+  // ou taper un repère déplace la carte vers ce lieu. Refermer une ligne laisse
+  // la carte là où elle est.
   const mapRef = React.useRef<FederationMapHandle>(null);
   React.useEffect(() => {
     if (openId == null) return;
@@ -536,24 +554,26 @@ export function BecomeMemberScreen({
   const visible = collapsedList ? filtered.slice(0, INITIAL_COUNT) : filtered;
   const hiddenCount = filtered.length - visible.length;
 
-  // Android's scrollbar is pinned to the ScrollView's right edge and ignores
-  // scrollIndicatorInsets, so we inset the ScrollView itself by a hair to lift
-  // the bar off the screen edge like iOS. iOS keeps full width + indicator
-  // insets.
+  // La barre de défilement d'Android est collée au bord droit du ScrollView et
+  // ignore scrollIndicatorInsets ; on décale donc le ScrollView lui-même d'un
+  // cheveu pour écarter la barre du bord de l'écran, comme sur iOS. iOS conserve
+  // la pleine largeur + les insets d'indicateur.
   const ANDROID_BAR_INSET = Platform.OS === "android" ? 8 : 0;
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
-      {/* Light page — keep dark status-bar icons even when opened over the navy
-          Home hero (which sets them light). */}
+      {/* Page claire — conserver des icônes de barre d'état sombres même lorsque
+          la page est ouverte par-dessus le hero navy de l'Accueil (qui les passe
+          en clair). */}
       <StatusBar style="dark" />
       <View style={{ flex: 1 }}>
-      {/* Modal close — only when hosted as a slide-up (floating Join CTA).
-          Sits top-right, clear of the left-aligned large title. */}
+      {/* Fermeture de la modale — uniquement lorsque l'écran est présenté en
+          glissement vers le haut (CTA flottant Adhérer). Placée en haut à droite,
+          dégagée du grand titre aligné à gauche. */}
       {onClose ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel="Fermer"
           onPress={onClose}
           hitSlop={10}
           style={({ pressed }) => [
@@ -581,17 +601,17 @@ export function BecomeMemberScreen({
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* The page scrolls as a whole, so you can reach the bottom. The map
-            pans when touched and the federation list scrolls inside its own
-            window — each keeps its own gesture; the page scrolls everywhere
-            else. */}
-        {/* Large title + the requested subtitle */}
+        {/* La page défile dans son ensemble, pour pouvoir atteindre le bas. La
+            carte se déplace au toucher et la liste des fédérations défile dans sa
+            propre fenêtre — chacune conserve son geste ; la page défile partout
+            ailleurs. */}
+        {/* Grand titre + le sous-titre demandé */}
         <View
           style={{
             paddingHorizontal: GUTTER,
             paddingTop: PAGE_TOP_PADDING,
             paddingBottom: 6,
-            // Keep the title clear of the modal close button (top-right).
+            // Dégager le titre du bouton de fermeture de la modale (en haut à droite).
             paddingRight: onClose ? 52 : GUTTER,
           }}
         >
@@ -606,16 +626,16 @@ export function BecomeMemberScreen({
               letterSpacing: -0.8,
             }}
           >
-            Join FFIE
+            Adhérer à la FFIE
           </Text>
           <Text style={{ fontSize: 15, color: t.text.muted, marginTop: 6, lineHeight: 21 }}>
-            To join, contact your departmental federation below.
+            Pour adhérer, contactez votre fédération départementale ci-dessous.
           </Text>
         </View>
 
-        {/* Map — one pin per federation. Tapping a pin shows its name/area in a
-            callout. Native module (react-native-maps): Apple Maps on iOS,
-            Google Maps on Android. */}
+        {/* Carte — un repère par fédération. Taper un repère affiche son nom/
+            département dans une bulle. Module natif (react-native-maps) : Apple
+            Maps sur iOS, Google Maps sur Android. */}
         <View
           style={{
             marginHorizontal: GUTTER,
@@ -631,12 +651,12 @@ export function BecomeMemberScreen({
             style={{ width: "100%", height: MAP_HEIGHT }}
             initialRegion={FRANCE_REGION}
             pins={FEDERATION_PINS}
-            accessibilityLabel="Map of departmental federations"
+            accessibilityLabel="Carte des fédérations départementales"
             onPinPress={focusFederation}
           />
         </View>
 
-        {/* Search field — same affordance as the Library */}
+        {/* Champ de recherche — même affordance que la Bibliothèque */}
         <View
           style={{
             paddingHorizontal: GUTTER,
@@ -646,8 +666,9 @@ export function BecomeMemberScreen({
         >
           <View
             style={{
-              // A touch taller on Android — the native text baseline sits
-              // higher there, so 38 felt cramped; iOS keeps the tighter figure.
+              // Un peu plus haut sur Android — la ligne de base native du texte y
+              // est plus haute, donc 38 paraissait à l'étroit ; iOS conserve la
+              // valeur plus serrée.
               height: Platform.OS === "android" ? 46 : 38,
               borderRadius: 10,
               backgroundColor: t.border.subtle,
@@ -661,13 +682,13 @@ export function BecomeMemberScreen({
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search a department or federation"
+              placeholder="Rechercher un département ou une fédération"
               placeholderTextColor={t.text.placeholder}
               style={{ flex: 1, color: t.text.body, fontSize: 16 }}
               returnKeyType="search"
               autoCorrect={false}
               autoCapitalize="none"
-              accessibilityLabel="Search a departmental federation"
+              accessibilityLabel="Rechercher une fédération départementale"
             />
             {query.length > 0 ? (
               <SearchClearButton themeName={themeName} onPress={() => setQuery("")} />
@@ -675,13 +696,14 @@ export function BecomeMemberScreen({
           </View>
         </View>
 
-        {/* Departmental federation directory — scrolls inside its own fixed
-            window so the page can still scroll around it (nested scroll). */}
+        {/* Annuaire des fédérations départementales — défile dans sa propre
+            fenêtre fixe pour que la page puisse tout de même défiler autour
+            (défilement imbriqué). */}
         {filtered.length === 0 ? (
           <View style={{ padding: 48, alignItems: "center" }}>
-            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>No federation found.</Text>
+            <Text style={{ color: t.text.muted, fontSize: 15, marginBottom: 6 }}>Aucune fédération trouvée.</Text>
             <Text style={{ color: t.text.muted, fontSize: 13, opacity: 0.8, textAlign: "center" }}>
-              Try a department number ("69"), a name ("Rhône") or "Building".
+              Essayez un numéro de département (« 69 »), un nom (« Rhône ») ou « Bâtiment ».
             </Text>
           </View>
         ) : (
@@ -705,8 +727,8 @@ export function BecomeMemberScreen({
               listTop.current = e.nativeEvent.layout.y;
             }}
           >
-            {/* Each FederationRow is now its own card (margins + shadow live on
-                the row); this is just a plain container. */}
+            {/* Chaque FederationRow est désormais sa propre carte (marges + ombre
+                portées par la ligne) ; ceci n'est qu'un simple conteneur. */}
             <View>
               {visible.map((f) => (
                 <FederationRow
@@ -729,11 +751,11 @@ export function BecomeMemberScreen({
           </ScrollView>
           </View>
 
-            {/* Show more — reveals the rest of the directory */}
+            {/* Afficher plus — révèle le reste de l'annuaire */}
             {collapsedList && hiddenCount > 0 ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Show all ${filtered.length} federations`}
+                accessibilityLabel={`Afficher les ${filtered.length} fédérations`}
                 onPress={() => setShowAll(true)}
                 style={({ pressed }) => ({
                   marginTop: 12,
@@ -757,18 +779,19 @@ export function BecomeMemberScreen({
                     color: t.text.body,
                   }}
                 >
-                  Show {hiddenCount} more
+                  Afficher {hiddenCount} de plus
                 </Text>
                 <ChevronDown size={18} color={t.brand.accent} />
               </Pressable>
             ) : null}
 
-            {/* Show less — collapses back to the short list (only when the user
-                expanded it themselves; search manages its own result count) */}
+            {/* Afficher moins — replie vers la liste courte (uniquement lorsque
+                l'utilisateur l'a lui-même dépliée ; la recherche gère son propre
+                nombre de résultats) */}
             {showAll && !isSearching ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Show fewer federations`}
+                accessibilityLabel={`Afficher moins de fédérations`}
                 onPress={() => {
                   setShowAll(false);
                   scrollToTop();
@@ -795,7 +818,7 @@ export function BecomeMemberScreen({
                     color: t.text.body,
                   }}
                 >
-                  Show less
+                  Afficher moins
                 </Text>
                 <ChevronUp size={18} color={t.brand.accent} />
               </Pressable>
@@ -811,13 +834,13 @@ export function BecomeMemberScreen({
                   marginHorizontal: GUTTER + 4,
                 }}
               >
-                {`Showing ${visible.length} of ${FEDERATIONS.length} departmental federations.`}
+                {`Affichage de ${visible.length} fédérations départementales sur ${FEDERATIONS.length}.`}
               </Text>
             ) : null}
           </>
         )}
 
-        {/* Eligibility */}
+        {/* Éligibilité */}
         <View style={{ paddingHorizontal: GUTTER, marginTop: 20 }}>
           <View
             style={{
@@ -832,17 +855,18 @@ export function BecomeMemberScreen({
           >
             <ShieldCheck size={18} color={t.brand.accent} style={{ marginTop: 1 }} />
             <Text style={{ flex: 1, fontSize: 13, color: t.text.muted, lineHeight: 19 }}>
-              Open to electrical integration companies registered in France. Applications are handled by your
-              departmental federation, then reviewed by FFIE before access is granted. You will be notified by email.
+              Ouvert aux entreprises d'intégration électrique immatriculées en France. Les demandes sont traitées par
+              votre fédération départementale, puis examinées par la FFIE avant l'octroi de l'accès. Vous serez notifié par e-mail.
             </Text>
           </View>
         </View>
       </ScrollView>
       </View>
 
-      {/* Pinned login footer — only when opened from the floating avatar. A
-          full-width boxed CTA opens the email → OTP sign-in popup; the muted
-          line above says who it's for. */}
+      {/* Pied de page de connexion épinglé — uniquement à l'ouverture depuis
+          l'avatar flottant. Un CTA encadré pleine largeur ouvre la fenêtre de
+          connexion e-mail → OTP ; la ligne atténuée au-dessus précise à qui il
+          s'adresse. */}
       {onLogin ? (
         <View
           onLayout={(e) => setFooterH(e.nativeEvent.layout.height)}
@@ -863,7 +887,7 @@ export function BecomeMemberScreen({
               marginBottom: 8,
             }}
           >
-            Already a member?
+            Déjà adhérent ?
           </Text>
           <Button
             variant="primary"
@@ -871,16 +895,17 @@ export function BecomeMemberScreen({
             fullWidth
             themeName={themeName}
             onPress={onLogin}
-            accessibilityLabel="Sign in"
+            accessibilityLabel="Se connecter"
           >
-            Sign in
+            Se connecter
           </Button>
         </View>
       ) : null}
 
-      {/* Back to top — floats over the list once scrolled deep. The whole
-          button fades in/out (opacity only, no slide). Lifted above the login
-          footer when it's present. */}
+      {/* Retour en haut — flotte au-dessus de la liste une fois le défilement en
+          profondeur. Le bouton entier apparaît/disparaît en fondu (opacité
+          uniquement, pas de glissement). Relevé au-dessus du pied de page de
+          connexion lorsqu'il est présent. */}
       <Animated.View
         pointerEvents={showBackToTop ? "box-none" : "none"}
         style={{
@@ -892,7 +917,7 @@ export function BecomeMemberScreen({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to top"
+          accessibilityLabel="Retour en haut"
           onPress={scrollToTop}
           style={({ pressed }) => ({
             width: 48,

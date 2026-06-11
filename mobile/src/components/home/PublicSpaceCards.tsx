@@ -1,11 +1,13 @@
-// PublicSpaceCards — the two vivid gradient cards in the Home "Public space"
-// section: "Find a pro" (emerald, the geolocated federation directory) and
-// "Our trades" (violet, the careers / Métiers discovery surface).
+// PublicSpaceCards — les deux cartes à dégradé vif de la section « Espace
+// public » de l'Accueil : « Trouver un pro » (émeraude, l'annuaire géolocalisé
+// des fédérations) et « Nos métiers » (violet, la surface de découverte des
+// carrières / Métiers).
 //
-// These are the public, non-gated entry points (P6/P7) — surfaced with bold
-// marketing gradients to stand apart from the white utility cards above. The
-// gradients are FIXED brand-decoration tokens (primitives.gradients), the same
-// way the navy hero is a fixed surface; on-colors are white throughout.
+// Ce sont les points d'entrée publics, sans restriction (P6/P7) — mis en avant
+// avec des dégradés marketing affirmés pour se distinguer des cartes utilitaires
+// blanches au-dessus. Les dégradés sont des tokens de décoration de marque FIXES
+// (primitives.gradients), à l'image du héros marine qui est une surface fixe ;
+// les couleurs de premier plan sont blanches partout.
 
 import React from "react";
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
@@ -19,9 +21,10 @@ import type { HomeNavTarget } from "@/screens/HomeScreen";
 
 const WHITE = primitives.colors.white;
 const GRID_GAP = 12;
-// Token white at reduced alpha: a translucent tile behind the glyph, a
-// barely-dimmed subtitle (kept near-solid so it holds WCAG AA on the gradient),
-// and a faint rim that stands in for the cards' 1px border on the gradient.
+// Blanc de token à alpha réduit : une tuile translucide derrière le glyphe, un
+// sous-titre à peine atténué (gardé quasi opaque pour tenir le WCAG AA sur le
+// dégradé), et un liseré ténu qui remplace la bordure 1 px des cartes sur le
+// dégradé.
 const TILE = "rgba(255, 255, 255, 0.18)";
 const SUBTITLE = "rgba(255, 255, 255, 0.92)";
 const EDGE = "rgba(255, 255, 255, 0.22)";
@@ -39,16 +42,16 @@ const CARDS: ReadonlyArray<GradientCard> = [
   {
     key: "find-pro",
     icon: MapPin,
-    title: "Find a pro",
-    subtitle: "Geolocated Directory",
+    title: "Trouver un pro",
+    subtitle: "Annuaire géolocalisé",
     colors: primitives.gradients.findPro,
     target: "find-pro",
   },
   {
     key: "trades",
     icon: GraduationCap,
-    title: "Our trades",
-    subtitle: "Discovering the trades",
+    title: "Nos métiers",
+    subtitle: "Découvrir les métiers",
     colors: primitives.gradients.trades,
     target: "trades",
   },
@@ -61,7 +64,7 @@ export function PublicSpaceCards({
   themeName?: ThemeName;
   onNavigate?: (target: HomeNavTarget) => void;
 }) {
-  void _themeName; // gradient cards are theme-agnostic (fixed brand surfaces)
+  void _themeName; // les cartes à dégradé ignorent le thème (surfaces de marque fixes)
   return (
     <View style={{ flexDirection: "row", columnGap: GRID_GAP, paddingHorizontal: GUTTER }}>
       {CARDS.map((card) => (
@@ -73,11 +76,12 @@ export function PublicSpaceCards({
 
 function Card({ card, onPress }: { card: GradientCard; onPress: () => void }) {
   const Icon = card.icon;
-  // The shadow lives on an OUTER wrapper while the rounded clip (overflow:
-  // hidden, needed so the gradient honours the corner radius) lives on the
-  // inner Pressable. On a single view iOS clips its own shadow when overflow is
-  // hidden — splitting them keeps the shadow. The wrapper's opaque bg (the
-  // gradient's start colour) also gives the shadow a solid shape to cast.
+  // L'ombre se trouve sur un conteneur EXTÉRIEUR tandis que la découpe arrondie
+  // (overflow: hidden, nécessaire pour que le dégradé respecte le rayon des
+  // coins) se trouve sur le Pressable intérieur. Sur une seule vue, iOS découpe
+  // sa propre ombre quand overflow est masqué — les séparer préserve l'ombre. Le
+  // fond opaque du conteneur (la couleur de départ du dégradé) donne aussi à
+  // l'ombre une forme solide à projeter.
   return (
     <View style={[styles.shadowWrap, { backgroundColor: card.colors[0] }]}>
       <Pressable
@@ -87,9 +91,10 @@ function Card({ card, onPress }: { card: GradientCard; onPress: () => void }) {
         accessibilityHint={card.subtitle}
         style={({ pressed }): ViewStyle => ({
           flex: 1,
-          // Same card geometry as every other card: radii.lg + a 1px edge.
-          // A grey hairline is invisible on the gradient, so the edge is a faint
-          // translucent-white rim — the gradient analogue of the cards' border.
+          // Même géométrie de carte que toutes les autres : radii.lg + un liseré
+          // de 1 px. Un filet gris serait invisible sur le dégradé, donc le bord
+          // est un liseré blanc translucide ténu — l'équivalent, sur dégradé, de
+          // la bordure des cartes.
           borderRadius: primitives.radii.lg,
           borderWidth: 1,
           borderColor: EDGE,
@@ -142,7 +147,7 @@ function Card({ card, onPress }: { card: GradientCard; onPress: () => void }) {
 const styles = StyleSheet.create({
   shadowWrap: {
     flex: 1,
-    borderRadius: primitives.radii.lg, // match every other card's corner (12)
+    borderRadius: primitives.radii.lg, // identique au coin de toutes les autres cartes (12)
     ...CARD_SHADOW,
   },
   fill: {

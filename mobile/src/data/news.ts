@@ -1,28 +1,32 @@
-// Mock news content — mirrors the structure the FFIE backend will serve
-// (Epic 2, News feed). In production these come from the CMS / back-office.
+// Contenu d'actualités factice — reproduit la structure que servira le backend
+// FFIE (Epic 2, fil d'actualités). En production, ces données proviennent du
+// CMS / back-office.
 //
-// `memberOnly` articles appear in the public feed as locked teasers: a guest
-// who taps one is sent to the membership upsell rather than the reader. This
-// is the only place the public/member boundary shows up inside News, and it
-// doubles as a conversion surface (DESIGN_PRINCIPLES: news is "the bait").
+// Les articles `memberOnly` apparaissent dans le fil public comme des teasers
+// verrouillés : un visiteur qui appuie dessus est dirigé vers l'incitation à
+// l'adhésion plutôt que vers le lecteur. C'est le seul endroit où la frontière
+// public/adhérent apparaît dans les Actualités, et elle fait aussi office de
+// surface de conversion (DESIGN_PRINCIPLES : l'actualité est « l'appât »).
 //
-// Copy is realistic but deliberately free of fabricated precise statistics —
-// real figures come from FFIE.
+// Le texte est réaliste mais délibérément exempt de statistiques précises
+// inventées — les vrais chiffres viennent de la FFIE.
 
 export type NewsCategory = "Technical" | "Training" | "Communication" | "Economical";
 
-// A body block is either a plain paragraph (string) or a "rich line" — an
-// array of segments that can be bold or styled as a link. This lets a few
-// articles mirror the FFIE site's formatting (bold date lead-ins, link words)
-// while the rest stay simple strings.
+// Un bloc de corps est soit un paragraphe simple (string), soit une « ligne
+// riche » — un tableau de segments pouvant être en gras ou stylés comme un
+// lien. Cela permet à quelques articles de reproduire la mise en forme du site
+// FFIE (amorces de date en gras, mots-liens) pendant que les autres restent de
+// simples chaînes.
 export type RichSegment = { text: string; bold?: boolean; link?: boolean; url?: string };
 export type BodyBlock = string | RichSegment[];
 
-// A document attached to an article (NEWS-02: "the detailed view can display
-// text, images, AND associated documents"). These are the real FFIE files an
-// article references — surfaced as a first-class "Related documents" list in
-// the reader, not just buried as inline body links. `kind` only drives the row
-// icon; everything opens in the in-app browser for now (download lands with
+// Un document joint à un article (NEWS-02 : « la vue détaillée peut afficher du
+// texte, des images ET des documents associés »). Ce sont les vrais fichiers
+// FFIE qu'un article référence — mis en avant comme une liste « Documents
+// associés » à part entière dans le lecteur, et non enfouis comme de simples
+// liens dans le corps. `kind` ne pilote que l'icône de la ligne ; tout s'ouvre
+// dans le navigateur in-app pour l'instant (le téléchargement arrive avec
 // FFIE-DOC-03).
 export type ArticleAttachment = { label: string; url: string; kind?: "pdf" | "doc" };
 
@@ -31,50 +35,53 @@ export type Article = {
   category: NewsCategory;
   title: string;
   excerpt: string;
-  body: BodyBlock[]; // paragraphs (string) or rich lines (segment arrays)
-  // Sortable publish date, ISO yyyy-mm-dd (the shape the backend will send).
-  // This is the source of truth for feed order; `date` is its display form.
+  body: BodyBlock[]; // paragraphes (string) ou lignes riches (tableaux de segments)
+  // Date de publication triable, ISO aaaa-mm-jj (le format que le backend
+  // enverra). C'est la source de vérité pour l'ordre du fil ; `date` en est la
+  // forme d'affichage.
   isoDate: string;
-  date: string; // display string (Europe/Paris), derived from isoDate
+  date: string; // chaîne d'affichage (Europe/Paris), dérivée de isoDate
   readMinutes: number;
   memberOnly: boolean;
-  imageUrl?: string; // real FFIE CMS image; falls back to a placeholder if absent
-  attachments?: ArticleAttachment[]; // documents the article links to (NEWS-02)
+  imageUrl?: string; // vraie image du CMS FFIE ; repli sur un placeholder si absente
+  attachments?: ArticleAttachment[]; // documents vers lesquels l'article renvoie (NEWS-02)
 };
 
-// Content mirrors the live FFIE news articles, pulled from each
-// article's detail page (titles/dates in French, bodies as supplied by FFIE —
-// a mix of FR/EN). Article #1 is the featured/hero item, the rest fill the
-// 2-column grid. The first body block of each article is the "lead" line,
-// rendered larger in the reader.
+// Le contenu reproduit les articles d'actualité FFIE en ligne, repris de la
+// page détail de chaque article (titres/dates en français, corps tels que
+// fournis par la FFIE — un mélange FR/EN). L'article n°1 est l'élément vedette /
+// hero, les autres remplissent la grille à 2 colonnes. Le premier bloc de corps
+// de chaque article est la ligne « chapeau », affichée plus grande dans le
+// lecteur.
 //
-// Categories are NOT exposed on the FFIE detail pages, so they're best-guess
-// mappings to our 4-tag taxonomy (Economical → Economical, Training →
-// Training, federation/event news → Communication).
+// Les catégories ne sont PAS exposées sur les pages détail FFIE, ce sont donc
+// des correspondances au jugé vers notre taxonomie à 4 tags (Economical →
+// Economical, Training → Training, actualités fédération/événement →
+// Communication).
 const ARTICLES_RAW: Article[] = [
   {
     id: 1,
     category: "Communication",
-    title: "FFIE 2026 regional meetings, ask for the program!",
-    excerpt: "4 new regional meetings are planned...",
+    title: "Rencontres régionales FFIE 2026, demandez le programme !",
+    excerpt: "4 nouvelles rencontres régionales sont prévues...",
     body: [
-      "4 new regional meetings are planned...",
+      "4 nouvelles rencontres régionales sont prévues...",
       [
-        { text: "On May 5 in Miribel", bold: true },
-        { text: " - REXEL logistics center" },
+        { text: "Le 5 mai à Miribel", bold: true },
+        { text: " - centre logistique REXEL" },
       ],
       [
-        { text: "On June 4 in Toulouse", bold: true },
-        { text: " - FFB 31 - OCCITANIE regional meeting | " },
-        { text: "REGISTRATION", link: true, url: "https://forms.office.com/e/M33WgFrPzK" },
+        { text: "Le 4 juin à Toulouse", bold: true },
+        { text: " - FFB 31 - rencontre régionale OCCITANIE | " },
+        { text: "INSCRIPTION", link: true, url: "https://forms.office.com/e/M33WgFrPzK" },
       ],
       [
-        { text: "On November 5 in Besançon", bold: true },
-        { text: " - FFB 25 - BOURGOGNE FRANCHE-COMTÉ regional meeting" },
+        { text: "Le 5 novembre à Besançon", bold: true },
+        { text: " - FFB 25 - rencontre régionale BOURGOGNE FRANCHE-COMTÉ" },
       ],
       [
-        { text: "On December 3 in Port-Marly", bold: true },
-        { text: " - FFB Île-de-France - ÎLE-DE-FRANCE regional meeting" },
+        { text: "Le 3 décembre à Port-Marly", bold: true },
+        { text: " - FFB Île-de-France - rencontre régionale ÎLE-DE-FRANCE" },
       ],
     ],
     isoDate: "2026-01-01",
@@ -86,17 +93,17 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 2,
     category: "Communication",
-    title: "FFIE regional meeting in Toulouse, there's still time!",
-    excerpt: "Register for the Occitanie regional meeting...",
+    title: "Rencontre régionale FFIE à Toulouse, il est encore temps !",
+    excerpt: "Inscrivez-vous à la rencontre régionale Occitanie...",
     body: [
-      "Register for the Occitanie regional meeting...",
-      "Are you in the Occitanie region? Don't miss the next FFIE Meeting on June 4 starting at 9:30 AM!",
-      "A program designed for the region's electrical integration companies:",
-      "• Low-voltage systems in connected buildings\n• Presentations by Citel, Schneider Electric, Sonepar and Milwaukee\n• A presentation of the tools FFIE makes available to you",
-      "All in the presence of FFIE President Pascal Toggenburger and regional delegate Bertrand Desplats. A lunch reception will be served at the end of the meeting.",
+      "Inscrivez-vous à la rencontre régionale Occitanie...",
+      "Vous êtes en région Occitanie ? Ne manquez pas la prochaine Rencontre FFIE le 4 juin à partir de 9h30 !",
+      "Un programme conçu pour les entreprises d'intégration électrique de la région :",
+      "• Les courants faibles dans les bâtiments connectés\n• Présentations de Citel, Schneider Electric, Sonepar et Milwaukee\n• Une présentation des outils que la FFIE met à votre disposition",
+      "Le tout en présence du président de la FFIE Pascal Toggenburger et du délégué régional Bertrand Desplats. Un cocktail déjeunatoire sera servi à l'issue de la rencontre.",
       [
         {
-          text: "View the program and register",
+          text: "Voir le programme et s'inscrire",
           link: true,
           url: "https://forms.office.com/pages/responsepage.aspx?id=ssnTPbZKGE6zJoaE4m80eR4ATBmRs3xAlpV89FTqU6lUMUEyTUM2NE9NOTlVWEZKRFlNTVFSN1hJMi4u&route=shorturl",
         },
@@ -111,17 +118,17 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 3,
     category: "Communication",
-    title: "FFIE selected for the French Electrification Team",
-    excerpt: "A French team for electrification...",
+    title: "La FFIE retenue pour l'Équipe de France de l'Électrification",
+    excerpt: "Une équipe de France pour l'électrification...",
     body: [
-      "A French team for electrification...",
-      "FIEEC took the initiative to bring together all stakeholders in the electrical sector under the banner of the French Electrification Team. Within this framework, all stakeholders in the electrical sector — producers of all types of energy, network operators, electricity suppliers, storage and demand-flexibility operators, manufacturers, professional distributors, electrical integrators, plumbers-heating engineers, and more broadly all building companies and small craft businesses and installers of electrical technologies — are united and mobilized to form a French Electrification Team determined to act quickly across the regions to meet the targets set by the public authorities.",
-      "It is through this collective — made up of industry flagships and SMEs in manufacturing, installation and professional distribution, as well as the network of hundreds of thousands of qualified building companies and craftspeople spanning the whole of France — that the electrification battle will be won.",
-      "An op-ed was drafted and signed at the Élysée Palace in the presence of Emmanuel Macron, President of the Republic. FFIE wished for FFB to stand alongside it in this endeavor, and so it was only natural that FFB represented FFIE in signing the op-ed.",
-      "The next step for the electrical sector is to work on concrete and effective proposals for the 2027 presidential election.",
+      "Une équipe de France pour l'électrification...",
+      "La FIEEC a pris l'initiative de réunir l'ensemble des acteurs de la filière électrique sous la bannière de l'Équipe de France de l'Électrification. Dans ce cadre, tous les acteurs de la filière électrique — producteurs de tous types d'énergie, gestionnaires de réseaux, fournisseurs d'électricité, opérateurs de stockage et de flexibilité de la demande, fabricants, distributeurs professionnels, intégrateurs électriciens, plombiers-chauffagistes, et plus largement toutes les entreprises du bâtiment et les petites entreprises artisanales et installateurs de technologies électriques — sont unis et mobilisés pour former une Équipe de France de l'Électrification déterminée à agir vite sur tous les territoires afin d'atteindre les objectifs fixés par les pouvoirs publics.",
+      "C'est grâce à ce collectif — composé des fleurons de l'industrie et des PME de la fabrication, de l'installation et de la distribution professionnelle, ainsi que du réseau des centaines de milliers d'entreprises du bâtiment et d'artisans qualifiés présents dans toute la France — que la bataille de l'électrification sera gagnée.",
+      "Une tribune a été rédigée et signée au palais de l'Élysée en présence d'Emmanuel Macron, président de la République. La FFIE a souhaité que la FFB se tienne à ses côtés dans cette démarche, et c'est donc tout naturellement que la FFB a représenté la FFIE pour la signature de la tribune.",
+      "La prochaine étape pour la filière électrique est de travailler à des propositions concrètes et efficaces en vue de l'élection présidentielle de 2027.",
       [
         {
-          text: "Download the May 26 op-ed",
+          text: "Télécharger la tribune du 26 mai",
           link: true,
           url: "https://www.ffie.fr/fileadmin/DOCUMENTATION/PACTE_Equipe_de_France_Electrification.pdf",
         },
@@ -132,10 +139,10 @@ const ARTICLES_RAW: Article[] = [
     readMinutes: 3,
     memberOnly: false,
     imageUrl: "https://www.ffie.fr/fileadmin/user_upload/ELECTRIFICATION_WEB.png",
-    // The op-ed referenced inline above, surfaced as an attached document.
+    // La tribune référencée plus haut dans le texte, mise en avant comme document joint.
     attachments: [
       {
-        label: "Op-ed — French Electrification Team (May 26)",
+        label: "Tribune — Équipe de France de l'Électrification (26 mai)",
         url: "https://www.ffie.fr/fileadmin/DOCUMENTATION/PACTE_Equipe_de_France_Electrification.pdf",
         kind: "pdf",
       },
@@ -144,18 +151,18 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 4,
     category: "Communication",
-    title: "Take part in the SME AI Spring in Île-de-France",
-    excerpt: "Test AI for your business...",
+    title: "Participez au Printemps de l'IA des PME en Île-de-France",
+    excerpt: "Testez l'IA pour votre entreprise...",
     body: [
-      "Test AI for your business...",
-      "FFIE invites you to take part in the SME AI Spring organized by OMNES Education in partnership with BFM Business and Onepoint: on June 16 from 10 AM to 4:30 PM, in Paris 15th.",
-      "The opportunity to test AI tools suited to your business: in a single day, try out simple automations and leave with 2–3 immediately actionable use cases.",
-      "Designed as reverse-mentoring workshops, led by students amplified by AI, it's also a chance to spot young talent ready to strengthen your teams (internships, work-study).",
-      "These workshops will be led by students from the ECE, Sub de Pub and INSEEC schools.",
+      "Testez l'IA pour votre entreprise...",
+      "La FFIE vous invite à participer au Printemps de l'IA des PME organisé par OMNES Education en partenariat avec BFM Business et Onepoint : le 16 juin de 10h à 16h30, à Paris 15e.",
+      "L'occasion de tester des outils d'IA adaptés à votre métier : en une seule journée, expérimentez des automatisations simples et repartez avec 2 à 3 cas d'usage immédiatement actionnables.",
+      "Conçus comme des ateliers de mentorat inversé, animés par des étudiants augmentés par l'IA, c'est aussi l'occasion de repérer de jeunes talents prêts à renforcer vos équipes (stages, alternance).",
+      "Ces ateliers seront animés par des étudiants des écoles ECE, Sup de Pub et INSEEC.",
       [
-        { text: "Limited places – reserve your spot now via this link " },
+        { text: "Places limitées – réservez votre place dès maintenant via ce lien " },
         {
-          text: "AI tools & SMEs: What? Why? How?",
+          text: "Outils d'IA & PME : Quoi ? Pourquoi ? Comment ?",
           link: true,
           url: "https://mibc-fr-05.mailinblack.com/securelink/?url=https://docs.google.com&key=eyJsYW5nIjoiRlIiLCJ1cmwiOiJodHRwczovL2RvY3MuZ29vZ2xlLmNvbS9mb3Jtcy9kL2UvMUZBSXBRTFNjTUlaejNDbzdaekRjRGZSOVA2TTJMa0ZwXzh2WjNtbmRfY3dNbWZBZVpTeFZhc1Evdmlld2Zvcm0iLCJ0b2tlbiI6ImdBQUFBQUJwLUdnVDBUblhKN2pPQl9JcmhPd0ZtZ21YdXJOSkl5TUMxSlpnQVVXNi03YXdfNzlyUGVDSGh3UWJPWHZ2NEkzRDFCY3M0RkxxSHF1eTRTZGUwd0xTRnBhUnA0U21DUTdzTElJXzRUNm5DX3hjRjllUU5FWVVwemhpWW1wQ3dnSEZxZmg1RUVsQ1l4aGxpX0lXWDFKY29waFhmX2tQN3diWkNlanJkaU1GWVM5WGxJSVhEdGU1Y2RqN3oxMFdqU0h1SkZ4b01RQUFmMnhNNWtMdVBkanhpUGtxTEZCOE9RYkVhSVlSc1ZuVUhPc2hCNF9jSnNnWGk5R1J4TU9jcVZHa2hpTUlFb04xR3BtazRIOU9jMmV2czFnc0dGNlpfVld0Q0ZWZkNjc3ZqVlJYdWVSQzRiYU03UW9iNk1zeV9tZlZPdnhSIn0=",
         },
@@ -171,17 +178,17 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 5,
     category: "Communication",
-    title: "FFIE present at the Promotelec general assembly",
-    excerpt: "FFIE engaged alongside Promotelec...",
+    title: "La FFIE présente à l'assemblée générale de Promotelec",
+    excerpt: "La FFIE engagée aux côtés de Promotelec...",
     body: [
-      "FFIE engaged alongside Promotelec...",
-      "Represented by Jean-Claude Guillot and Philippe Rifaux, FFIE attended the Promotelec General Assembly held on May 27.",
+      "La FFIE engagée aux côtés de Promotelec...",
+      "Représentée par Jean-Claude Guillot et Philippe Rifaux, la FFIE a assisté à l'Assemblée Générale de Promotelec qui s'est tenue le 27 mai.",
       [
         {
-          text: "This AGM is part of an unprecedented sector-wide momentum: the Plan for the Electrification of Uses, presented in April and for which FFIE put forward 8 proposals (",
+          text: "Cette AG s'inscrit dans une dynamique inédite à l'échelle de toute la filière : le Plan pour l'Électrification des Usages, présenté en avril et pour lequel la FFIE a porté 8 propositions (",
         },
         {
-          text: "download the electrification plan",
+          text: "télécharger le plan d'électrification",
           link: true,
           url: "https://www.ffie.fr/les-documents-de-la-ffie/detail?tx_ffiedoc_document%5Baction%5D=show&tx_ffiedoc_document%5Bcontroller%5D=Document&tx_ffiedoc_document%5Bdocument%5D=1484&cHash=597a013aa0fd74421cbbc0d4543c3359",
         },
@@ -189,10 +196,10 @@ const ARTICLES_RAW: Article[] = [
       ],
       [
         {
-          text: "In addition, and alongside Promotelec, FFIE is also engaged in promoting electricity and electrical safety (",
+          text: "Par ailleurs, et aux côtés de Promotelec, la FFIE est également engagée dans la promotion de l'électricité et de la sécurité électrique (",
         },
         {
-          text: "download the fact sheet on electrical safety",
+          text: "télécharger la fiche sur la sécurité électrique",
           link: true,
           url: "https://www.ffie.fr/les-documents-de-la-ffie/detail?tx_ffiedoc_document%5Baction%5D=show&tx_ffiedoc_document%5Bcontroller%5D=Document&tx_ffiedoc_document%5Bdocument%5D=1471&cHash=3eea20b0f9b6af15a86243538583bd7e",
         },
@@ -204,15 +211,15 @@ const ARTICLES_RAW: Article[] = [
     readMinutes: 3,
     memberOnly: false,
     imageUrl: "https://www.ffie.fr/fileadmin/user_upload/ELECTRIFICATION_WEB.png",
-    // The two FFIE documents referenced inline above, as attached documents.
+    // Les deux documents FFIE référencés plus haut dans le texte, comme documents joints.
     attachments: [
       {
-        label: "Plan for the Electrification of Uses",
+        label: "Plan pour l'Électrification des Usages",
         url: "https://www.ffie.fr/les-documents-de-la-ffie/detail?tx_ffiedoc_document%5Baction%5D=show&tx_ffiedoc_document%5Bcontroller%5D=Document&tx_ffiedoc_document%5Bdocument%5D=1484&cHash=597a013aa0fd74421cbbc0d4543c3359",
         kind: "doc",
       },
       {
-        label: "Fact sheet — electrical safety",
+        label: "Fiche — sécurité électrique",
         url: "https://www.ffie.fr/les-documents-de-la-ffie/detail?tx_ffiedoc_document%5Baction%5D=show&tx_ffiedoc_document%5Bcontroller%5D=Document&tx_ffiedoc_document%5Bdocument%5D=1471&cHash=3eea20b0f9b6af15a86243538583bd7e",
         kind: "doc",
       },
@@ -221,18 +228,18 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 6,
     category: "Economical",
-    title: "FFIE economic survey",
-    excerpt: "Take 5 minutes to answer the questionnaire!",
+    title: "Enquête économique FFIE",
+    excerpt: "Prenez 5 minutes pour répondre au questionnaire !",
     body: [
-      "Take 5 minutes to answer the questionnaire!",
-      "We need you to feed FFIE's economic barometer, in place since January 2026.",
-      "We are preparing the update of the data collected for Q2, and the survey of members is essential to capture market trends.",
-      "Without your strong participation in this questionnaire, the barometer will not reflect the reality on the ground.",
-      "We're counting on you!",
-      "Respond via the link below",
+      "Prenez 5 minutes pour répondre au questionnaire !",
+      "Nous avons besoin de vous pour alimenter le baromètre économique de la FFIE, en place depuis janvier 2026.",
+      "Nous préparons la mise à jour des données collectées pour le 2e trimestre, et l'enquête auprès des adhérents est essentielle pour saisir les tendances du marché.",
+      "Sans votre forte participation à ce questionnaire, le baromètre ne reflétera pas la réalité du terrain.",
+      "Nous comptons sur vous !",
+      "Répondez via le lien ci-dessous",
       [
         {
-          text: "FFIE 2026 MAJOR SURVEY Take part in the economic barometer! (2) – Fill out the form",
+          text: "GRANDE ENQUÊTE FFIE 2026 Participez au baromètre économique ! (2) – Remplir le formulaire",
           link: true,
           url: "https://forms.office.com/e/zpy1zNx3HF",
         },
@@ -247,14 +254,14 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 7,
     category: "Economical",
-    title: "BT47 and copper indices: new trends",
-    excerpt: "Tracking the indicators: BT 47 index and copper index",
+    title: "Indices BT47 et cuivre : nouvelles tendances",
+    excerpt: "Suivi des indicateurs : indice BT 47 et indice cuivre",
     body: [
-      "Tracking the indicators: BT 47 index and copper index",
-      "The March BT 47 index has just been published in the Official Journal. It stands at 132.5, up 0.4 points from last month (132.1). Over the trailing 12 months, the rise is confirmed at +3.75%.",
-      "The copper index confirms its stabilization after a very sharp rise in recent months. For the month of March, it stands at 190.4 and records a 2nd consecutive decline since February. However, over the trailing 12 months, it rises sharply by more than 20%.",
-      "The trends of these 2 indices will be detailed in FFIE's economic barometer for Q2.",
-      "Track the trend of the BT47 and copper indicators:",
+      "Suivi des indicateurs : indice BT 47 et indice cuivre",
+      "L'indice BT 47 de mars vient de paraître au Journal officiel. Il s'établit à 132,5, en hausse de 0,4 point par rapport au mois dernier (132,1). Sur les 12 derniers mois, la hausse se confirme à +3,75 %.",
+      "L'indice cuivre confirme sa stabilisation après une très forte hausse ces derniers mois. Pour le mois de mars, il s'établit à 190,4 et enregistre une 2e baisse consécutive depuis février. Toutefois, sur les 12 derniers mois, il progresse fortement de plus de 20 %.",
+      "Les tendances de ces 2 indices seront détaillées dans le baromètre économique de la FFIE du 2e trimestre.",
+      "Suivez l'évolution des indicateurs BT47 et cuivre :",
       [
         {
           text: "https://www.insee.fr/fr/statistiques/serie/001710979",
@@ -279,19 +286,19 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 8,
     category: "Communication",
-    title: "Heading to Toulouse with FFIE!",
-    excerpt: "Regional meeting, register now!",
+    title: "Direction Toulouse avec la FFIE !",
+    excerpt: "Rencontre régionale, inscrivez-vous dès maintenant !",
     body: [
-      "Regional meeting, register now!",
-      "The next FFIE regional meeting will take place in Toulouse on June 4.",
-      "On the program, starting at 9:30 AM:",
-      "• Welcome by FFIE President Pascal Toggenburger and regional delegate Bertrand Desplats\n• Presentations by our partners Citel and Schneider Electric\n• Low-voltage systems in connected buildings by Adel Guediri, FFIE engineer\n• Presentations by our partners Milwaukee and Sonepar\n• FFIE news, services and tools.",
-      "At the end of the morning, participants will gather for a lunch reception to continue the discussions.",
-      "View the program:",
+      "Rencontre régionale, inscrivez-vous dès maintenant !",
+      "La prochaine rencontre régionale FFIE aura lieu à Toulouse le 4 juin.",
+      "Au programme, à partir de 9h30 :",
+      "• Accueil par le président de la FFIE Pascal Toggenburger et le délégué régional Bertrand Desplats\n• Présentations de nos partenaires Citel et Schneider Electric\n• Les courants faibles dans les bâtiments connectés par Adel Guediri, ingénieur FFIE\n• Présentations de nos partenaires Milwaukee et Sonepar\n• Actualités, services et outils de la FFIE.",
+      "À l'issue de la matinée, les participants se retrouveront autour d'un cocktail déjeunatoire pour poursuivre les échanges.",
+      "Voir le programme :",
       [
-        { text: "To register for this free morning session: " },
+        { text: "Pour vous inscrire à cette matinée gratuite : " },
         {
-          text: "FFIE OCCITANIE regional meeting – Fill out the form",
+          text: "Rencontre régionale FFIE OCCITANIE – Remplir le formulaire",
           link: true,
           url: "https://forms.office.com/e/M33WgFrPzK",
         },
@@ -306,18 +313,18 @@ const ARTICLES_RAW: Article[] = [
   {
     id: 9,
     category: "Training",
-    title: "Take part in the next Formapelec webinar!",
-    excerpt: "Live low-voltage work (TST BT): the latest news!",
+    title: "Participez au prochain webinaire Formapelec !",
+    excerpt: "Travaux sous tension basse tension (TST BT) : les dernières nouveautés !",
     body: [
-      "Live low-voltage work (TST BT): the latest news!",
-      "Formapelec invites you to take part in its webinar dedicated to the 2026 updates and the new TST BT training track",
-      "Formapelec is holding its last webinar before summer on Tuesday, June 9 from 10:00 AM to 11:30 AM.",
-      "On the program:",
-      "✔ Updates to the training\n✔ The new TST BT training track\n✔ Discussions with our experts",
+      "Travaux sous tension basse tension (TST BT) : les dernières nouveautés !",
+      "Formapelec vous invite à participer à son webinaire dédié aux mises à jour 2026 et au nouveau cursus de formation TST BT",
+      "Formapelec tient son dernier webinaire avant l'été le mardi 9 juin de 10h00 à 11h30.",
+      "Au programme :",
+      "✔ Mises à jour de la formation\n✔ Le nouveau cursus de formation TST BT\n✔ Échanges avec nos experts",
       [
-        { text: "To register: " },
+        { text: "Pour vous inscrire : " },
         {
-          text: "WEBINAR on June 9 from 10:00 AM to 11:30 AM",
+          text: "WEBINAIRE le 9 juin de 10h00 à 11h30",
           link: true,
           url: "https://mibc-fr-05.mailinblack.com/securelink/?url=https://docs.google.com&key=eyJsYW5nIjoiRlIiLCJ1cmwiOiJodHRwczovL2RvY3MuZ29vZ2xlLmNvbS9mb3Jtcy9kL2UvMUZBSXBRTFNlQms0eGp5andjU0h5WklJWi0wWFJ1eEIyVUppYm9zZENWZlI1LXNudmstZmdkd1Evdmlld2Zvcm0_cGxpPTEiLCJ0b2tlbiI6ImdBQUFBQUJxREFlSmQwaGE5anJQWVVfYVBqbkFlUTFkbFRVRzZjbjhUbEx4b0R5cEhLd1pZU1I5WlNPY3Z3UVBSVjhMY3BmN1NRYUdadVJvWG9VZ0NBSU1PcF9sWk5VLUZ1bHRaeldCX3ZUXzNES204TTJKUDlXYnRPYklUcWYtWEhuQm54QVRZbVhTRlkyanNrWWNoOGZHU0JxaV9pb3p5OHByZzJMNmpLVEZvdllkNlV2MWxyN1pWMl9JMlYzS1ZBNm1ZSnhkNXdEdTVwVlhaVW9uV3VveC1lM2pDYnBuSlJzYkxqMVlyWXhQalZyWTVHWVZQNUhjaWVaMjQ3VmNaRTVxbDZIU1Y3WFo5dU90SnVtZG5lSGFwelpWcTZkZlpRTkdPdmFCVjVVUFl2LTlURDU1UmpidWxqcU5xVU5sT213Y0xQMlJqZ0EzIn0=",
         },
@@ -331,12 +338,13 @@ const ARTICLES_RAW: Article[] = [
   },
 ];
 
-// Feed order is strictly reverse-chronological — NEWS-01's "content is displayed
-// chronologically". Sorting on isoDate (yyyy-mm-dd sorts lexicographically =
-// chronologically) means the hero is always the most recent article, never a
-// hand-picked entry. The sort is stable in Hermes/V8, so same-day articles keep
-// their source order. Consumers (hero = ARTICLES[0], grid = slice(1), and the
-// reader's prev/next neighbours) all inherit this order automatically.
+// L'ordre du fil est strictement anté-chronologique — le « contenu est affiché
+// de façon chronologique » de NEWS-01. Trier sur isoDate (aaaa-mm-jj se trie
+// lexicographiquement = chronologiquement) signifie que le hero est toujours
+// l'article le plus récent, jamais une entrée choisie à la main. Le tri est
+// stable dans Hermes/V8, donc les articles d'un même jour conservent leur ordre
+// source. Les consommateurs (hero = ARTICLES[0], grille = slice(1), et les
+// voisins précédent/suivant du lecteur) héritent tous automatiquement de cet ordre.
 export const ARTICLES: Article[] = [...ARTICLES_RAW].sort((a, b) =>
   b.isoDate.localeCompare(a.isoDate),
 );

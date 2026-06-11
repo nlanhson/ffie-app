@@ -1,205 +1,211 @@
-// Content for the Trades tab — "Discover the professions" (WBS Epic 4 /
-// FFIE-TRADES-01). A PUBLIC, no-login section (P6). Scoped STRICTLY to the WBS
-// acceptance criteria:
-//   1. a section for discovering careers in the electrical industry exists;
-//   2. it features CAREER PROFILES  ← the required core (below);
-//   3. it MAY ALSO include educational content + presentation videos
-//      ← the training paths and the real FFIE testimonial films below.
+// Contenu de l'onglet Métiers — « Découvrir les métiers » (WBS Epic 4 /
+// FFIE-TRADES-01). Une section PUBLIQUE, sans connexion (P6). Limitée STRICTEMENT
+// aux critères d'acceptation du WBS :
+//   1. il existe une section pour découvrir les carrières du secteur électrique ;
+//   2. elle présente des FICHES MÉTIER  ← le cœur requis (ci-dessous) ;
+//   3. elle PEUT AUSSI inclure du contenu pédagogique + des vidéos de présentation
+//      ← les parcours de formation et les véritables films de témoignages FFIE ci-dessous.
 //
-// Deliberately NOT included (beyond the WBS / would be fabricated real-world
-// data per CLAUDE.md): salary figures, invented named testimonials. Authentic
-// practitioner voices come from FFIE's own presentation videos instead.
+// Volontairement NON inclus (au-delà du WBS / serait une donnée fabriquée du
+// monde réel selon CLAUDE.md) : les chiffres de salaire, les témoignages nommés
+// inventés. Les voix authentiques de praticiens proviennent à la place des
+// propres vidéos de présentation de la FFIE.
 //
-// Job descriptions are MOCK editorial writing about real electrical trades.
-// Imagery is PLACEHOLDER — electrical-field photos via LoremFlickr keywords
-// (the `tradeImage` helper below), so the stand-ins look like the trade rather
-// than random stock. Production swaps them for real FFIE photos, and each
-// `imageAlt` is the contract the real photo must meet (P7 representation:
-// women, people of colour, a range of ages and contexts).
+// Les descriptions de poste sont une rédaction éditoriale FICTIVE portant sur de
+// vrais métiers de l'électricité. L'imagerie est un ESPACE RÉSERVÉ — des photos
+// du secteur électrique via des mots-clés LoremFlickr (l'assistant `tradeImage`
+// ci-dessous), pour que les images de remplacement ressemblent au métier plutôt
+// qu'à du stock aléatoire. La production les remplace par de vraies photos FFIE,
+// et chaque `imageAlt` est le contrat que la vraie photo doit respecter
+// (représentation P7 : femmes, personnes racisées, diversité d'âges et de
+// contextes).
 
 export type Profession = {
   id: string;
-  /** The job title — the "career profile" the WBS requires. */
+  /** L'intitulé du poste — la « fiche métier » exigée par le WBS. */
   role: string;
-  /** Specialization area, shown as a chip. */
+  /** Domaine de spécialisation, affiché sous forme de chip. */
   domain: string;
-  /** One-line hook. */
+  /** Accroche d'une ligne. */
   tagline: string;
-  /** Electrical-field placeholder keywords (LoremFlickr) + a stable lock so the
-   *  image doesn't change on reload. */
+  /** Mots-clés d'espace réservé du secteur électrique (LoremFlickr) + un verrou
+   *  stable pour que l'image ne change pas au rechargement. */
   imageKeywords: string;
   imageLock: number;
   imageAlt: string;
-  /** 2–3 sentence intro to the job. */
+  /** Présentation du métier en 2 à 3 phrases. */
   summary: string;
-  /** "What you'd do" — concrete day-to-day activities. */
+  /** « Ce que tu ferais » — les activités concrètes du quotidien. */
   dayInLife: string[];
-  /** Skill chips. */
+  /** Chips de compétences. */
   skills: string[];
-  /** How you'd train into it (real French qualifications). */
+  /** Comment s'y former (vraies qualifications françaises). */
   pathIn: string;
 };
 
 export const PROFESSIONS_INTRO =
-  "Electricity isn't one job — it's a whole field. From wiring a home to installing the chargers a city runs on, here are the people who make it work, what their days actually look like, and how you'd get there. No account needed.";
+  "L'électricité n'est pas un seul métier — c'est tout un secteur. Du câblage d'une maison à l'installation des bornes dont une ville dépend, voici les personnes qui font tourner tout ça, à quoi ressemblent vraiment leurs journées, et comment y arriver. Aucun compte nécessaire.";
 
-// The film that leads the section (the WBS's "presentation videos"; a real FFIE
-// video — see data/videos.ts).
+// Le film qui ouvre la section (les « vidéos de présentation » du WBS ; une vraie
+// vidéo FFIE — voir data/videos.ts).
 export const HERO_VIDEO_ID = "4jQJT9gOluo";
 
-// Electrical-field placeholder imagery. LoremFlickr returns a real Flickr photo
-// matching the keywords (so placeholders look like the trade, not random
-// stock); `lock` keeps each image stable across reloads. PLACEHOLDER only —
-// production swaps these for real FFIE photography.
+// Imagerie d'espace réservé du secteur électrique. LoremFlickr renvoie une vraie
+// photo Flickr correspondant aux mots-clés (pour que les espaces réservés
+// ressemblent au métier, pas à du stock aléatoire) ; `lock` garde chaque image
+// stable au fil des rechargements. ESPACE RÉSERVÉ uniquement — la production les
+// remplace par de vraies photographies FFIE.
 export const tradeImage = (keywords: string, lock: number, w = 640, h = 480) =>
   `https://loremflickr.com/${w}/${h}/${encodeURIComponent(keywords)}?lock=${lock}`;
 
-// The hero image above the role list.
+// L'image hero au-dessus de la liste des métiers.
 export const HERO_IMAGE_KEYWORDS = "electrician,electrical";
 export const HERO_IMAGE_LOCK = 7;
 
 export const PROFESSIONS: Profession[] = [
   {
     id: "building-electrician",
-    role: "Building electrician",
-    domain: "Buildings & housing",
-    tagline: "Bring power and light to the places people live and work.",
+    role: "Électricien du bâtiment",
+    domain: "Bâtiment & logement",
+    tagline: "Apportez le courant et la lumière aux lieux où l'on vit et travaille.",
     imageKeywords: "electrician,wiring",
     imageLock: 11,
-    imageAlt: "A young woman electrician fitting a consumer unit on a building site",
+    imageAlt: "Une jeune électricienne posant un tableau électrique sur un chantier",
     summary:
-      "The trade most people picture — and the foundation of every other one here. You take a building from bare walls to a working, certified installation, then hand it over to the people who'll rely on it every day.",
+      "Le métier que la plupart des gens imaginent — et le socle de tous les autres présentés ici. Vous menez un bâtiment de murs bruts à une installation fonctionnelle et certifiée, puis vous la remettez à celles et ceux qui en dépendront chaque jour.",
     dayInLife: [
-      "Read the plans and mark out where cables, points and panels go",
-      "Run and connect the circuits — lighting, sockets, heating, the consumer unit",
-      "Test the installation and bring it up to NF C 15-100",
-      "Walk the client through it and sign off the handover",
+      "Lire les plans et repérer l'emplacement des câbles, points et tableaux",
+      "Tirer et raccorder les circuits — éclairage, prises, chauffage, tableau électrique",
+      "Tester l'installation et la mettre en conformité avec la NF C 15-100",
+      "Faire le tour de l'installation avec le client et valider la réception",
     ],
-    skills: ["Wiring & circuits", "NF C 15-100", "Reading plans", "Electrical safety", "Client handover"],
+    skills: ["Câblage & circuits", "NF C 15-100", "Lecture de plans", "Sécurité électrique", "Réception client"],
     pathIn:
-      "A CAP Électricien (2 yrs) puts you on site fast; a Bac Pro MELEC (3 yrs) opens more responsibility sooner.",
+      "Un CAP Électricien (2 ans) vous met vite sur le chantier ; un Bac Pro MELEC (3 ans) ouvre plus tôt davantage de responsabilités.",
   },
   {
     id: "integrator",
-    role: "Electrical integrator",
-    domain: "Systems integration",
-    tagline: "Tie lighting, heating, security and networks into one system that simply works.",
+    role: "Intégrateur électrique",
+    domain: "Intégration de systèmes",
+    tagline: "Reliez éclairage, chauffage, sécurité et réseaux en un seul système qui fonctionne tout simplement.",
     imageKeywords: "electrical,panel",
     imageLock: 12,
-    imageAlt: "An integrator configuring a building-automation control panel",
+    imageAlt: "Un intégrateur configurant une armoire de gestion technique du bâtiment",
     summary:
-      "The signature trade of FFIE's members. You don't just install — you make a building's systems talk to each other, so one rule or one tap controls light, climate, access and energy together.",
+      "Le métier emblématique des adhérents de la FFIE. Vous n'installez pas seulement — vous faites dialoguer les systèmes d'un bâtiment entre eux, pour qu'une seule règle ou un seul geste pilote ensemble la lumière, le climat, les accès et l'énergie.",
     dayInLife: [
-      "Survey a building's systems and scope how they should work as one",
-      "Design the integration — the buses, controllers and logic behind the scenes",
-      "Coordinate with the other trades on site",
-      "Commission, test and fine-tune until the building runs itself",
+      "Étudier les systèmes d'un bâtiment et définir comment ils doivent fonctionner comme un tout",
+      "Concevoir l'intégration — les bus, automates et la logique en coulisses",
+      "Coordonner avec les autres corps de métier sur le chantier",
+      "Mettre en service, tester et affiner jusqu'à ce que le bâtiment se pilote seul",
     ],
-    skills: ["Systems design", "KNX / automation", "Coordination", "Commissioning", "Standards & safety"],
+    skills: ["Conception de systèmes", "KNX / domotique", "Coordination", "Mise en service", "Normes & sécurité"],
     pathIn:
-      "Bac Pro MELEC then a BTS Électrotechnique is the classic route — integration rewards people who keep learning.",
+      "Bac Pro MELEC puis BTS Électrotechnique est la voie classique — l'intégration récompense celles et ceux qui continuent d'apprendre.",
   },
   {
     id: "smart-building",
-    role: "Smart-building technician",
-    domain: "Connected buildings",
-    tagline: "Make buildings think — light, climate and security that respond on their own.",
+    role: "Technicien bâtiment intelligent",
+    domain: "Bâtiments connectés",
+    tagline: "Rendez les bâtiments intelligents — lumière, climat et sécurité qui réagissent d'eux-mêmes.",
     imageKeywords: "electrician,installation",
     imageLock: 13,
-    imageAlt: "A technician programming a smart-building controller from a tablet",
+    imageAlt: "Un technicien programmant un automate de bâtiment intelligent depuis une tablette",
     summary:
-      "You turn ordinary rooms into spaces that sense and react: lights that follow people, heating that learns the week, alerts that reach a phone. Part electrician, part programmer.",
+      "Vous transformez des pièces ordinaires en espaces qui perçoivent et réagissent : des lumières qui suivent les personnes, un chauffage qui apprend la semaine, des alertes qui arrivent sur un téléphone. Mi-électricien, mi-programmeur.",
     dayInLife: [
-      "Fit sensors, controllers and connected devices",
-      "Program the scenarios — 'away', 'evening', 'alarm'",
-      "Connect it all to the building's network and the owner's phone",
-      "Test every path and teach the client how to use it",
+      "Poser capteurs, automates et appareils connectés",
+      "Programmer les scénarios — « absence », « soirée », « alarme »",
+      "Relier le tout au réseau du bâtiment et au téléphone du propriétaire",
+      "Tester chaque chemin et apprendre au client à s'en servir",
     ],
-    skills: ["KNX / automation", "Sensors & actuators", "Scenario logic", "Networking", "Troubleshooting"],
+    skills: ["KNX / domotique", "Capteurs & actionneurs", "Logique de scénarios", "Réseaux", "Diagnostic de pannes"],
     pathIn:
-      "Bac Pro MELEC with a taste for IT, or a BTS — automation is where electrics meets code.",
+      "Bac Pro MELEC avec un goût pour l'informatique, ou un BTS — la domotique, c'est là où l'électricité rencontre le code.",
   },
   {
     id: "ev-charging",
-    role: "EV-charging installer",
-    domain: "Energy transition",
-    tagline: "Build the charging network the country's electric cars run on.",
+    role: "Installateur de bornes de recharge",
+    domain: "Transition énergétique",
+    tagline: "Bâtissez le réseau de recharge dont roulent les voitures électriques du pays.",
     imageKeywords: "electric,charging,station",
     imageLock: 14,
-    imageAlt: "A technician installing an EV charge point in a car park",
+    imageAlt: "Un technicien installant une borne de recharge dans un parking",
     summary:
-      "Every electric car needs somewhere to charge — homes, car parks, motorways. You install and connect the points, and make sure the building's power can actually handle them.",
+      "Chaque voiture électrique a besoin d'un endroit où se recharger — domiciles, parkings, autoroutes. Vous installez et raccordez les bornes, et vous vous assurez que la puissance du bâtiment peut réellement les supporter.",
     dayInLife: [
-      "Assess a site's power and where the chargers can go",
-      "Install the charge points and their protection",
-      "Set up load management so the grid connection copes",
-      "Test, certify and commission each point",
+      "Évaluer la puissance d'un site et où les bornes peuvent être posées",
+      "Installer les bornes de recharge et leur protection",
+      "Mettre en place la gestion de charge pour que le raccordement au réseau tienne",
+      "Tester, certifier et mettre en service chaque borne",
     ],
-    skills: ["IRVE qualification", "Load management", "Power & protection", "Testing", "Energy metering"],
+    skills: ["Qualification IRVE", "Gestion de charge", "Puissance & protection", "Tests", "Comptage d'énergie"],
     pathIn:
-      "Start as an electrician, then add the IRVE qualification — demand is outrunning the people trained for it.",
+      "Commencez comme électricien, puis ajoutez la qualification IRVE — la demande dépasse le nombre de personnes formées.",
   },
   {
     id: "solar-pv",
-    role: "Photovoltaic technician",
-    domain: "Energy transition",
-    tagline: "Turn rooftops into power stations.",
+    role: "Technicien photovoltaïque",
+    domain: "Transition énergétique",
+    tagline: "Transformez les toitures en centrales électriques.",
     imageKeywords: "solar,panel",
     imageLock: 15,
-    imageAlt: "A young woman installing solar panels on a roof",
+    imageAlt: "Une jeune femme installant des panneaux solaires sur un toit",
     summary:
-      "You put the panels up, wire them in, and connect them to the building or the grid — so a roof that used to do nothing now generates real power.",
+      "Vous posez les panneaux, les câblez et les raccordez au bâtiment ou au réseau — pour qu'un toit qui ne faisait rien produise désormais une véritable énergie.",
     dayInLife: [
-      "Size the array for the roof and the demand",
-      "Mount the panels safely and run the DC wiring",
-      "Fit the inverters and protection",
-      "Connect to the grid and verify the output",
+      "Dimensionner le champ de panneaux selon le toit et les besoins",
+      "Monter les panneaux en sécurité et tirer le câblage continu (DC)",
+      "Poser les onduleurs et la protection",
+      "Raccorder au réseau et vérifier la production",
     ],
-    skills: ["PV sizing", "Inverters", "Work-at-height safety", "Grid connection", "Metering"],
+    skills: ["Dimensionnement PV", "Onduleurs", "Sécurité du travail en hauteur", "Raccordement réseau", "Comptage"],
     pathIn:
-      "An electrical CAP or Bac Pro plus PV-specific training — the energy transition is the fastest-growing corner of the trade.",
+      "Un CAP ou un Bac Pro électrique plus une formation spécifique au PV — la transition énergétique est le secteur du métier qui croît le plus vite.",
   },
   {
     id: "networks",
-    role: "Networks & low-voltage technician",
-    domain: "Communication networks",
-    tagline: "Wire the data, fibre and security a modern site depends on.",
+    role: "Technicien réseaux & courants faibles",
+    domain: "Réseaux de communication",
+    tagline: "Câblez les données, la fibre et la sécurité dont dépend un site moderne.",
     imageKeywords: "cable,network",
     imageLock: 16,
-    imageAlt: "A technician terminating fibre-optic cabling in a comms cabinet",
+    imageAlt: "Un technicien raccordant du câblage fibre optique dans une baie de brassage",
     summary:
-      "Beyond power, every building runs on low-voltage systems — data, fibre, cameras, access control. You install the nervous system the rest of the building talks over.",
+      "Au-delà du courant, chaque bâtiment fonctionne grâce aux courants faibles — données, fibre, caméras, contrôle d'accès. Vous installez le système nerveux par lequel communique le reste du bâtiment.",
     dayInLife: [
-      "Pull the structured cabling and fibre runs",
-      "Fit and connect cameras, access control and intercoms",
-      "Label, test and certify every link",
-      "Document the network for whoever maintains it",
+      "Tirer le câblage structuré et les liaisons fibre",
+      "Poser et raccorder caméras, contrôle d'accès et interphones",
+      "Étiqueter, tester et certifier chaque liaison",
+      "Documenter le réseau pour celles et ceux qui le maintiendront",
     ],
-    skills: ["Structured cabling", "Fibre optics", "CCTV & access control", "Certification", "Documentation"],
+    skills: ["Câblage structuré", "Fibre optique", "Vidéosurveillance & contrôle d'accès", "Certification", "Documentation"],
     pathIn:
-      "Bac Pro MELEC or a low-current specialisation — precise, methodical people thrive here.",
+      "Bac Pro MELEC ou une spécialisation en courants faibles — les personnes précises et méthodiques s'y épanouissent.",
   },
 ];
 
-// Optional educational content (WBS AC #3 "may also include"): the routes in.
-// All real French qualifications (the same ones the existing trades data uses).
+// Contenu pédagogique optionnel (WBS AC #3 « peut aussi inclure ») : les voies
+// d'accès. Toutes de vraies qualifications françaises (les mêmes que celles
+// utilisées par les données métiers existantes).
 export type TrainingPath = { id: string; label: string; level: string; note: string };
 
 export const TRAINING_PATHS: TrainingPath[] = [
-  { id: "cap", label: "CAP Électricien", level: "2 yrs · from age 15", note: "The fastest route onto a site." },
-  { id: "bac", label: "Bac Pro MELEC", level: "3 yrs", note: "The backbone qualification of the trade." },
-  { id: "bts", label: "BTS Électrotechnique", level: "+2 yrs", note: "Toward design, supervision and team lead." },
-  { id: "but", label: "BUT Génie Électrique", level: "+3 yrs", note: "Engineering-track integration roles." },
+  { id: "cap", label: "CAP Électricien", level: "2 ans · dès 15 ans", note: "La voie la plus rapide vers le chantier." },
+  { id: "bac", label: "Bac Pro MELEC", level: "3 ans", note: "La qualification de référence du métier." },
+  { id: "bts", label: "BTS Électrotechnique", level: "+2 ans", note: "Vers la conception, l'encadrement et le chef d'équipe." },
+  { id: "but", label: "BUT Génie Électrique", level: "+3 ans", note: "Des postes d'intégration en filière ingénierie." },
 ];
 
-// Optional presentation videos (WBS AC #3): real FFIE field testimonials — the
-// same youtube IDs and names the Videos section uses (see data/videos.ts), so
-// the voices are authentic, not invented.
+// Vidéos de présentation optionnelles (WBS AC #3) : de vrais témoignages de
+// terrain FFIE — les mêmes identifiants YouTube et noms que ceux utilisés par la
+// section Vidéos (voir data/videos.ts), pour que les voix soient authentiques et
+// non inventées.
 export type ProfessionVideo = { youtubeId: string; name: string; role: string };
 
 export const PROFESSION_VIDEOS: ProfessionVideo[] = [
-  { youtubeId: "zKP5j27P1Ng", name: "Florian Saliou", role: "Calasys employee" },
-  { youtubeId: "hyo0hi0OWbc", name: "Youssef Bendouche", role: "CESI apprentice" },
-  { youtubeId: "Hk0Ah__hoig", name: "Bamba Losseny", role: "CFA Delépine apprentice" },
-  { youtubeId: "D3bFUpwXo4U", name: "Travis Lombert", role: "Young Calasys employee" },
+  { youtubeId: "zKP5j27P1Ng", name: "Florian Saliou", role: "Salarié de Calasys" },
+  { youtubeId: "hyo0hi0OWbc", name: "Youssef Bendouche", role: "Apprenti CESI" },
+  { youtubeId: "Hk0Ah__hoig", name: "Bamba Losseny", role: "Apprenti CFA Delépine" },
+  { youtubeId: "D3bFUpwXo4U", name: "Travis Lombert", role: "Jeune salarié de Calasys" },
 ];

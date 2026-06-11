@@ -1,10 +1,11 @@
-// Pagination — bottom-of-list page indicator with prev/next arrows, a centred
-// window of page numbers, and dotted gaps where pages are skipped. Extracted
-// from the News feed so every paged list (News, Library) shares one look and
-// one behaviour — the same reason FilterControls was extracted from Library.
+// Pagination — indicateur de page en bas de liste avec des flèches préc./suiv., une
+// fenêtre centrée de numéros de page, et des écarts en pointillés là où des pages sont
+// sautées. Extrait du fil d'Actualités pour que chaque liste paginée (Actualités,
+// Bibliothèque) partage un même aspect et un même comportement — la même raison pour
+// laquelle FilterControls a été extrait de la Bibliothèque.
 //
-// Tapping a number or an arrow calls back with the target page; the component
-// is controlled (the caller owns `page` and re-renders the list).
+// Appuyer sur un numéro ou une flèche rappelle avec la page cible ; le composant est
+// contrôlé (l'appelant possède `page` et réaffiche la liste).
 
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -13,10 +14,10 @@ import { themes, type ThemeName } from "@tokens";
 import { ralewayFamily } from "@/theme/fonts";
 import { GUTTER } from "@/components/ui/ios";
 
-// Build the page-indicator tokens: always the first and last page, a 3-wide
-// window centred on the current page (shifted inward at the edges so it stays
-// 3 numbers), and "gap" markers (unique strings, for React keys) wherever a
-// run of pages is skipped. Returns e.g. [1,"gap-1",6,7,8,"gap-8",130] for page 7.
+// Construit les jetons de l'indicateur de page : toujours la première et la dernière page,
+// une fenêtre large de 3 centrée sur la page courante (décalée vers l'intérieur aux bords
+// pour rester à 3 numéros), et des marqueurs « gap » (chaînes uniques, pour les clés React)
+// partout où une série de pages est sautée. Renvoie par ex. [1,"gap-1",6,7,8,"gap-8",130] pour la page 7.
 export function buildPageTokens(page: number, total: number): (number | string)[] {
   if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
 
@@ -64,10 +65,10 @@ export function Pagination({
   const atStart = page <= 1;
   const atEnd = page >= totalPages;
 
-  // Tokens to render: the first page, a 3-wide window centred on the current
-  // page (shifted inward at the edges), the last page, and dotted gaps where
-  // numbers are skipped. e.g. page 7 → 1 … 6 7 8 … 130; page 1 → 1 2 3 … 130.
-  // String tokens are gap markers (kept unique per position for React keys).
+  // Jetons à rendre : la première page, une fenêtre large de 3 centrée sur la page
+  // courante (décalée vers l'intérieur aux bords), la dernière page, et des écarts en
+  // pointillés là où des numéros sont sautés. par ex. page 7 → 1 … 6 7 8 … 130 ; page 1 → 1 2 3 … 130.
+  // Les jetons de type chaîne sont des marqueurs d'écart (gardés uniques par position pour les clés React).
   const tokens = buildPageTokens(page, totalPages);
 
   const Arrow = ({
@@ -83,7 +84,7 @@ export function Pagination({
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={dir === "left" ? "Previous page" : "Next page"}
+        accessibilityLabel={dir === "left" ? "Page précédente" : "Page suivante"}
         accessibilityState={{ disabled }}
         disabled={disabled}
         onPress={onPress}
@@ -121,7 +122,7 @@ export function Pagination({
       <View style={{ flexDirection: "row", alignItems: "center", columnGap: 6 }}>
         {tokens.map((tok) => {
           if (typeof tok === "string") {
-            // Dotted gap (ellipsis) where a run of pages is skipped.
+            // Écart en pointillés (points de suspension) là où une série de pages est sautée.
             return (
               <Text
                 key={tok}

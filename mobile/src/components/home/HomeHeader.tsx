@@ -1,24 +1,29 @@
-// HomeHeader — the navy "hero" header at the top of the Home tab.
+// HomeHeader — l'en-tête « héros » marine en haut de l'onglet Accueil.
 //
-// A deep-navy brand surface that bleeds up behind the status bar and carries:
-//   - the FFIE lockup on the left — the logo chip plus a greeting beside it
-//     ("Welcome" for members, "Welcome to the FFIE" for guests)
-//   - top-right actions (notifications + profile) as plain icon buttons
-//   - a greeting + identity block:
-//       · member → "Hello," + name + an "Active member · No. ____" pill,
-//         the whole block tappable to open Profile
-//       · guest  → the welcome greeting sits beside the logo (above), so the
-//         block below is just the subtitle + a "Join the FFIE" pill
+// Une surface de marque bleu marine profond qui remonte derrière la barre
+// d'état et porte :
+//   - le bloc-marque FFIE à gauche — la pastille du logo et un message d'accueil
+//     à côté (« Bienvenue » pour les adhérents, « Bienvenue à la FFIE » pour les
+//     invités)
+//   - les actions en haut à droite (notifications + profil) sous forme de simples
+//     boutons icône
+//   - un bloc d'accueil + identité :
+//       · adhérent → « Bonjour, » + nom + une pastille « Adhérent actif · N° ____ »,
+//         tout le bloc étant cliquable pour ouvrir le Profil
+//       · invité   → le message d'accueil se place à côté du logo (ci-dessus), si
+//         bien que le bloc en dessous n'est que le sous-titre + une pastille
+//         « Adhérer à la FFIE »
 //
-// This is a fixed brand surface, not a theme surface: the background is always
-// FFIE institutional navy (brand.navy[700]) with white / teal on-colors, the
-// same way FFIELogo treats brand colors as constants. Only the page content
-// *below* the header follows the active theme.
+// C'est une surface de marque fixe, pas une surface de thème : le fond est
+// toujours le marine institutionnel FFIE (brand.navy[700]) avec des couleurs de
+// premier plan blanc / sarcelle, de la même façon que FFIELogo traite les
+// couleurs de marque comme des constantes. Seul le contenu de la page *sous*
+// l'en-tête suit le thème actif.
 //
-// Static by design — no entrance motion. The tab's skeleton→content swap
-// (TabSkeletonGate) already covers the load transition, so animating the
-// header on every Home visit would be motion for its own sake (see
-// emil-design-eng: when *not* to animate).
+// Statique par choix — aucune animation d'entrée. La bascule squelette→contenu
+// de l'onglet (TabSkeletonGate) couvre déjà la transition de chargement : animer
+// l'en-tête à chaque visite de l'Accueil serait du mouvement gratuit (voir
+// emil-design-eng : quand *ne pas* animer).
 
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
@@ -36,18 +41,21 @@ import { FFIELogo } from "@/components/ui/FFIELogo";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { type MemberProfile } from "@/data/member";
 
-// --- fixed brand-surface colors (teal hero) -------------------------------
+// --- couleurs de surface de marque fixes (héros sarcelle) -----------------
 const WHITE = primitives.colors.white;
-// Status / join pill: a SOLID light chip with deep-teal text. A white chip with
-// teal[800] text lands ~7:1 (AAA) — stronger emphasis than white-on-teal, and
-// it stays robust no matter how the header teal shifts. (The 13px label is the
-// binding case: small text needs 4.5:1, so the chip carries it, not the teal.)
+// Pastille de statut / adhésion : une pastille claire OPAQUE avec un texte
+// sarcelle foncé. Une pastille blanche avec un texte teal[800] atteint ~7:1
+// (AAA) — une emphase plus forte que blanc-sur-sarcelle, et qui reste robuste
+// quelle que soit la dérive du sarcelle de l'en-tête. (L'étiquette de 13 px est
+// le cas contraignant : le petit texte exige 4,5:1, donc c'est la pastille qui
+// le porte, pas le sarcelle.)
 const PILL_BG = WHITE;
-const PILL_TEXT = primitives.colors.brand.teal[800]; // #045764 — AAA on white
-const PILL_ICON = primitives.colors.brand.teal[700]; // #027489 — reads on white
+const PILL_TEXT = primitives.colors.brand.teal[800]; // #045764 — AAA sur blanc
+const PILL_ICON = primitives.colors.brand.teal[700]; // #027489 — lisible sur blanc
 
-// Translucent overlays derived from token colors (tokens have no alpha
-// variants; this keeps the source values token-driven rather than literal).
+// Voiles translucides dérivés des couleurs de token (les tokens n'ont pas de
+// variantes alpha ; cela garde les valeurs source pilotées par les tokens plutôt
+// que littérales).
 function withAlpha(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.slice(0, 2), 16);
@@ -56,44 +64,47 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const HELLO = withAlpha(WHITE, 0.82); // muted greeting / subtitle on the teal hero
-const PRESS_BG = withAlpha(WHITE, 0.12); // icon-button pressed tint
-const CIRCLE_BG = withAlpha(WHITE, 0.2); // resting fill behind the profile glyph — anchors the right edge at the gutter (mirrors the white logo chip on the left)
+const HELLO = withAlpha(WHITE, 0.82); // message d'accueil / sous-titre atténué sur le héros sarcelle
+const PRESS_BG = withAlpha(WHITE, 0.12); // teinte du bouton icône à l'appui
+const CIRCLE_BG = withAlpha(WHITE, 0.2); // fond au repos derrière le glyphe de profil — ancre le bord droit à la marge (reflet de la pastille blanche du logo à gauche)
 
-// Gap below the safe-area top edge before the brand row. Kept identical to
-// AppHeader's TOP_GAP so the logo sits at the same vertical position on every
-// page — switching between Home and the other tabs shouldn't shift the lockup.
+// Écart sous le bord supérieur de la zone sûre avant la rangée de marque. Gardé
+// identique au TOP_GAP de AppHeader pour que le logo soit à la même position
+// verticale sur chaque page — passer de l'Accueil aux autres onglets ne doit pas
+// décaler le bloc-marque.
 const TOP_GAP = Platform.OS === "android" ? 14 : 12;
 
-// Guest hero: breathing room added on BOTH sides of the subtitle (below the
-// brand row, and above the CTA) on top of the measured chip overhang — so the
-// subtitle clears the logo instead of hugging it, while staying centred.
+// Héros invité : de l'air ajouté des DEUX côtés du sous-titre (sous la rangée de
+// marque, et au-dessus du CTA) en plus du débord mesuré de la pastille — pour
+// que le sous-titre dégage le logo au lieu de le coller, tout en restant centré.
 const GUEST_GAP = 8;
 
-// Logo glyph size inside the white chip. Sized up from the original 20 so the
-// mark is clearly legible on the navy hero (applies to both member + guest).
+// Taille du glyphe du logo dans la pastille blanche. Agrandie depuis les 20
+// d'origine pour que la marque soit nettement lisible sur le héros marine
+// (s'applique aux variantes adhérent et invité).
 const LOGO_SIZE = 42;
 
 export type HomeHeaderProps = {
   themeName?: ThemeName;
-  /** "member" shows the identity + member pill; "guest" shows a join CTA. */
+  /** « member » affiche l'identité + la pastille adhérent ; « guest » affiche un CTA d'adhésion. */
   variant: "member" | "guest";
-  /** Required for the member variant. */
+  /** Requis pour la variante adhérent. */
   member?: MemberProfile;
-  /** Shows the red dot on the bell (member variant only). */
+  /** Affiche le point rouge sur la cloche (variante adhérent uniquement). */
   hasUnread?: boolean;
-  /** Member: open notifications. Omit to hide the bell. */
+  /** Adhérent : ouvrir les notifications. Omettre pour masquer la cloche. */
   onPressNotifications?: () => void;
-  /** Open search. Omit to hide the search button. */
+  /** Ouvrir la recherche. Omettre pour masquer le bouton de recherche. */
   onPressSearch?: () => void;
-  /** Member: tap the identity block → open Profile. */
+  /** Adhérent : toucher le bloc d'identité → ouvrir le Profil. */
   onPressIdentity?: () => void;
-  /** Guest: tap the "Join the FFIE" pill. */
+  /** Invité : toucher la pastille « Adhérer à la FFIE ». */
   onPressJoin?: () => void;
 };
 
-// A plain top-bar icon button (white glyph on the brand surface). hitSlop lifts
-// the 40pt visible disc to a ≥44pt accessible target.
+// Un simple bouton icône de barre supérieure (glyphe blanc sur la surface de
+// marque). hitSlop élargit le disque visible de 40 pt à une cible accessible de
+// ≥ 44 pt.
 function IconButton({
   icon: Icon,
   label,
@@ -105,7 +116,7 @@ function IconButton({
   label: string;
   hint?: string;
   onPress?: () => void;
-  /** Show a resting translucent circle behind the glyph (profile action). */
+  /** Affiche un cercle translucide au repos derrière le glyphe (action profil). */
   filled?: boolean;
 }) {
   return (
@@ -136,16 +147,18 @@ export function HomeHeader({
   onPressIdentity,
   onPressJoin,
 }: HomeHeaderProps) {
-  void themeName; // navy hero is theme-agnostic; prop kept for API symmetry
+  void themeName; // le héros marine ignore le thème ; prop conservée par symétrie d'API
   const insets = useSafeAreaInsets();
   const isMember = variant === "member" && member != null;
 
-  // The logo chip is taller than the greeting text beside it, so the brand row
-  // extends ~half-a-chip below the text baseline. We measure that overhang and
-  // feed it to the guest CTA's top margin, so the subtitle ends up visually
-  // centred between the brand row and the "Join the FFIE" button (equal gaps).
-  // Measuring beats hardcoding because the chip/text heights depend on the font
-  // and platform. Defaults to a sensible value until the first layout pass.
+  // La pastille du logo est plus haute que le texte d'accueil à côté, si bien que
+  // la rangée de marque dépasse d'environ une demi-pastille sous la ligne de base
+  // du texte. On mesure ce débord et on l'injecte dans la marge haute du CTA
+  // invité, pour que le sous-titre se retrouve visuellement centré entre la
+  // rangée de marque et le bouton « Adhérer à la FFIE » (écarts égaux). Mesurer
+  // vaut mieux que coder en dur car les hauteurs pastille/texte dépendent de la
+  // police et de la plateforme. Valeur par défaut raisonnable jusqu'à la première
+  // passe de mise en page.
   const [chipOverhang, setChipOverhang] = React.useState(10);
   const brandH = React.useRef(0);
   const greetingH = React.useRef(0);
@@ -157,7 +170,7 @@ export function HomeHeader({
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + TOP_GAP }]}>
-      {/* Brand lockup + top-right actions */}
+      {/* Bloc-marque + actions en haut à droite */}
       <View style={styles.topRow}>
         <View
           style={styles.brand}
@@ -165,8 +178,9 @@ export function HomeHeader({
             brandH.current = e.nativeEvent.layout.height;
             measureOverhang();
           }}
-          // Member: one "FFIE" label covers the logo + wordmark lockup. Guest:
-          // the logo and the "Welcome" greeting are labelled individually.
+          // Adhérent : une seule étiquette « FFIE » couvre le bloc logo +
+          // logotype. Invité : le logo et le message « Bienvenue » sont
+          // étiquetés séparément.
           accessible={isMember}
           accessibilityRole={isMember ? "image" : undefined}
           accessibilityLabel={isMember ? "FFIE" : undefined}
@@ -180,9 +194,10 @@ export function HomeHeader({
             <FFIELogo size={LOGO_SIZE} themeName="light" />
           </View>
           {isMember ? (
-            // Member: a short "Welcome" beside the logo (replacing the FFIE
-            // wordmark), above the personal "Hello, {name}" line. The lockup is
-            // already labelled "FFIE", so this isn't re-announced.
+            // Adhérent : un bref « Bienvenue » à côté du logo (remplaçant le
+            // logotype FFIE), au-dessus de la ligne personnelle « Bonjour, {nom} ».
+            // Le bloc-marque est déjà étiqueté « FFIE », donc ce n'est pas
+            // ré-annoncé.
             <Text
               style={styles.brandGreeting}
               numberOfLines={1}
@@ -191,11 +206,12 @@ export function HomeHeader({
                 measureOverhang();
               }}
             >
-              Welcome
+              Bienvenue
             </Text>
           ) : (
-            // Guest: the greeting moves up beside the logo (replacing the
-            // wordmark); the block below carries the subtitle + join CTA.
+            // Invité : le message d'accueil remonte à côté du logo (remplaçant le
+            // logotype) ; le bloc en dessous porte le sous-titre + le CTA
+            // d'adhésion.
             <Text
               style={styles.brandGreeting}
               accessibilityRole="header"
@@ -205,20 +221,20 @@ export function HomeHeader({
                 measureOverhang();
               }}
             >
-              Welcome to the FFIE
+              Bienvenue à la FFIE
             </Text>
           )}
         </View>
 
         <View style={styles.actions}>
-          {/* Profile: opens the member's profile (same destination as the
-              tappable identity block below), mirroring AppHeader's profile
-              action. */}
+          {/* Profil : ouvre le profil de l'adhérent (même destination que le bloc
+              d'identité cliquable ci-dessous), à l'image de l'action profil de
+              AppHeader. */}
           {isMember && onPressIdentity ? (
             <IconButton
               icon={User}
-              label="My profile"
-              hint="Opens your profile and settings"
+              label="Mon profil"
+              hint="Ouvre votre profil et vos réglages"
               onPress={onPressIdentity}
               filled
             />
@@ -226,53 +242,54 @@ export function HomeHeader({
         </View>
       </View>
 
-      {/* Identity / greeting */}
+      {/* Identité / message d'accueil */}
       {isMember ? (
         <Pressable
           onPress={onPressIdentity}
           disabled={!onPressIdentity}
           accessibilityRole={onPressIdentity ? "button" : undefined}
-          accessibilityLabel={`${member.fullName}, ${member.statusLabel}, number ${member.memberNo}`}
-          accessibilityHint={onPressIdentity ? "Opens your profile" : undefined}
+          accessibilityLabel={`${member.fullName}, ${member.statusLabel}, numéro ${member.memberNo}`}
+          accessibilityHint={onPressIdentity ? "Ouvre votre profil" : undefined}
           style={({ pressed }) => [
             styles.identity,
             pressed && onPressIdentity ? { opacity: 0.85 } : null,
           ]}
         >
-          <Text style={styles.hello}>Hello,</Text>
+          <Text style={styles.hello}>Bonjour,</Text>
           <Text style={styles.name} numberOfLines={1}>
             {member.fullName}
           </Text>
           <View style={styles.pill}>
             <CheckCircle2 size={14} color={PILL_ICON} />
             <Text style={styles.pillText} numberOfLines={1}>
-              {member.statusLabel} · No. {member.memberNo}
+              {member.statusLabel} · N° {member.memberNo}
             </Text>
           </View>
         </Pressable>
       ) : (
         <View style={[styles.identity, styles.identityGuest]}>
           <Text style={styles.subtitle}>
-            Explore news, resources and member benefits.
+            Explorez les actualités, les ressources et les avantages adhérents.
           </Text>
           {onPressJoin ? (
             <Pressable
               onPress={onPressJoin}
               accessibilityRole="button"
-              accessibilityLabel="Join the FFIE"
-              accessibilityHint="Opens membership information"
+              accessibilityLabel="Adhérer à la FFIE"
+              accessibilityHint="Ouvre les informations d'adhésion"
               style={({ pressed }) => [
                 styles.pill,
-                // Bottom gap = chip overhang + the same breathing offset applied
-                // above the subtitle (identityGuest). So the subtitle is visually
-                // centred between the "Welcome" line and this CTA, while still
-                // clearing the logo chip rather than hugging it.
+                // Écart bas = débord de la pastille + le même décalage d'air
+                // appliqué au-dessus du sous-titre (identityGuest). Ainsi le
+                // sous-titre est visuellement centré entre la ligne « Bienvenue »
+                // et ce CTA, tout en dégageant la pastille du logo plutôt que de
+                // la coller.
                 { marginTop: chipOverhang + GUEST_GAP },
                 pressed ? { opacity: 0.85 } : null,
               ]}
             >
               <UserPlus size={14} color={PILL_ICON} />
-              <Text style={styles.pillText}>Join the FFIE</Text>
+              <Text style={styles.pillText}>Adhérer à la FFIE</Text>
             </Pressable>
           ) : null}
         </View>
@@ -285,35 +302,39 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: HEADER_SURFACE,
     paddingHorizontal: GUTTER,
-    // Bottom margin tuned so the *visible* brand surface below the identity pill
-    // matches AppHeader's 16px bottom margin on every other page. The dashboard
-    // sheet lifts over it by SHEET.lift (12), so 28 - 12 = 16px of visible teal
-    // — keeping the header's bottom spacing consistent app-wide.
+    // Marge basse ajustée pour que la surface de marque *visible* sous la
+    // pastille d'identité corresponde à la marge basse de 16 px de AppHeader sur
+    // toutes les autres pages. La feuille du tableau de bord la recouvre de
+    // SHEET.lift (12), donc 28 - 12 = 16 px de sarcelle visible — l'espacement
+    // bas de l'en-tête reste cohérent dans toute l'app.
     paddingBottom: 28,
   },
   topRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    // Floor sized to comfortably contain the (now larger) logo chip.
+    // Hauteur plancher dimensionnée pour contenir confortablement la pastille du
+    // logo (désormais plus grande).
     minHeight: 44,
   },
   brand: {
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
-    // Let the lockup shrink so the guest greeting truncates before it would
-    // collide with the search button, instead of pushing it off-screen.
+    // Laisse le bloc-marque se rétrécir pour que le message d'accueil invité se
+    // tronque avant d'entrer en collision avec le bouton de recherche, au lieu
+    // de le pousser hors écran.
     flexShrink: 1,
   },
   logoChip: {
     backgroundColor: WHITE,
-    borderRadius: 6, // between radii.sm (4) and radii.md (8) — no exact token
+    borderRadius: 6, // entre radii.sm (4) et radii.md (8) — pas de token exact
     padding: 5,
   },
-  // Greeting beside the logo in the brand row — "Welcome" (member) or
-  // "Welcome to the FFIE" (guest). A phrase, so it uses tighter heading
-  // tracking rather than a wordmark's wide letter spacing.
+  // Message d'accueil à côté du logo dans la rangée de marque — « Bienvenue »
+  // (adhérent) ou « Bienvenue à la FFIE » (invité). Une phrase : elle utilise
+  // donc l'interlettrage resserré d'un titre plutôt que l'interlettrage large
+  // d'un logotype.
   brandGreeting: {
     color: WHITE,
     fontFamily: displayFamily("700"),
@@ -326,9 +347,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 2,
-    // No negative margin: the trailing action is a filled circle, so its outer
-    // edge should line up with the page gutter — mirroring the logo chip on the
-    // left — for symmetric left/right padding.
+    // Pas de marge négative : l'action de fin est un cercle plein, donc son bord
+    // extérieur doit s'aligner sur la marge de page — à l'image de la pastille du
+    // logo à gauche — pour un rembourrage gauche/droite symétrique.
     marginRight: 0,
   },
   iconBtn: {
@@ -344,10 +365,11 @@ const styles = StyleSheet.create({
   identity: {
     marginTop: 14,
   },
-  // Guest override: the brand row is taller than its text because of the logo
-  // chip. The subtitle sits GUEST_GAP below the chip's bottom edge (breathing
-  // room so it doesn't hug the logo); the CTA below gets that same offset plus
-  // the measured chip overhang, keeping the subtitle visually centred.
+  // Surcharge invité : la rangée de marque est plus haute que son texte à cause
+  // de la pastille du logo. Le sous-titre se place GUEST_GAP sous le bord
+  // inférieur de la pastille (de l'air pour ne pas coller le logo) ; le CTA en
+  // dessous reçoit ce même décalage plus le débord mesuré de la pastille, ce qui
+  // garde le sous-titre visuellement centré.
   identityGuest: {
     marginTop: GUEST_GAP,
   },
@@ -371,8 +393,9 @@ const styles = StyleSheet.create({
     fontFamily: ralewayFamily("400"),
     fontSize: 13.5,
     lineHeight: 19,
-    // No top margin: the guest block's top gap comes from the logo-chip overhang
-    // (see identityGuest) so it balances the subtitle→CTA gap below.
+    // Pas de marge haute : l'écart supérieur du bloc invité provient du débord de
+    // la pastille du logo (voir identityGuest) pour équilibrer l'écart
+    // sous-titre→CTA en dessous.
     marginTop: 0,
   },
   pill: {
@@ -383,8 +406,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 11,
     borderRadius: primitives.radii.full,
-    // Solid light chip (no border) so the deep-teal label reads at AAA on the
-    // teal hero — a translucent fill with white text would fail AA here.
+    // Pastille claire opaque (sans bordure) pour que l'étiquette sarcelle foncé
+    // se lise en AAA sur le héros sarcelle — un fond translucide avec texte blanc
+    // échouerait au AA ici.
     backgroundColor: PILL_BG,
     marginTop: 12,
   },
