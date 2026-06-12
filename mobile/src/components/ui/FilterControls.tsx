@@ -22,6 +22,7 @@ import {
   Easing,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -124,6 +125,12 @@ export function FilterButton({
 // ---------------------------------------------------------------------------
 const WINDOW_H = Dimensions.get("window").height;
 const SCRIM_MAX_OPACITY = 0.45;
+// Hauteur max de la zone de puces (entre le titre et les boutons d'action). La
+// liste défile au-delà, donc déplier toutes les sections n'agrandit plus la
+// feuille — sa hauteur reste stable et les boutons restent toujours visibles.
+// `maxHeight` (et non une hauteur fixe) garde les feuilles courtes (Actualités,
+// Partenaires : peu d'options) compactes — elles ne se remplissent pas de vide.
+const SHEET_LIST_MAX_HEIGHT = Math.round(WINDOW_H * 0.5);
 
 export function FilterSheet<K extends string>({
   visible,
@@ -319,7 +326,20 @@ export function FilterSheet<K extends string>({
               {/* Sections : chacune est un libellé + une ligne enveloppée de puces
                   basculables. En mode accordéon (collapsibleSections), l'en-tête
                   devient une rangée touchable avec un chevron, fermée par défaut, et
-                  les puces ne se rendent que lorsque le groupe est déplié. */}
+                  les puces ne se rendent que lorsque le groupe est déplié.
+
+                  Enveloppées dans un ScrollView à hauteur plafonnée : déplier
+                  toutes les sections fait défiler la liste plutôt que de pousser la
+                  feuille (et ses boutons) hors écran. `keyboardShouldPersistTaps`
+                  garde les puces réactives ; on désactive le rebond pour que la
+                  zone ne « flotte » pas quand le contenu est plus court que le cap. */}
+              <ScrollView
+                style={{ maxHeight: SHEET_LIST_MAX_HEIGHT }}
+                contentContainerStyle={{ paddingBottom: 8 }}
+                showsVerticalScrollIndicator
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+              >
               {resolvedSections.map((section, si) => {
                 const isOpen = !collapsibleSections || expandedSections.has(si);
                 const selectedCount = section.selected.size;
@@ -394,6 +414,7 @@ export function FilterSheet<K extends string>({
                 </View>
                 );
               })}
+              </ScrollView>
 
               {/* Actions */}
               <View style={sheetStyles.actionsRow}>
