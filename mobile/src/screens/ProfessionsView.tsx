@@ -36,8 +36,8 @@ import {
   type Profession,
 } from "@/data/professions";
 
-// Teal[700] de la marque — le teal d'action accessible de l'app (assorti aux CTA / pastilles).
-const TEAL = primitives.colors.brand.teal[700];
+// Navy[700] de la marque — le navy d'action accessible de l'app (assorti aux CTA / pastilles).
+const NAVY = primitives.colors.brand.navy[700];
 
 export function ProfessionsView({ themeName = "light" }: { themeName?: ThemeName }) {
   // Quelle fiche est ouverte dans le lecteur plein écran (null = fermé), et quelle
@@ -76,7 +76,7 @@ export function ProfessionsView({ themeName = "light" }: { themeName?: ThemeName
 // Hero — une carte image pleine largeur avec un voile sombre, le titre de section
 // et une pastille « Voir le film » (P7 — mené par la vidéo). Le texte blanc sur le
 // voile passe l'AA pour les grandes tailles d'affichage ; la pastille est une puce
-// blanche avec un libellé teal[700].
+// blanche avec un libellé navy[700].
 // ---------------------------------------------------------------------------
 function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => void }) {
   return (
@@ -119,8 +119,8 @@ function Hero({ themeName, onWatch }: { themeName: ThemeName; onWatch: () => voi
                 opacity: pressed ? 0.85 : 1,
               })}
             >
-              <Play size={16} color={TEAL} fill={TEAL} />
-              <Text style={{ color: TEAL, fontSize: 15, fontFamily: ralewayFamily("700"), fontWeight: "700", marginLeft: 8 }}>
+              <Play size={16} color={NAVY} fill={NAVY} />
+              <Text style={{ color: NAVY, fontSize: 15, fontFamily: ralewayFamily("700"), fontWeight: "700", marginLeft: 8 }}>
                 Voir le film
               </Text>
             </Pressable>
@@ -254,7 +254,7 @@ function TrainingPaths({ themeName }: { themeName: ThemeName }) {
                 ...CARD_SHADOW,
               }}
             >
-              <GraduationCap size={20} color={TEAL} strokeWidth={1.9} />
+              <GraduationCap size={20} color={NAVY} strokeWidth={1.9} />
               {/* Réserver 2 lignes pour le libellé et la note pour que chaque
                   carte ait la même hauteur et que le niveau/la note s'alignent
                   sur toute la grille (des libellés comme « BTS Électrotechnique »
@@ -394,7 +394,7 @@ function ProfessionDetailModal({
                   {p.dayInLife.map((item, i) => (
                     <View key={i} style={{ flexDirection: "row", alignItems: "flex-start" }}>
                       <View style={{ width: 22, paddingTop: 2 }}>
-                        <Check size={16} color={TEAL} strokeWidth={2.4} />
+                        <Check size={16} color={NAVY} strokeWidth={2.4} />
                       </View>
                       <Text style={{ flex: 1, color: t.text.body, fontSize: 15, lineHeight: 22 }}>{item}</Text>
                     </View>
@@ -415,7 +415,7 @@ function ProfessionDetailModal({
               <DetailSection title="Comment y arriver" themeName={themeName}>
                 <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                   <View style={{ width: 26, paddingTop: 1 }}>
-                    <GraduationCap size={18} color={TEAL} strokeWidth={1.9} />
+                    <GraduationCap size={18} color={NAVY} strokeWidth={1.9} />
                   </View>
                   <Text style={{ flex: 1, color: t.text.body, fontSize: 15, lineHeight: 23 }}>{p.pathIn}</Text>
                 </View>

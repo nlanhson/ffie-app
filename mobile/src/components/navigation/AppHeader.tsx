@@ -23,7 +23,7 @@
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { User, UserPlus, type LucideIcon } from "lucide-react-native";
+import { Bell, User, UserPlus, type LucideIcon } from "lucide-react-native";
 import { primitives } from "@tokens";
 import { displayFamily } from "@/theme/fonts";
 import { GUTTER } from "@/components/ui/ios";
@@ -70,6 +70,7 @@ function IconButton({
   hint,
   onPress,
   filled = false,
+  dot = false,
 }: {
   icon: LucideIcon;
   label: string;
@@ -77,6 +78,8 @@ function IconButton({
   onPress?: () => void;
   /** Affiche un cercle translucide au repos derrière le glyphe (action profil). */
   filled?: boolean;
+  /** Affiche une pastille « non lu » en surimpression (cloche de notifications). */
+  dot?: boolean;
 }) {
   return (
     <Pressable
@@ -92,6 +95,7 @@ function IconButton({
       ]}
     >
       <Icon size={22} color={WHITE} strokeWidth={2} />
+      {dot ? <View style={styles.unreadDot} /> : null}
     </Pressable>
   );
 }
@@ -119,6 +123,15 @@ export function AppHeader({
       </Text>
 
       <View style={styles.actions}>
+        {isMember && onPressNotifications ? (
+          <IconButton
+            icon={Bell}
+            label="Notifications"
+            hint="Ouvre le centre de notifications"
+            onPress={onPressNotifications}
+            dot={hasUnread}
+          />
+        ) : null}
         {isMember && onPressProfile ? (
           <IconButton
             icon={User}
@@ -182,5 +195,18 @@ const styles = StyleSheet.create({
   },
   iconBtnFilled: {
     backgroundColor: CIRCLE_BG,
+  },
+  // Pastille « non lu » sur la cloche — point rouge cerclé de blanc pour rester
+  // lisible sur le bandeau bleu marine.
+  unreadDot: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 10,
+    height: 10,
+    borderRadius: primitives.radii.full,
+    backgroundColor: primitives.colors.red[500],
+    borderWidth: 1.5,
+    borderColor: HEADER_SURFACE,
   },
 });

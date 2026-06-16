@@ -486,13 +486,13 @@ const light = {
   label: "Standard (Light)",
   brand: {
     institutional: colors.brand.navy[700], // logo navy — headers, federation marks
-    // The app's single interactive teal. One shade deeper than the ffie.fr
-    // anchor (teal[600] #0094A9) so it equals action.primary.bg and the header
-    // (HEADER_SURFACE) — one brand teal everywhere. The deeper hue also clears
-    // AA where accent is used as a *fill* under white labels (filter button /
-    // chips, ~5.4:1) and as *text/icons* on white (back buttons, links, the
-    // active tab — was ~3.6:1 at [600], now ~5.4:1).
-    accent: colors.brand.teal[700], // #027489 — matches the header + primary CTAs
+    // The app's single interactive hue — FFIE institutional navy from the logo
+    // (#222D5D). It equals action.primary.bg and the header (HEADER_SURFACE) so
+    // the whole interactive system reads as one brand navy rather than two
+    // near-identical tints. As a *fill* under white labels (filter button /
+    // chips) it clears AAA (~11:1); as *text/icons* on white (back buttons,
+    // links, the active tab) it is ~11:1 — comfortably above AA.
+    accent: colors.brand.navy[700], // #222D5D — matches the header + primary CTAs
   },
   surface: {
     default: colors.white,
@@ -503,7 +503,7 @@ const light = {
     default: colors.gray[200], // decorative — card outlines, dividers
     subtle: colors.gray[100],
     strong: colors.gray[400], // load-bearing — input outlines, table dividers under text. 3.4:1 on white, clears WCAG 1.4.11 non-text 3:1.
-    focus: colors.brand.teal[700], // focus ring on white — ~5.4:1 (≥3:1). Same brand teal as accent + header (one-teal system).
+    focus: colors.brand.navy[700], // focus ring on white — ~11:1 (≥3:1). Same brand navy as accent + header (one-navy system).
   },
   text: {
     body: colors.gray[900], // 16.5:1 on white — AAA
@@ -513,25 +513,24 @@ const light = {
     brand: colors.brand.navy[700], // for FFIE federation marks
   },
     action: {
-    // Primary action surface — FFIE operational teal at [700] (#027489), which
-    // clears WCAG AA for white text at any size (~5.5:1 on white). Hover /
-    // pressed step darker (teal[800] / teal[900]) so the engagement gradient
-    // stays legible. (Was #3CA9C5 ≈ 2.5:1 — failed AA for text; replaced so the
-    // token no longer ships a known-failing default on every primary CTA.)
+    // Primary action surface — FFIE institutional navy at [700] (#222D5D, the
+    // logo block), which clears WCAG AAA for white text at any size (~11:1 on
+    // white). Hover / pressed step darker (navy[800] / navy[900]) so the
+    // engagement gradient stays legible.
     primary: {
-      bg: colors.brand.teal[700],
-      bgHover: colors.brand.teal[800],
-      bgPressed: colors.brand.teal[900],
+      bg: colors.brand.navy[700],
+      bgHover: colors.brand.navy[800],
+      bgPressed: colors.brand.navy[900],
       fg: colors.white,
     },
     // Secondary = outlined button. Transparent bg by default, brand border + fg.
-    // Hover tints the fill with the lightest teal so it stays in-family.
+    // Hover tints the fill with the lightest navy so it stays in-family.
     secondary: {
       bg: "transparent",
-      bgHover: colors.brand.teal[50],
-      bgPressed: colors.brand.teal[100],
-      fg: colors.brand.teal[700],
-      border: colors.brand.teal[700],
+      bgHover: colors.brand.navy[50],
+      bgPressed: colors.brand.navy[100],
+      fg: colors.brand.navy[700],
+      border: colors.brand.navy[700],
     },
     destructive: {
       bg: colors.red[600],
@@ -575,7 +574,7 @@ const dark = {
   label: "Dark",
   brand: {
     institutional: colors.brand.navy[300], // lighter to read on dark surfaces
-    accent: colors.brand.teal[400],
+    accent: colors.brand.navy[300], // logo navy, lightened to read on dark
   },
   surface: {
     default: colors.gray[950],
@@ -586,30 +585,32 @@ const dark = {
     default: colors.gray[700],
     subtle: colors.gray[800],
     strong: colors.gray[500], // 3.5:1 on gray[950], clears non-text 3:1
-    focus: colors.brand.teal[300], // bright teal pops on dark
+    focus: colors.brand.navy[300], // light navy ring pops on dark
   },
   text: {
     body: colors.gray[50], // 17:1 on gray.950 — AAA
     muted: colors.gray[400], // 7.2:1 on gray.950 — AAA
     placeholder: colors.gray[500],
     inverse: colors.gray[950],
-    brand: colors.brand.teal[300],
+    brand: colors.brand.navy[300],
   },
   action: {
-    // brighter teal pops on dark. Hover/pressed go LIGHTER (not darker) —
-    // on dark backgrounds, "more engaged" reads as brighter, not darker.
+    // Light navy reads on dark. Hover/pressed go LIGHTER (not darker) — on dark
+    // backgrounds, "more engaged" reads as brighter, not darker. A light navy
+    // fill carries dark text (the dark-mode "bright bg + dark fg" pattern); navy
+    // can't go bright, so we lift the fill into the periwinkle end of the ramp.
     primary: {
-      bg: colors.brand.teal[400],
-      bgHover: colors.brand.teal[300],
-      bgPressed: colors.brand.teal[200],
+      bg: colors.brand.navy[200],
+      bgHover: colors.brand.navy[100],
+      bgPressed: colors.brand.navy[50],
       fg: colors.gray[950],
     },
     secondary: {
       bg: "transparent",
       bgHover: colors.gray[800],
       bgPressed: colors.gray[700],
-      fg: colors.brand.teal[300],
-      border: colors.brand.teal[400],
+      fg: colors.brand.navy[300],
+      border: colors.brand.navy[300],
     },
     // red[500] vs white = 3.76 fails AA. red[400] is brighter and pairs with
     // dark text for 7.4:1 — matches the dark-mode pattern of bright bg + dark fg.
@@ -643,7 +644,7 @@ const dark = {
   state: {
     gated: {
       public: colors.gray[500],
-      memberOnly: colors.brand.teal[400],
+      memberOnly: colors.brand.navy[300],
     },
   },
 } as const;
@@ -657,7 +658,7 @@ const sunlight = {
   label: "Sunlight (High Contrast)",
   brand: {
     institutional: colors.brand.navy[900], // deepest navy for outdoor legibility
-    accent: colors.brand.teal[800],
+    accent: colors.brand.navy[900], // deepest navy — one brand hue outdoors too
   },
   surface: {
     default: colors.white,

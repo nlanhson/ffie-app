@@ -28,6 +28,7 @@ import { HomeScreen, type HomeNavTarget } from "@/screens/HomeScreen";
 import { DocLibraryScreen } from "@/screens/DocLibraryScreen";
 import { NewsScreen } from "@/screens/NewsScreen";
 import { NotificationsScreen } from "@/screens/NotificationsScreen";
+import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen";
 import { PartnersScreen } from "@/screens/PartnersScreen";
 import { ProfileScreen } from "@/screens/ProfileScreen";
 import { DiscoverScreen } from "@/screens/DiscoverScreen";
@@ -41,6 +42,7 @@ import { MembersMapScreen } from "@/screens/MembersMapScreen";
 import { FfieFiguresScreen } from "@/screens/FfieFiguresScreen";
 import { LegalScreen } from "@/screens/legal/LegalScreen";
 import { SignInFlow } from "@/screens/auth/SignInFlow";
+import { unreadCount } from "@/data/notifications";
 import { ActiveTabProvider, useActiveTab } from "@/navigation/activeTabContext";
 import { RequireRole } from "@/auth/RequireRole";
 import { RoleDebugSwitcher } from "@/components/dev/RoleDebugSwitcher";
@@ -192,6 +194,10 @@ function MainSurface({ onSignOut }: { onSignOut: () => void }) {
 function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<MemberTabKey>("home");
   const [settingsOverlay, setSettingsOverlay] = useState<"none" | "notifications">("none");
+  // Centre de notifications (boîte de réception) — ouvert par la cloche en haut à
+  // droite (AppHeader / HomeHeader). Distinct de `settingsOverlay`, qui porte les
+  // RÉGLAGES de notification (autorisations système).
+  const [notifCenterOpen, setNotifCenterOpen] = useState(false);
   // Modal Événements ("Agenda") plein écran, ouvert par le raccourci Agenda de
   // l'Accueil.
   const [agendaOpen, setAgendaOpen] = useState(false);
@@ -273,8 +279,8 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
           <AppHeader
             title={TAB_TITLE[activeTab]}
             variant="member"
-            hasUnread
-            onPressNotifications={() => setSettingsOverlay("notifications")}
+            hasUnread={unreadCount() > 0}
+            onPressNotifications={() => setNotifCenterOpen(true)}
             onPressSearch={() => {
               // TODO : ouvrir la recherche globale quand la surface de recherche
               // arrivera.
@@ -295,6 +301,7 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
           >
             {renderMemberTab(activeTab, {
               onProfileRowPress: handleProfileRowPress,
+              onOpenNotificationCenter: () => setNotifCenterOpen(true),
               onOpenProfile: () => setActiveTab("profile"),
               onOpenFigures: () => setFiguresOpen(true),
               onOpenSearch: () => {
@@ -346,6 +353,29 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
             plein écran) pour qu'il chevauche chaque onglet adhérent. Maquette
             uniquement ; voir AssistantChatWidget. */}
         <AssistantChatWidget />
+
+        {/* Centre de notifications (boîte de réception) — Modal qui monte par le
+            bas, ouvert par la cloche. L'engrenage à l'intérieur route vers les
+            RÉGLAGES : on ferme d'abord le centre, puis on ouvre les réglages une
+            fois la fermeture terminée (deux modals plein écran ne se chevauchent
+            jamais sur iOS — même motif échelonné qu'ailleurs). SafeAreaProvider
+            neuf (correctif de cumul d'inset). */}
+        <Modal
+          visible={notifCenterOpen}
+          animationType="slide"
+          presentationStyle="fullScreen"
+          onRequestClose={() => setNotifCenterOpen(false)}
+        >
+          <SafeAreaProvider>
+            <NotificationCenterScreen
+              onBack={() => setNotifCenterOpen(false)}
+              onOpenSettings={() => {
+                setNotifCenterOpen(false);
+                setTimeout(() => setSettingsOverlay("notifications"), MODAL_DISMISS_MS);
+              }}
+            />
+          </SafeAreaProvider>
+        </Modal>
 
         {/* Réglages des notifications — Modal qui monte par le bas.
             SafeAreaProvider neuf pour que l'inset ne se cumule pas à travers la
@@ -432,6 +462,7 @@ function renderMemberTab(
   tab: MemberTabKey,
   actions: {
     onProfileRowPress: (rowKey: string) => void;
+    onOpenNotificationCenter: () => void;
     onOpenProfile: () => void;
     onOpenFigures: () => void;
     onOpenSearch: () => void;
@@ -446,7 +477,7 @@ function renderMemberTab(
       return (
         <HomeScreen
           themeName={themeName}
-          onOpenNotifications={() => actions.onProfileRowPress("notifications")}
+          onOpenNotifications={actions.onOpenNotificationCenter}
           onOpenProfile={actions.onOpenProfile}
           onOpenFigures={actions.onOpenFigures}
           onOpenSearch={actions.onOpenSearch}

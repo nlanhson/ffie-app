@@ -15,7 +15,7 @@
 //
 // C'est une surface de marque fixe, pas une surface de thème : le fond est
 // toujours le marine institutionnel FFIE (brand.navy[700]) avec des couleurs de
-// premier plan blanc / sarcelle, de la même façon que FFIELogo traite les
+// premier plan blanc / navy, de la même façon que FFIELogo traite les
 // couleurs de marque comme des constantes. Seul le contenu de la page *sous*
 // l'en-tête suit le thème actif.
 //
@@ -27,7 +27,7 @@
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { CheckCircle2, UserPlus } from "lucide-react-native";
+import { Bell, CheckCircle2, UserPlus } from "lucide-react-native";
 import { primitives, type ThemeName } from "@tokens";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 import { GUTTER } from "@/components/ui/ios";
@@ -36,17 +36,17 @@ import { FFBLogo } from "@/components/ui/FFBLogo";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { type MemberProfile } from "@/data/member";
 
-// --- couleurs de surface de marque fixes (héros sarcelle) -----------------
+// --- couleurs de surface de marque fixes (héros navy) -----------------
 const WHITE = primitives.colors.white;
 // Pastille de statut / adhésion : une pastille claire OPAQUE avec un texte
-// sarcelle foncé. Une pastille blanche avec un texte teal[800] atteint ~7:1
-// (AAA) — une emphase plus forte que blanc-sur-sarcelle, et qui reste robuste
-// quelle que soit la dérive du sarcelle de l'en-tête. (L'étiquette de 13 px est
+// navy foncé. Une pastille blanche avec un texte navy[800] atteint ~13:1
+// (AAA) — une emphase plus forte que blanc-sur-navy, et qui reste robuste
+// quelle que soit la dérive du navy de l'en-tête. (L'étiquette de 13 px est
 // le cas contraignant : le petit texte exige 4,5:1, donc c'est la pastille qui
-// le porte, pas le sarcelle.)
+// le porte, pas le navy.)
 const PILL_BG = WHITE;
-const PILL_TEXT = primitives.colors.brand.teal[800]; // #045764 — AAA sur blanc
-const PILL_ICON = primitives.colors.brand.teal[700]; // #027489 — lisible sur blanc
+const PILL_TEXT = primitives.colors.brand.navy[800]; // #1A2349 — AAA sur blanc
+const PILL_ICON = primitives.colors.brand.navy[700]; // #222D5D — lisible sur blanc
 
 // Voiles translucides dérivés des couleurs de token (les tokens n'ont pas de
 // variantes alpha ; cela garde les valeurs source pilotées par les tokens plutôt
@@ -59,7 +59,8 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const HELLO = withAlpha(WHITE, 0.82); // message d'accueil / sous-titre atténué sur le héros sarcelle
+const HELLO = withAlpha(WHITE, 0.82); // message d'accueil / sous-titre atténué sur le héros navy
+const PRESS_BG = withAlpha(WHITE, 0.12); // teinte du bouton cloche à l'appui
 
 // Écart sous le bord supérieur de la zone sûre avant la rangée de marque. Gardé
 // identique au TOP_GAP de AppHeader pour que le logo soit à la même position
@@ -144,9 +145,25 @@ export function HomeHeader({
             <FFBLogo size={FFB_LOGO_SIZE} />
           </View>
         </View>
-        {/* Plus de bouton d'action en haut à droite : le Profil (adhérent) vit
-            désormais dans la barre d'onglets du bas. Le bloc d'identité plus bas
-            reste cliquable pour ouvrir le Profil (raccourci, pas un bouton de coin). */}
+        {/* Cloche de notifications (adhérent) → ouvre le centre de notifications.
+            Le Profil, lui, vit dans la barre d'onglets du bas + le bloc d'identité
+            cliquable ci-dessous ; seule la cloche revient en coin haut-droit. */}
+        {isMember && onPressNotifications ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Notifications"
+            accessibilityHint="Ouvre le centre de notifications"
+            onPress={onPressNotifications}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.bell,
+              pressed ? { backgroundColor: PRESS_BG } : null,
+            ]}
+          >
+            <Bell size={22} color={WHITE} strokeWidth={2} />
+            {hasUnread ? <View style={styles.unreadDot} /> : null}
+          </Pressable>
+        ) : null}
       </View>
 
       {/* Mention d'affiliation FFB (FFIE-01) — pleine largeur sous le verrou de
@@ -217,7 +234,7 @@ const styles = StyleSheet.create({
     // Marge basse ajustée pour que la surface de marque *visible* sous la
     // pastille d'identité corresponde à la marge basse de 16 px de AppHeader sur
     // toutes les autres pages. La feuille du tableau de bord la recouvre de
-    // SHEET.lift (12), donc 28 - 12 = 16 px de sarcelle visible — l'espacement
+    // SHEET.lift (12), donc 28 - 12 = 16 px de navy visible — l'espacement
     // bas de l'en-tête reste cohérent dans toute l'app.
     paddingBottom: 28,
   },
@@ -241,6 +258,28 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     borderRadius: 6, // entre radii.sm (4) et radii.md (8) — pas de token exact
     padding: 5,
+  },
+  // Cloche de notifications en coin haut-droit — disque tactile ≥ 40 pt (hitSlop
+  // l'étend à ≥ 44 pt), glyphe blanc sur le héros navy.
+  bell: {
+    width: 40,
+    height: 40,
+    borderRadius: primitives.radii.full,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
+  },
+  // Pastille « non lu » — point rouge cerclé de navy pour se détacher du héros.
+  unreadDot: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 10,
+    height: 10,
+    borderRadius: primitives.radii.full,
+    backgroundColor: primitives.colors.red[500],
+    borderWidth: 1.5,
+    borderColor: HEADER_SURFACE,
   },
   // Mention d'affiliation FFB sous le verrou de co-marque (FFIE-01). Reprend le
   // traitement « texte atténué sur le héros » du sous-titre invité.
@@ -308,8 +347,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 11,
     borderRadius: primitives.radii.full,
-    // Pastille claire opaque (sans bordure) pour que l'étiquette sarcelle foncé
-    // se lise en AAA sur le héros sarcelle — un fond translucide avec texte blanc
+    // Pastille claire opaque (sans bordure) pour que l'étiquette navy foncé
+    // se lise en AAA sur le héros navy — un fond translucide avec texte blanc
     // échouerait au AA ici.
     backgroundColor: PILL_BG,
     marginTop: 12,

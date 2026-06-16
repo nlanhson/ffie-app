@@ -9,13 +9,16 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "fr.ffie.app",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "fr.ffie.app",
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/android-icon-foreground.png"
+        "backgroundColor": "#222D5D",
+        "foregroundImage": "./assets/icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "edgeToEdgeEnabled": true,

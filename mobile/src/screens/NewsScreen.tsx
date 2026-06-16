@@ -394,7 +394,7 @@ function NewsFeed({
 
 // ---------------------------------------------------------------------------
 // CategoryPill — une pastille de filtre dans le rail. Sélectionnée = remplissage
-// teal[700] de la marque (assorti au contrôle segmenté + aux actions primaires)
+// navy[700] de la marque (assorti au contrôle segmenté + aux actions primaires)
 // avec un libellé blanc ; non sélectionnée = surface de carte avec une bordure fine.
 // L'état est exposé aux technologies d'assistance via accessibilityState, et le
 // renforcement de graisse garde la sélection lisible au-delà du changement de couleur (P4).
@@ -427,11 +427,11 @@ function CategoryPill({
         paddingHorizontal: 16,
         borderRadius: primitives.radii.full,
         backgroundColor: selected
-          ? primitives.colors.brand.teal[700]
+          ? t.brand.accent
           : pressed ? t.border.subtle : c.cardBg,
         // Bordure dans les deux états pour que la pastille ne change pas de taille à la sélection.
         borderWidth: 1,
-        borderColor: selected ? primitives.colors.brand.teal[700] : (c.cardBorder ?? t.border.subtle),
+        borderColor: selected ? t.brand.accent : (c.cardBorder ?? t.border.subtle),
         alignItems: "center",
         justifyContent: "center",
       })}

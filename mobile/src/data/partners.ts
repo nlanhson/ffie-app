@@ -122,7 +122,7 @@ export const PARTNER_TABS: PartnerTab[] = [
         ],
       },
       {
-        header: "Fédération d'adhésion",
+        header: "Fédération membre",
         entries: [
           {
             id: "ffb",

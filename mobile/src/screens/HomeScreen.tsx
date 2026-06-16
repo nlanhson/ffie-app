@@ -29,6 +29,7 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { primitives, themes, type ThemeName } from "@tokens";
 import { useRole } from "@/auth/roleContext";
+import { unreadCount } from "@/data/notifications";
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { SectionLabel } from "@/components/home/SectionLabel";
 import { QuickAccessGrid } from "@/components/home/QuickAccessGrid";
@@ -121,7 +122,7 @@ export function HomeScreen({
           themeName={themeName}
           variant={variant}
           member={currentMember}
-          hasUnread
+          hasUnread={unreadCount() > 0}
           onPressNotifications={onOpenNotifications}
           onPressSearch={onOpenSearch}
           onPressIdentity={onOpenProfile}

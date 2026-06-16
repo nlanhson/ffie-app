@@ -11,15 +11,14 @@
 import { primitives } from "@tokens";
 
 /**
- * Fond de l'en-tête de marque — sarcelle opérationnel FFIE au [700] (#027489).
+ * Fond de l'en-tête de marque — navy institutionnel FFIE au [700] (#222D5D, le
+ * bloc du logo).
  *
- * UN SEUL sarcelle pour tout le système interactif : c'est la MÊME valeur que
+ * UN SEUL navy pour tout le système interactif : c'est la MÊME valeur que
  * `action.primary.bg` et `brand.accent` du thème clair, si bien que l'en-tête,
  * les boutons principaux, les bascules segmentées et les contrôles de filtre se
- * lisent tous comme un unique sarcelle de marque plutôt que comme deux teintes
- * presque identiques. C'était teal[600] (#0094A9) — une teinte plus claire —
- * mais celui-ci n'atteint que ~3,6:1 sur blanc (AA-grand uniquement) ; le [700]
- * atteint ~5,4:1, donc le texte/les icônes blancs de l'en-tête passent le AA à
- * toute taille.
+ * lisent tous comme un unique navy de marque plutôt que comme deux teintes
+ * presque identiques. Le navy[700] atteint ~11:1 sur blanc, donc le texte/les
+ * icônes blancs de l'en-tête passent le AAA à toute taille.
  */
-export const HEADER_SURFACE = primitives.colors.brand.teal[700]; // #027489
+export const HEADER_SURFACE = primitives.colors.brand.navy[700]; // #222D5D

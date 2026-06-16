@@ -30,8 +30,8 @@ import { ralewayFamily, displayFamily } from "@/theme/fonts";
 
 const t = themes.light;
 const RADIUS = primitives.radii.lg; // 12
-const TEAL = primitives.colors.brand.teal[700]; // #027489 — libellé blanc ≈5.4:1 (AA)
-const TEAL_PRESSED = primitives.colors.brand.teal[800]; // #045764
+const NAVY = primitives.colors.brand.navy[700]; // #222D5D — libellé blanc ≈11:1 (AAA)
+const NAVY_PRESSED = primitives.colors.brand.navy[800]; // #1A2349
 
 export function FederationSignInScreen({
   federation,
@@ -70,7 +70,7 @@ export function FederationSignInScreen({
         >
           {/* Cadre de sécurité — cela se passe du côté de la fédération, pas du nôtre. */}
           <View style={styles.secureBadge}>
-            <ShieldCheck size={16} color={TEAL} />
+            <ShieldCheck size={16} color={NAVY} />
             <Text style={styles.secureText}>
               Connexion sécurisée via le réseau de fédérations FFB
             </Text>
@@ -101,7 +101,7 @@ export function FederationSignInScreen({
 
           {/* Réassurance — pourquoi il n'y a pas de mot de passe ici. */}
           <View style={styles.reassure}>
-            <ShieldCheck size={18} color={TEAL} style={styles.reassureIcon} />
+            <ShieldCheck size={18} color={NAVY} style={styles.reassureIcon} />
             <Text style={styles.reassureText}>
               Vous vous connectez sur la page de votre propre fédération — la FFIE
               ne voit jamais votre mot de passe. Votre fédération confirme votre
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: primitives.radii.md,
-    backgroundColor: primitives.colors.brand.teal[50], // #E6F8FB
+    backgroundColor: primitives.colors.brand.navy[50], // #ECEEF6
     alignSelf: "flex-start",
   },
   secureText: {
@@ -259,9 +259,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     columnGap: 8,
-    backgroundColor: TEAL,
+    backgroundColor: NAVY,
   },
-  ctaPressed: { backgroundColor: TEAL_PRESSED },
+  ctaPressed: { backgroundColor: NAVY_PRESSED },
   ctaLabel: {
     color: "#FFFFFF",
     fontSize: 16,

@@ -62,12 +62,12 @@ import { ralewayFamily, displayFamily } from "@/theme/fonts";
 const t = themes.light;
 const GUTTER = semantics.spacing.gutter.mobile; // 16 — identique à l'annuaire d'adhésion
 const RADIUS = primitives.radii.lg; // 12 — champs, rangées, boutons, carte
-const TEAL = t.brand.accent; // #027489 — surbrillance de sélection (radio / bordures) ; désormais le même teal de marque que le CTA plus bas
-const TEAL_TINT = primitives.colors.brand.teal[50]; // #E6F8FB — remplissage de rangée sélectionnée
-// Le CTA Continuer utilise teal[700] — le teal de marque FFIE, en cohérence avec
-// l'action principale par défaut de l'app (≈5.4:1 blanc-sur-teal, respecte WCAG AA).
-const CTA_BG = primitives.colors.brand.teal[700]; // #027489
-const CTA_PRESSED = primitives.colors.brand.teal[800]; // #045764
+const NAVY = t.brand.accent; // #222D5D — surbrillance de sélection (radio / bordures) ; désormais le même navy de marque que le CTA plus bas
+const NAVY_TINT = primitives.colors.brand.navy[50]; // #ECEEF6 — remplissage de rangée sélectionnée
+// Le CTA Continuer utilise navy[700] — le navy de marque FFIE, en cohérence avec
+// l'action principale par défaut de l'app (≈11:1 blanc-sur-navy, respecte WCAG AAA).
+const CTA_BG = primitives.colors.brand.navy[700]; // #222D5D
+const CTA_PRESSED = primitives.colors.brand.navy[800]; // #1A2349
 
 // Vue initiale de la carte centrée sur la France métropolitaine (même cadrage
 // que l'annuaire d'adhésion ; les fédérations d'outre-mer sont en dehors —
@@ -342,7 +342,7 @@ export function SSOFederationScreen({
                 style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
               >
                 <Text style={styles.toggleLabel}>Afficher {hiddenCount} de plus</Text>
-                <ChevronDown size={18} color={TEAL} />
+                <ChevronDown size={18} color={NAVY} />
               </Pressable>
             ) : null}
 
@@ -357,7 +357,7 @@ export function SSOFederationScreen({
                 style={({ pressed }) => [styles.toggle, pressed && styles.togglePressed]}
               >
                 <Text style={styles.toggleLabel}>Afficher moins</Text>
-                <ChevronUp size={18} color={TEAL} />
+                <ChevronUp size={18} color={NAVY} />
               </Pressable>
             ) : null}
 
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     backgroundColor: t.surface.default,
     marginBottom: 8,
   },
-  rowSelected: { backgroundColor: TEAL_TINT, borderColor: TEAL },
+  rowSelected: { backgroundColor: NAVY_TINT, borderColor: NAVY },
   rowPressed: { backgroundColor: t.surface.subtle },
   badge: {
     minWidth: 40,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  radioOn: { backgroundColor: TEAL, borderColor: TEAL },
+  radioOn: { backgroundColor: NAVY, borderColor: NAVY },
 
   toggle: {
     marginTop: 12,

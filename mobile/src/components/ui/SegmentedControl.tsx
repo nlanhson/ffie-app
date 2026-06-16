@@ -41,16 +41,16 @@ export function SegmentedControl<K extends string>({
   value: K;
   options: SegmentOption<K>[];
   onChange: (key: K) => void;
-  /** Selected-thumb colour. Defaults to brand teal[700] (#027489) — the app's
-   *  accessible action teal, matching the primary CTAs and the News filter
+  /** Selected-thumb colour. Defaults to brand navy[700] (#222D5D) — the app's
+   *  accessible action navy, matching the primary CTAs and the News filter
    *  pills. The label over the thumb is always white, so any override must be
-   *  dark enough for AA (teal[600] #0094A9 is only ~3.6:1 on white — too light). */
+   *  dark enough for AA (navy[700] is ~11:1 on white — AAA). */
   tint?: string;
 }) {
   const t = themes[themeName];
   const c = useGroupedColors(themeName);
   const reducedMotion = useReducedMotion();
-  const thumbColor = tint ?? primitives.colors.brand.teal[700];
+  const thumbColor = tint ?? primitives.colors.brand.navy[700];
 
   const bw = c.cardBorder ? 1 : 0;
   const n = options.length;

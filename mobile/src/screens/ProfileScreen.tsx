@@ -68,11 +68,11 @@ import {
   type InterestKey,
 } from "@/screens/settings/ProfileSettingsSheets";
 
-// --- fixed brand-surface colours (teal hero, shared with HomeHeader) --------
-const SURFACE = HEADER_SURFACE; // turquoise de marque derrière le hero d'identité
+// --- fixed brand-surface colours (navy hero, shared with HomeHeader) --------
+const SURFACE = HEADER_SURFACE; // navy de marque derrière le hero d'identité
 const WHITE = primitives.colors.white;
 const AVATAR = primitives.colors.white; // pastille de monogramme blanche — assortie à la pastille du logo de l'en-tête
-const INITIALS = primitives.colors.brand.teal[800]; // #045764 — AAA sur l'avatar blanc
+const INITIALS = primitives.colors.brand.navy[800]; // #1A2349 — AAA sur l'avatar blanc
 
 function withAlpha(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
@@ -170,7 +170,7 @@ export function ProfileScreen({
       {/* Contenu de barre d'état clair (horloge / signal) par-dessus le hero bleu marine. */}
       <StatusBar style="light" />
 
-      {/* Fond turquoise derrière la barre d'état pour qu'un rebond de sur-défilement
+      {/* Fond navy derrière la barre d'état pour qu'un rebond de sur-défilement
           en haut révèle la couleur de l'en-tête, pas la page en dessous (même
           astuce que HomeScreen). Il n'apparaît qu'AU-DESSUS du hero — le conteneur
           aux couleurs de la page sous le hero le recouvre pour tout le contenu. */}
@@ -213,12 +213,12 @@ export function ProfileScreen({
         </View>
 
         {/* Conteneur aux couleurs de la page pour tout ce qui est SOUS le hero.
-            Il recouvre le fond turquoise pour que la couleur de l'en-tête
+            Il recouvre le fond navy pour que la couleur de l'en-tête
             n'entoure que le bloc d'identité ; le contenu groupé repose sur le
             fond de page normal comme les autres onglets. flexGrow remplit toute
             hauteur restante sous le dernier groupe. */}
         <View style={{ flexGrow: 1, backgroundColor: c.pageBg, paddingBottom: 32 }}>
-          {/* Petit espace au-dessus du premier groupe pour que l'en-tête turquoise
+          {/* Petit espace au-dessus du premier groupe pour que l'en-tête navy
               se lise comme une bande distincte avant le début du contenu groupé. */}
           <View style={{ height: 12 }} />
 
@@ -469,7 +469,7 @@ function GlassSwitch({
       onValueChange={onToggle}
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
-      // Couleurs d'interrupteur façon iOS — piste « activée » turquoise (accent de marque), neutre désactivée.
+      // Couleurs d'interrupteur façon iOS — piste « activée » navy (accent de marque), neutre désactivée.
       trackColor={{ false: t.border.strong, true: t.brand.accent }}
       thumbColor={WHITE}
       ios_backgroundColor={t.border.strong}
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   },
   // Barre d'identité compacte — réglée sur le même rythme vertical que l'AppHeader
   // des autres onglets (paddingBottom 16, rangée de contenu d'environ 52pt) pour que
-  // la bande turquoise se lise comme un en-tête, pas comme un grand hero. Un avatar
+  // la bande navy se lise comme un en-tête, pas comme un grand hero. Un avatar
   // de 44pt + une identité serrée sur trois lignes tiennent dans cette hauteur tout
   // en conservant chaque détail.
   hero: {
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   memberLine: {
-    // Blanc (pas l'ancien accent turquoise, qui disparaîtrait sur le hero turquoise).
+    // Blanc (pas l'ancien accent navy, qui disparaîtrait sur le hero navy).
     color: WHITE,
     fontSize: 12,
     lineHeight: 15,

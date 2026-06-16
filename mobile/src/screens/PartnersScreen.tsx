@@ -186,7 +186,7 @@ function PartnerRow({
 }
 
 // AboutCard — la note explicative sous les groupes d'un segment (Lab_FFIE). Une
-// carte d'information teintée de teal, alignée sur la marque (tokens
+// carte d'information teintée de navy, alignée sur la marque (tokens
 // subtle.syncing) pour qu'elle se lise comme « informative », distincte des
 // lignes de partenaires touchables au-dessus.
 function AboutCard({ note, themeName }: { note: PartnerNote; themeName: ThemeName }) {
@@ -262,7 +262,7 @@ export function PartnersScreen({ themeName = "light" }: { themeName?: ThemeName 
       >
         {/* Sélecteur de segment — Écosystème / Lab_FFIE / Partenaires. */}
         <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 16 }}>
-          {/* La pastille sélectionnée utilise le teal exact de la marque de
+          {/* La pastille sélectionnée utilise le navy exact de la marque de
               l'en-tête de l'app au-dessus (HEADER_SURFACE) pour que le sélecteur
               se lise comme faisant partie de la même barre de marque plutôt que
               comme un accent séparé. */}

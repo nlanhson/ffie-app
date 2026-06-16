@@ -11,7 +11,6 @@
 import React from "react";
 import { ChevronLeft, Share2 } from "lucide-react-native";
 import { Pressable, ScrollView, Share, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { themes, type ThemeName } from "@tokens";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 import { GUTTER, useGroupedColors } from "@/components/ui/ios";
@@ -39,7 +38,11 @@ export function VideoCategoryScreen({
   };
 
   return (
-    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: c.pageBg }}>
+    // Le titre de page (« Outils ») vit dans l'AppHeader partagé (shell), qui
+    // dégage déjà l'encoche : ce lecteur se rend directement en dessous dans un
+    // simple View. Réappliquer un inset haut (SafeAreaView edges=["top"]) le
+    // compterait deux fois et créerait un grand vide en haut.
+    <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       {/* Barre de nav fine : retour + partage (à l'image des lecteurs Actualités / cours). */}
       <View
         style={{
@@ -129,6 +132,6 @@ export function VideoCategoryScreen({
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
