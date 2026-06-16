@@ -48,7 +48,17 @@ export function BottomTabBar({
 
   // Espace de respiration supplémentaire au-dessus et en dessous de la rangée d'onglets,
   // en plus de l'inset de safe area du bas de l'appareil (indicateur d'accueil).
-  const VERTICAL_PADDING = 12;
+  // Volontairement serré pour une barre plus basse ; l'inset de safe area reste
+  // ajouté à part (paddingBottom) pour ne jamais empiéter sur l'indicateur d'accueil.
+  const VERTICAL_PADDING = 6;
+  // Un peu plus d'air au-dessus de la rangée d'onglets que sous elle.
+  const TOP_PADDING = 8;
+  // Sur les appareils SANS indicateur d'accueil (anciens iPhone à bouton, la
+  // plupart des Android), insets.bottom vaut 0 — on garde alors un minimum de marge
+  // basse pour que la barre ne colle pas au bord de l'écran. Avec indicateur, on
+  // s'aligne pile sur l'inset de safe area (aucune marge ajoutée) pour gagner en
+  // hauteur sans empiéter sur la zone sûre.
+  const bottomPad = insets.bottom > 0 ? insets.bottom : VERTICAL_PADDING;
 
   return (
     <View
@@ -58,8 +68,8 @@ export function BottomTabBar({
         {
           backgroundColor: t.surface.default,
           borderTopColor: t.border.subtle,
-          paddingTop: VERTICAL_PADDING,
-          paddingBottom: insets.bottom + VERTICAL_PADDING,
+          paddingTop: TOP_PADDING,
+          paddingBottom: bottomPad,
         },
       ]}
     >
@@ -118,7 +128,7 @@ function TabButton({
       })}
       hitSlop={4}
     >
-      <Icon size={26} color={fg} strokeWidth={isActive ? 2.2 : 1.8} />
+      <Icon size={23} color={fg} strokeWidth={isActive ? 2.2 : 1.8} />
       <Text
         numberOfLines={1}
         style={{
@@ -143,10 +153,10 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    minHeight: 50, // hauteur de barre d'onglets iOS ; toujours une cible ≥44 avec le hitSlop
+    minHeight: 36, // barre plus basse ; reste une cible ≥44 avec le hitSlop
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 8,
-    paddingBottom: 4,
+    paddingTop: 2,
+    paddingBottom: 0,
   },
 });

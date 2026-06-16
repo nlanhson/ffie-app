@@ -25,6 +25,7 @@
 
 import React from "react";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { primitives, themes, type ThemeName } from "@tokens";
@@ -80,6 +81,7 @@ export function HomeScreen({
   onNavigate?: (target: HomeNavTarget) => void;
 }) {
   const c = useHomeColors(themeName);
+  const insets = useSafeAreaInsets();
   const { role } = useRole();
   const variant = role === "member" || role === "admin" ? "member" : "guest";
 
@@ -174,6 +176,24 @@ export function HomeScreen({
           </View>
         </View>
       </ScrollView>
+
+      {/* Bandeau de barre d'état opaque — épinglé tout en haut, AU-DESSUS de la vue
+          de défilement (dernier frère = z-index supérieur). L'en-tête bleu marine
+          vit DANS la ScrollView et défile donc vers le haut ; sans ce bandeau, son
+          contenu (logos, « Bienvenue ») passerait derrière l'horloge / le signal de
+          l'OS et s'y superposerait. Le bandeau garde l'horloge sur un fond bleu
+          marine plein et masque le contenu qui défile en dessous. */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top,
+          backgroundColor: NAVY,
+        }}
+      />
     </View>
   );
 }

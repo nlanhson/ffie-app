@@ -8,7 +8,7 @@
 //
 // La liste de raccourcis dépend du rôle (FFIE-03 / FFIE-04) :
 //   • Adhérent : Documentation · Outils FFIE · Partenaires · Agenda
-//   • Public   : Actus · Découvrir les métiers · Partenaires · Trouver un pro
+//   • Public   : Actus · Découvrir les métiers · Partenaires · Agenda
 // Le public ne voit jamais les sections réservées aux adhérents (Documentation /
 // Outils). Pour modifier les raccourcis, éditez MEMBER_SHORTCUTS / GUEST_SHORTCUTS
 // ci-dessous — l'ordre suit les lignes (rangées de deux ; une carte finale isolée
@@ -21,7 +21,6 @@ import {
   FileText,
   GraduationCap,
   Landmark,
-  MapPin,
   Newspaper,
   Wrench,
   type LucideIcon,
@@ -55,12 +54,15 @@ const MEMBER_SHORTCUTS: ReadonlyArray<Shortcut> = [
 // Raccourcis public — la MÊME grille à 4 cartes (2×2) que les adhérents, mais
 // uniquement des fonctionnalités accessibles aux non-adhérents : aucune surface
 // réservée (ni Documentation ni Outils/calculateurs). Les quatre sont publiques —
-// Actus, Découvrir les métiers, Partenaires, Trouver un pro (FFIE-04).
+// Actus, Découvrir les métiers, Partenaires, Agenda (FFIE-04). « Trouver un pro »
+// a sa propre carte à dégradé dans « Espace public » (évite le doublon).
 const GUEST_SHORTCUTS: ReadonlyArray<Shortcut> = [
   { key: "news", icon: Newspaper, title: "Actus", subtitle: "Le fil d'actualités", target: "news" },
   { key: "trades", icon: GraduationCap, title: "Découvrir les métiers", subtitle: "Métiers & formations", target: "trades" },
   { key: "partners", icon: Landmark, title: "Partenaires", subtitle: "Écosystème & Lab", target: "partners" },
-  { key: "find-pro", icon: MapPin, title: "Trouver un pro", subtitle: "Annuaire géolocalisé", target: "find-pro" },
+  // « Trouver un pro » a sa propre carte à dégradé dans « Espace public » plus bas ;
+  // la grille pointe donc vers l'Agenda (autre surface publique) pour éviter le doublon.
+  { key: "agenda", icon: CalendarDays, title: "Agenda", subtitle: "Événements", target: "agenda" },
 ];
 
 export function QuickAccessGrid({
