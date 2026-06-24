@@ -62,6 +62,7 @@ import { SavedBadge } from "@/components/ui/SavedBadge";
 import { LockTag } from "@/components/ui/LockTag";
 import { FilterButton, FilterSheet, type FilterSection } from "@/components/ui/FilterControls";
 import { DOCS, DOC_FAMILIES, docSubtitle, type Doc, type DocFamily } from "@/data/docs";
+import { PROFESSIONS } from "@/data/professions";
 import { DocDetailScreen } from "@/screens/DocDetailScreen";
 import { MemberOnlyPrompt } from "@/screens/MemberOnlyPrompt";
 import { canAccess, useRole } from "@/auth/roleContext";
@@ -175,6 +176,60 @@ const DOC_FILTER_GROUPS: { family: DocFamily; options: string[] }[] = [
     ],
   },
 ];
+
+// Filtre « Métier » (FFIE-DOC) — une facette transversale qui regroupe les
+// documents par métier d'intégrateur électricien. Aucun document ne porte
+// d'étiquette métier en propre ; chaque métier est donc rattaché aux VRAIES
+// facettes de catégorie FFIE (DOC_FILTER_GROUPS ci-dessus) qui relèvent de son
+// domaine — une vue éditoriale sur les catégories existantes, pas une donnée
+// par-document inventée (convention du repo « aucune donnée réelle fabriquée »).
+// Sélectionner un métier filtre donc les documents dont au moins une catégorie
+// appartient à l'une de ces facettes. Mapping PROVISOIRE — à valider avec la FFIE.
+const METIER_DOC_CATEGORIES: Record<string, string[]> = {
+  "building-electrician": [
+    "Commande et distribution électrique",
+    "Éclairage",
+    "CVC",
+    "Règles d'installation",
+    "Habilitations électriques",
+  ],
+  integrator: [
+    "Pilotage du bâtiment GTB / GTC / BACS",
+    "Commande et distribution électrique",
+    "Supervision / Hypervision",
+    "API (Interfaces de programmation)",
+    "IA Intelligence Artificielle",
+  ],
+  "smart-building": [
+    "Pilotage du bâtiment GTB / GTC / BACS",
+    "IA Intelligence Artificielle",
+    "Accessibilité /Silver Economie",
+    "Serrures connectées",
+    "API (Interfaces de programmation)",
+  ],
+  "ev-charging": ["IRVE", "Autoconsommation / Stockage"],
+  "solar-pv": [
+    "Photovoltaïque PV",
+    "Autoconsommation / Stockage",
+    "CEE",
+    "RE 2020 / RT 2012",
+  ],
+  networks: [
+    "Réseaux de communication",
+    "Fibre optique",
+    "PoE / SPE",
+    "Vidéoprotection",
+    "Contrôle d'accès",
+    "Audiovisuel / Sonorisation / Antennes",
+  ],
+};
+
+// Options de la facette Métier — dérivées de PROFESSIONS pour rester synchrones
+// avec l'onglet Métiers (clé = id du métier, libellé = intitulé du métier).
+const METIER_FILTER: { key: string; label: string }[] = PROFESSIONS.map((p) => ({
+  key: p.id,
+  label: p.role,
+}));
 
 // Rapproche l'intitulé d'une facette de filtre des valeurs `category`/`categories`
 // d'un document SANS dépendre d'un encodage identique au caractère près (accents,
@@ -487,6 +542,9 @@ export function DocLibraryScreen({
   const [statusFilter, setStatusFilter] = useState<Set<SavedFilterKey>>(new Set());
   // Catégories FFIE cochées (clés = intitulés de facette de DOC_FILTER_GROUPS).
   const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
+  // Métiers cochés (clés = ids de PROFESSIONS) — chacun se résout en un ensemble
+  // de catégories FFIE via METIER_DOC_CATEGORIES.
+  const [metierFilter, setMetierFilter] = useState<Set<string>>(new Set());
   // Un document tapé ouvre soit son détail (accessible), soit l'incitation à
   // l'adhésion (un invité tapant un document verrouillé) — une seule surface à la
   // fois au-dessus de la liste.
@@ -544,8 +602,20 @@ export function DocLibraryScreen({
     const selectedCats = categoryFilter.size > 0
       ? new Set([...categoryFilter].map(normCat))
       : null;
+    // Métiers cochés → union de leurs catégories FFIE mappées (normalisées une
+    // seule fois). Un document passe la facette Métier s'il porte au moins une de
+    // ces catégories — OU au sein de la facette, ET avec les autres facettes.
+    const selectedMetierCats = metierFilter.size > 0
+      ? new Set(
+          [...metierFilter]
+            .flatMap((id) => METIER_DOC_CATEGORIES[id] ?? [])
+            .map(normCat),
+        )
+      : null;
     return DOCS.filter((d) => {
       if (selectedCats && !docCategorySet(d).some((c) => selectedCats.has(normCat(c))))
+        return false;
+      if (selectedMetierCats && !docCategorySet(d).some((c) => selectedMetierCats.has(normCat(c))))
         return false;
       const savedKey: SavedFilterKey = d.saved ? "saved" : "not-saved";
       if (hasStatusFilter && !statusFilter.has(savedKey)) return false;
@@ -556,12 +626,12 @@ export function DocLibraryScreen({
         d.categories.some((cat) => cat.toLowerCase().includes(q))
       );
     });
-  }, [query, statusFilter, categoryFilter]);
+  }, [query, statusFilter, categoryFilter, metierFilter]);
 
   // Tout changement de l'ensemble des résultats replie chaque section sur son aperçu.
   useEffect(() => {
     setExpandedSections(new Set());
-  }, [query, statusFilter, categoryFilter]);
+  }, [query, statusFilter, categoryFilter, metierFilter]);
 
   // Regroupe le corpus filtré en sections de familles, dans l'ordre canonique des
   // familles, en écartant les familles sans correspondance (pour que la recherche/le
@@ -590,7 +660,7 @@ export function DocLibraryScreen({
     if (next !== showBackToTop) setShowBackToTop(next);
   };
 
-  const activeFilterCount = statusFilter.size + categoryFilter.size;
+  const activeFilterCount = statusFilter.size + categoryFilter.size + metierFilter.size;
   const cachedCount = useMemo(() => DOCS.filter((d) => d.saved).length, []);
 
   // Bascule une clé dans/hors d'un filtre à valeur d'ensemble (de façon immuable).
@@ -602,13 +672,20 @@ export function DocLibraryScreen({
       return next;
     });
 
-  // Une section repliable par famille FFIE (reproduisant la barre latérale de
+  // La facette Métier en tête (transversale, regroupe les documents par métier),
+  // puis une section repliable par famille FFIE (reproduisant la barre latérale de
   // filtre du site), chacune listant ses catégories en puces — puis la facette
   // Hors ligne (état du cache appareil, propre à l'app, gardée en dernier). Toutes
   // les sections famille partagent le même `categoryFilter` ; chaque section ne
   // reçoit que le sous-ensemble coché de SES options pour que le compteur
   // d'accordéon (et la réinitialisation) restent justes.
   const filterSections: FilterSection[] = [
+    {
+      label: "Métier",
+      options: METIER_FILTER,
+      selected: metierFilter,
+      onToggle: toggleIn(setMetierFilter) as (key: string) => void,
+    },
     ...DOC_FILTER_GROUPS.map((g) => ({
       label: g.family,
       options: g.options.map((o) => ({ key: o, label: o })),
@@ -875,6 +952,7 @@ export function DocLibraryScreen({
         onReset={() => {
           setCategoryFilter(new Set());
           setStatusFilter(new Set());
+          setMetierFilter(new Set());
         }}
         onClose={() => setFilterOpen(false)}
       />

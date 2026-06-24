@@ -223,7 +223,7 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
   // Outils, Nos métiers → Métiers) ; effacé à tout appui manuel sur la barre
   // d'onglets pour que le bouton de l'onglet ouvre son défaut (Métiers).
   const [tradesSegment, setTradesSegment] = useState<
-    "trades" | "tools" | "videos" | null
+    "trades" | "tools" | null
   >(null);
 
   // Appui sur la barre d'onglets. Un onglet différent → on bascule (le gate se
@@ -467,7 +467,7 @@ function renderMemberTab(
     onOpenFigures: () => void;
     onOpenSearch: () => void;
     onHomeNavigate: (target: HomeNavTarget) => void;
-    tradesSegment: "trades" | "tools" | "videos" | null;
+    tradesSegment: "trades" | "tools" | null;
     resetSignal: number;
     onDetailChange: (isDetail: boolean) => void;
   }
@@ -562,7 +562,7 @@ function GuestShell() {
   // Calculateurs) ; effacé à tout appui manuel sur la barre d'onglets. Voir
   // MemberShell pour la justification.
   const [tradesSegment, setTradesSegment] = useState<
-    "trades" | "tools" | "videos" | null
+    "trades" | "tools" | null
   >(null);
   const { setRole } = useRole();
   const { setActiveTab: publishActiveTab } = useActiveTab();
@@ -868,7 +868,7 @@ function renderGuestTab(
     onOpenFigures: () => void;
     onOpenSearch: () => void;
     onHomeNavigate: (target: HomeNavTarget) => void;
-    tradesSegment: "trades" | "tools" | "videos" | null;
+    tradesSegment: "trades" | "tools" | null;
     resetSignal: number;
     onDetailChange: (isDetail: boolean) => void;
   }

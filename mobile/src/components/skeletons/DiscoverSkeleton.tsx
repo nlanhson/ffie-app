@@ -70,7 +70,7 @@ export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeNam
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }} scrollEnabled={false}>
 
-          {/* Contrôle segmenté Métiers / Vidéos / Calculateurs. */}
+          {/* Contrôle segmenté Métiers / Outils. */}
           <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 18 }}>
             <SkeletonBlock width="100%" height={40} radius={primitives.radii.md} themeName={themeName} />
           </View>

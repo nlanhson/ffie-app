@@ -117,7 +117,6 @@ export function OnboardingFlow({
                   setIdentifier(value);
                   handleLogin(value);
                 }}
-                onSso={() => handleLogin()}
                 // « Pas encore adhérent ? » — ouvre l'annuaire des fédérations,
                 // pas l'app. L'adhésion est fédérée : on candidate via sa
                 // fédération départementale (pas d'auto-inscription).

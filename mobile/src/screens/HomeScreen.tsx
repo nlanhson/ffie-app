@@ -8,7 +8,6 @@
 // accueille le contenu du hub :
 //   • Accès rapide — une grille 2×2 de cartes raccourcis vers les onglets porteurs
 //   • Espace public — les deux cartes publiques en dégradé (Trouver un pro / Nos métiers)
-//     + la carte d'affiliation « membre de la FFB »
 //   • Actualités récentes — un rail horizontal d'aperçus des articles les plus récents
 //
 // L'en-tête est une surface de marque bleu marine fixe qui déborde derrière la
@@ -27,15 +26,13 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import * as WebBrowser from "expo-web-browser";
-import { primitives, themes, type ThemeName } from "@tokens";
+import { type ThemeName } from "@tokens";
 import { useRole } from "@/auth/roleContext";
 import { unreadCount } from "@/data/notifications";
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { SectionLabel } from "@/components/home/SectionLabel";
 import { QuickAccessGrid } from "@/components/home/QuickAccessGrid";
 import { PublicSpaceCards } from "@/components/home/PublicSpaceCards";
-import { FFBMembershipCard } from "@/components/home/FFBMembershipCard";
 import { RecentNews } from "@/components/home/RecentNews";
 import { SHEET, useHomeColors } from "@/components/home/homeColors";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
@@ -84,18 +81,6 @@ export function HomeScreen({
   const insets = useSafeAreaInsets();
   const { role } = useRole();
   const variant = role === "member" || role === "admin" ? "member" : "guest";
-
-  // La carte d'affiliation FFB ouvre le site de la fédération dans le navigateur
-  // intégré (page sheet), comme les lecteurs de liens externes Actualités / Métiers.
-  const openFFB = () => {
-    const t = themes[themeName];
-    WebBrowser.openBrowserAsync("https://www.ffbatiment.fr", {
-      presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
-      controlsColor: t.brand.accent,
-      toolbarColor: t.surface.default,
-      dismissButtonStyle: "close",
-    }).catch(() => {});
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
@@ -153,12 +138,10 @@ export function HomeScreen({
             <QuickAccessGrid themeName={themeName} variant={variant} onNavigate={onNavigate} />
           </View>
 
-          {/* Espace public — points d'entrée en dégradé + affiliation FFB */}
+          {/* Espace public — points d'entrée en dégradé */}
           <View style={{ marginBottom: 28 }}>
             <SectionLabel title="Espace public" themeName={themeName} />
             <PublicSpaceCards themeName={themeName} onNavigate={onNavigate} />
-            <View style={{ height: 12 }} />
-            <FFBMembershipCard themeName={themeName} onPress={openFFB} />
           </View>
 
           {/* Actualités récentes — rail horizontal d'aperçus */}

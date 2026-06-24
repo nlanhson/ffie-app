@@ -10,8 +10,8 @@
 // LoginScreen à mot de passe a remplacé les deux, il n'y a donc plus d'étape
 // interne à basculer — un seul écran authentifie directement.)
 //
-// Maquette v1 : tout identifiant + mot de passe bien formés authentifient ; le
-// SSO aussi. Production : vérifiez les identifiants auprès de l'API
+// Maquette v1 : tout identifiant + mot de passe bien formés authentifient (pas
+// de backend). Production : vérifiez les identifiants auprès de l'API
 // d'authentification FFIE avant onAuthenticated.
 
 import React from "react";
@@ -42,7 +42,6 @@ export function SignInFlow({
         <LoginScreen
           onBack={onClose}
           onSubmit={(identifier) => onAuthenticated(identifier)}
-          onSso={() => onAuthenticated("")}
           onJoin={onJoin}
         />
       </SafeAreaProvider>

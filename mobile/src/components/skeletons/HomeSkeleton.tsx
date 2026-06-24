@@ -1,9 +1,9 @@
 // HomeSkeleton — espace réservé de chargement pour HomeScreen. Reflète l'en-tête hero bleu
 // marine (HomeHeader) ET la feuille de tableau de bord en dessous (la feuille grise soulevée
-// avec la grille Accès rapide, les deux cartes en dégradé Espace public + la carte FFB, et le
-// rail Actualités récentes), pour que la mise en page ne saute pas quand le vrai écran s'y
-// substitue. Les métriques ici suivent HomeScreen / les composants d'accueil — les garder
-// synchronisées quand la mise en page du tableau de bord change.
+// avec la grille Accès rapide, les deux cartes en dégradé Espace public, et le rail Actualités
+// récentes), pour que la mise en page ne saute pas quand le vrai écran s'y substitue. Les
+// métriques ici suivent HomeScreen / les composants d'accueil — les garder synchronisées quand
+// la mise en page du tableau de bord change.
 //
 // Le hero se pose sur la surface de marque bleu marine fixe (HomeHeader est statique, sans
 // animation), ses espaces réservés sont donc des blocs blanc translucide PLATS (sans
@@ -27,18 +27,16 @@ const TOP_GAP = Platform.OS === "android" ? 14 : 12;
 const GRID_GAP = 12;
 const NEWS_CARD_W = 264;
 
-// Espaces réservés plats sur le hero bleu marine. Les pastilles de logo sont des boîtes
-// BLANCHES dans HomeHeader → un blanc plus opaque ; le texte (mention d'affiliation, accueil,
-// nom) est du texte blanc translucide → un voile plus discret.
+// Espaces réservés plats sur le hero bleu marine. La pastille de logo est une boîte
+// BLANCHE dans HomeHeader → un blanc plus opaque ; le texte (accueil, nom) est du texte
+// blanc translucide → un voile plus discret.
 const HERO_CHIP = "rgba(255,255,255,0.55)";
 const HERO_LINE = "rgba(255,255,255,0.20)";
 
-// Pastilles de logo du verrou de co-marque (FFIE-01). Les deux logos sont rendus à la même
-// HAUTEUR (≈ 35) dans une pastille blanche de 5 px de marge → ≈ 45 px de haut ; les largeurs
-// suivent les ratios intrinsèques (FFIE ≈ 42 + marge, FFB ≈ 37 + marge).
+// Pastille de logo FFIE (FFIE-01) — rendue à ≈ 35 de haut dans une pastille blanche de
+// 5 px de marge → ≈ 45 px de haut ; la largeur suit le ratio intrinsèque (FFIE ≈ 42 + marge).
 const CHIP_H = 45;
 const FFIE_CHIP_W = 52;
-const FFB_CHIP_W = 47;
 
 // Un espace réservé de sur-titre de section atténué (reflète les métriques de SectionLabel).
 function LabelPlaceholder({ themeName }: { themeName: ThemeName }) {
@@ -81,17 +79,12 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               paddingBottom: 28, // correspond au paddingBottom racine de HomeHeader
             }}
           >
-            {/* Rangée de marque : verrou de co-marque FFIE + FFB (deux pastilles de logo
-                blanches côte à côte). Plus aucune action en haut à droite — le Profil
-                (adhérent) et l'adhésion (invité) vivent désormais dans la barre d'onglets. */}
+            {/* Rangée de marque : pastille de logo FFIE blanche (FFIE-01). Plus aucune
+                action en haut à droite — le Profil (adhérent) et l'adhésion (invité)
+                vivent désormais dans la barre d'onglets. */}
             <View style={{ flexDirection: "row", alignItems: "center", columnGap: 8, minHeight: 44 }}>
               <View style={{ width: FFIE_CHIP_W, height: CHIP_H, borderRadius: 6, backgroundColor: HERO_CHIP }} />
-              <View style={{ width: FFB_CHIP_W, height: CHIP_H, borderRadius: 6, backgroundColor: HERO_CHIP }} />
             </View>
-
-            {/* Mention d'affiliation « La FFIE est membre adhérent de la FFB » — pleine
-                largeur sous le verrou de co-marque (FFIE-01). */}
-            <View style={{ width: 224, height: 12, borderRadius: 4, backgroundColor: HERO_LINE, marginTop: 12 }} />
 
             {/* Bloc d'identité : accueil + nom + pastille — les hauteurs/marges reflètent les
                 métriques de texte de HomeHeader pour que rien ne se décale à la substitution. */}
@@ -139,7 +132,7 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
               </View>
             </View>
 
-            {/* Espace public — deux cartes en dégradé + carte d'affiliation FFB */}
+            {/* Espace public — deux cartes en dégradé */}
             <View style={{ marginBottom: 28 }}>
               <LabelPlaceholder themeName={themeName} />
               <View style={{ flexDirection: "row", columnGap: GRID_GAP, paddingHorizontal: GUTTER }}>
@@ -148,9 +141,6 @@ export function HomeSkeleton({ themeName = "light" }: { themeName?: ThemeName })
                     <SkeletonBlock width="100%" height={124} radius={primitives.radii.xl} themeName={themeName} />
                   </View>
                 ))}
-              </View>
-              <View style={{ paddingHorizontal: GUTTER, marginTop: 12 }}>
-                <SkeletonBlock width="100%" height={64} radius={primitives.radii.lg} themeName={themeName} />
               </View>
             </View>
 

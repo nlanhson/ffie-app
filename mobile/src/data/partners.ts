@@ -4,8 +4,7 @@
 // répartie en trois segments :
 //
 //   - Écosystème · la chaîne commerciale avec laquelle un adhérent traite au
-//                  quotidien (distributeurs, fabricants) ainsi que la fédération
-//                  du bâtiment à laquelle il adhère (FFB).
+//                  quotidien (distributeurs, fabricants).
 //   - Lab_FFIE   · les organismes de qualité et de conformité, accompagnés d'un
 //                  court texte présentant ce qu'est le Lab_FFIE.
 //   - Partenaires · les partenaires institutionnels.
@@ -27,17 +26,12 @@ export type PartnerTabKey = "ecosystem" | "lab" | "partners";
 
 // Une pastille « logo » de marque : une tuile teintée portant le wordmark de la
 // marque. `outlined` ajoute un filet de bordure pour que les pastilles claires/
-// blanches (Sonepar, FFB) restent lisibles sur une carte blanche.
+// blanches (Sonepar) restent lisibles sur une carte blanche.
 export type PartnerLogo = {
   bg: string;
   fg: string;
   text: string;
   outlined?: boolean;
-  // Quand défini, la tuile rend le vrai logo vectoriel embarqué au lieu du
-  // wordmark de substitution (`text`). « ffb » → composant FFBLogo. `text`/`bg`
-  // restent le repli. Étendre cette union au fur et à mesure que de vrais logos
-  // de partenaires arrivent (FFIE-06).
-  brand?: "ffb";
 };
 
 export type PartnerEntry = {
@@ -118,20 +112,6 @@ export const PARTNER_TABS: PartnerTab[] = [
             descriptor: "Tableaux électriques et domotique",
             logo: { bg: "#004A99", fg: "#FFFFFF", text: "hager" },
             url: "https://www.hager.fr/",
-          },
-        ],
-      },
-      {
-        header: "Fédération membre",
-        entries: [
-          {
-            id: "ffb",
-            name: "FFB",
-            descriptor: "Fédération Française du Bâtiment",
-            // Vrai logo FFB (asset embarqué, le même que l'en-tête Accueil + le
-            // pied de connexion) plutôt que le wordmark de substitution.
-            logo: { bg: "#FFFFFF", fg: "#14387F", text: "FFB", outlined: true, brand: "ffb" },
-            url: "https://www.ffbatiment.fr/",
           },
         ],
       },

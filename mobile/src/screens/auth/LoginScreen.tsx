@@ -16,15 +16,11 @@
 //   - Champ identifiant + champ mot de passe.
 //   - CTA « Se connecter » — désactivé tant que les deux champs ne sont pas remplis.
 //   - Rangée de liens « Mot de passe oublié ? » / « Aide & contact ».
-//   - Séparateur « ou » → « Connexion SSO fédération » (cadenas).
-//   - Pied de page : note « La FFIE est membre de la FFB » + barre « Pas encore
-//     adhérent ? Adhérer à la FFIE → ».
+//   - Pied de page : barre « Pas encore adhérent ? Adhérer à la FFIE → ».
 //
 // Maquette v1 : tout identifiant + mot de passe bien formés authentifient (pas
-// de backend) ; le SSO ouvre le sélecteur de fédération → connexion fédération
-// (vérification) avant l'authentification ; Mot de passe oublié / Aide sont
-// inertes. Ne reliez pas ces écrans à une vraie API sans instruction explicite
-// (voir TESTFLIGHT.md / CLAUDE.md).
+// de backend) ; Mot de passe oublié / Aide sont inertes. Ne reliez pas ces
+// écrans à une vraie API sans instruction explicite (voir TESTFLIGHT.md / CLAUDE.md).
 
 import React, { useState } from "react";
 import {
@@ -38,13 +34,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { ArrowRight, ChevronLeft, Lock } from "lucide-react-native";
+import { ArrowRight, ChevronLeft } from "lucide-react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { auth } from "@/screens/auth/tokens";
 import { FFIELogo } from "@/components/ui/FFIELogo";
-import { FFBLogo } from "@/components/ui/FFBLogo";
-import { SSOFlow } from "@/screens/auth/SSOFlow";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 
 const L = auth.login;
@@ -53,7 +47,6 @@ export function LoginScreen({
   initialIdentifier,
   onBack,
   onSubmit,
-  onSso,
   onForgotPassword,
   onHelp,
   onJoin,
@@ -62,7 +55,6 @@ export function LoginScreen({
   onBack: () => void;
   // Se connecter avec un identifiant + mot de passe bien formés — la v1 accepte tout.
   onSubmit: (identifier: string) => void;
-  onSso?: () => void;
   onForgotPassword?: () => void;
   onHelp?: () => void;
   onJoin?: () => void;
@@ -70,27 +62,11 @@ export function LoginScreen({
   const [identifier, setIdentifier] = useState(initialIdentifier ?? "");
   const [password, setPassword] = useState("");
   const [focused, setFocused] = useState<"identifier" | "password" | null>(null);
-  // Le bouton « Connexion SSO fédération » ouvre le parcours SSO sur place :
-  // choisissez votre fédération → connectez-vous à elle (vérification) → onSso
-  // se déclenche. Sélectionner une fédération seule n'authentifie plus.
-  const [ssoOpen, setSsoOpen] = useState(false);
   const insets = useSafeAreaInsets();
 
   const trimmedId = identifier.trim();
   const canConnect = trimmedId.length > 0 && password.length > 0;
   const submit = () => canConnect && onSubmit(trimmedId);
-
-  if (ssoOpen) {
-    return (
-      <SSOFlow
-        onCancel={() => setSsoOpen(false)}
-        onAuthenticated={() => {
-          setSsoOpen(false);
-          onSso?.();
-        }}
-      />
-    );
-  }
 
   return (
     // Seulement le bord du HAUT ici — la feuille blanche du formulaire descend
@@ -210,44 +186,11 @@ export function LoginScreen({
             </Pressable>
           </View>
 
-          {/* Séparateur « ou » */}
-          <View style={styles.dividerRow}>
-            <View style={styles.rule} />
-            <Text style={styles.dividerLabel}>ou</Text>
-            <View style={styles.rule} />
-          </View>
-
-          {/* SSO — ouvre le sélecteur de fédération ; la confirmation authentifie. */}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Connexion SSO fédération"
-            onPress={() => {
-              Keyboard.dismiss();
-              setSsoOpen(true);
-            }}
-            style={({ pressed }) => [styles.sso, pressed && styles.ssoPressed]}
-          >
-            <Lock size={18} color={L.sso.fg} />
-            <Text style={styles.ssoLabel}>Connexion SSO fédération</Text>
-          </Pressable>
-
           {/* Pousse le pied de page vers le bas quand le contenu est court. */}
           <View style={styles.flex} />
 
-          {/* Pied de page — note d'affiliation FFB + barre d'adhésion. */}
+          {/* Pied de page — barre d'adhésion. */}
           <View style={styles.footer}>
-            <View style={styles.fbbNote}>
-              {/* Le logo porte son propre fond blanc ; on le rogne en tuile
-                  arrondie pour qu'il se lise comme une pastille blanche sur le
-                  pied de page navy. */}
-              <View style={styles.fbbMark}>
-                <FFBLogo size={32} />
-              </View>
-              <Text style={styles.fbbText}>
-                La FFIE est membre{"\n"}de la FFB
-              </Text>
-            </View>
-
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Pas encore adhérent ? Adhérer à la FFIE"
@@ -389,63 +332,8 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 
-  dividerRow: {
-    marginTop: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 12,
-  },
-  rule: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: L.divider,
-  },
-  dividerLabel: {
-    color: L.footer.noteText, // navy sur la feuille blanche (pas le sous-titre blanc du bandeau)
-    fontSize: 13,
-    fontFamily: ralewayFamily("400"),
-  },
-
-  sso: {
-    marginTop: 24,
-    height: 52,
-    borderRadius: L.radius,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    columnGap: 8,
-    backgroundColor: L.sso.bg,
-    borderWidth: 1,
-    borderColor: L.sso.border,
-  },
-  ssoPressed: { backgroundColor: L.sso.bgPressed },
-  ssoLabel: {
-    color: L.sso.fg,
-    fontSize: 15,
-    fontFamily: ralewayFamily("600"),
-    fontWeight: "600",
-  },
-
   footer: {
     marginTop: 24,
-    rowGap: 16,
-  },
-  fbbNote: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    columnGap: 8,
-  },
-  fbbMark: {
-    borderRadius: 6,
-    overflow: "hidden",
-    backgroundColor: "#FFFFFF",
-  },
-  fbbText: {
-    color: L.footer.noteText,
-    fontSize: 12,
-    lineHeight: 15,
-    fontFamily: ralewayFamily("400"),
   },
   joinBar: {
     height: 52,

@@ -34,7 +34,13 @@
     "plugins": [
       "expo-font",
       "expo-web-browser",
-      "@maplibre/maplibre-react-native"
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "L'application accède à vos photos pour définir votre photo de profil."
+        }
+      ]
     ],
     "extra": {
       "eas": {

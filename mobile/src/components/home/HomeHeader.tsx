@@ -2,9 +2,7 @@
 //
 // Une surface de marque bleu marine profond qui remonte derrière la barre
 // d'état et porte :
-//   - le verrou de co-marque FFIE + FFB à gauche (FFIE-01) : les deux logos côte à
-//     côte, puis la mention « La FFIE est membre adhérent de la FFB » en dessous.
-//     Le logo FFIE est touchable → ouvre « La FFIE en chiffres » (FFIE-02).
+//   - le logo FFIE à gauche (FFIE-01), touchable → ouvre « La FFIE en chiffres » (FFIE-02).
 //   - PAS de bouton d'action en haut à droite : le Profil (adhérent) et l'adhésion
 //     (invité) vivent désormais dans la barre d'onglets du bas.
 //   - un bloc d'accueil + identité :
@@ -32,7 +30,6 @@ import { primitives, type ThemeName } from "@tokens";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 import { GUTTER } from "@/components/ui/ios";
 import { FFIELogo } from "@/components/ui/FFIELogo";
-import { FFBLogo } from "@/components/ui/FFBLogo";
 import { HEADER_SURFACE } from "@/theme/brandHeader";
 import { type MemberProfile } from "@/data/member";
 
@@ -73,13 +70,9 @@ const TOP_GAP = Platform.OS === "android" ? 14 : 12;
 // que le sous-titre dégage le logo au lieu de le coller, tout en restant centré.
 const GUEST_GAP = 8;
 
-// Verrou de co-marque FFIE + FFB (FFIE-01) — les deux logos sont rendus à la
-// MÊME hauteur. Attention : les deux composants n'interprètent pas `size` de la
-// même façon — FFIELogo.size = LARGEUR (hauteur = size / 1,188) ; FFBLogo.size =
-// HAUTEUR. On choisit donc une largeur FFIE de 42 (≈ 35,4 de haut) et une hauteur
-// FFB de 35 pour que les deux pastilles s'alignent exactement à la même hauteur.
+// Logo FFIE (FFIE-01). FFIELogo.size = LARGEUR (hauteur = size / 1,188) ; une
+// largeur de 42 donne ≈ 35,4 de haut dans sa pastille blanche.
 const FFIE_LOGO_SIZE = 42; // largeur FFIE → hauteur ≈ 35,4
-const FFB_LOGO_SIZE = 35; // hauteur FFB → 35
 
 export type HomeHeaderProps = {
   themeName?: ThemeName;
@@ -119,14 +112,10 @@ export function HomeHeader({
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + TOP_GAP }]}>
-      {/* Verrou de co-marque (plus aucune action en haut à droite — voir l'en-tête de fichier) */}
+      {/* Logo de marque (plus aucune action en haut à droite — voir l'en-tête de fichier) */}
       <View style={styles.topRow}>
-        {/* Verrou de co-marque FFIE + FFB (FFIE-01) : les deux logos côte à côte, à
-            la MÊME hauteur, chacun dans sa pastille blanche ; la mention
-            d'affiliation est en pleine largeur sous la rangée (voir plus bas). Le
-            logo FFIE est touchable et ouvre « La FFIE en chiffres » (FFIE-02) ; le
-            logo FFB reste décoratif. Chaque pastille porte son propre libellé
-            d'accessibilité. */}
+        {/* Logo FFIE (FFIE-01) dans sa pastille blanche, touchable → ouvre
+            « La FFIE en chiffres » (FFIE-02). */}
         <View style={styles.logoLockup}>
           <Pressable
             onPress={onPressFigures}
@@ -141,9 +130,6 @@ export function HomeHeader({
           >
             <FFIELogo size={FFIE_LOGO_SIZE} themeName="light" />
           </Pressable>
-          <View style={styles.logoChip} accessibilityRole="image" accessibilityLabel="FFB">
-            <FFBLogo size={FFB_LOGO_SIZE} />
-          </View>
         </View>
         {/* Cloche de notifications (adhérent) → ouvre le centre de notifications.
             Le Profil, lui, vit dans la barre d'onglets du bas + le bloc d'identité
@@ -165,10 +151,6 @@ export function HomeHeader({
           </Pressable>
         ) : null}
       </View>
-
-      {/* Mention d'affiliation FFB (FFIE-01) — pleine largeur sous le verrou de
-          co-marque, à l'image de la carte « membre de la FFB » plus bas dans le hub. */}
-      <Text style={styles.affiliation}>La FFIE est membre adhérent de la FFB</Text>
 
       {/* Identité / message d'accueil */}
       {isMember ? (
@@ -197,8 +179,7 @@ export function HomeHeader({
       ) : (
         <View style={[styles.identity, styles.identityGuest]}>
           {/* Le message « Bienvenue à la FFIE » vit désormais ici (il était
-              auparavant en ligne à côté du logo, place reprise par le verrou de
-              co-marque FFIE + FFB). */}
+              auparavant en ligne à côté du logo). */}
           <Text style={styles.guestWelcome} accessibilityRole="header" numberOfLines={1}>
             Bienvenue à la FFIE
           </Text>
@@ -280,17 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: primitives.colors.red[500],
     borderWidth: 1.5,
     borderColor: HEADER_SURFACE,
-  },
-  // Mention d'affiliation FFB sous le verrou de co-marque (FFIE-01). Reprend le
-  // traitement « texte atténué sur le héros » du sous-titre invité.
-  affiliation: {
-    color: HELLO,
-    fontFamily: ralewayFamily("500"),
-    fontWeight: "500",
-    fontSize: 12.5,
-    lineHeight: 17,
-    letterSpacing: 0.1,
-    marginTop: 10,
   },
   // En-tête « Bienvenue à la FFIE » de la variante invité — désormais dans le bloc
   // d'identité (la rangée de marque porte le verrou de co-marque à la place).

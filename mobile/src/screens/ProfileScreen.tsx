@@ -1,7 +1,8 @@
 // Onglet Profil — compte adhérent, qualifications et réglages.
 //
-// S'ouvre sur un « hero d'identité » bleu marine (avatar + nom + intitulé de
-// poste + ligne adhérent), reprenant le motif du hero de l'Accueil : une
+// S'ouvre sur un « hero d'identité » bleu marine (avatar tactile pour définir une
+// photo de profil + nom + intitulé de poste + ligne adhérent), reprenant le motif
+// du hero de l'Accueil : une
 // surface de marque bleu marine fixe qui déborde derrière la barre d'état. La
 // coquille (App.tsx) masque l'AppHeader persistant sur cet onglet pour que le
 // hero occupe seul le haut — une seule région bleu marine, pas deux.
@@ -25,6 +26,7 @@
 import React, { useState } from "react";
 import {
   Building2,
+  Camera,
   Check,
   Globe,
   Hash,
@@ -37,7 +39,11 @@ import {
   type LucideIcon,
 } from "lucide-react-native";
 import {
+  Alert,
+  Image,
+  Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
@@ -46,6 +52,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { primitives, themes, type ThemeName } from "@tokens";
 import { useRole } from "@/auth/roleContext";
@@ -147,6 +154,41 @@ export function ProfileScreen({
   );
   const closeSheet = () => setSheet("none");
 
+  // Photo de profil — choisie localement depuis la photothèque (maquette v1 :
+  // aucun backend, l'URI ne vit que pour cette session ; voir CLAUDE.md). Sans
+  // photo, l'avatar retombe sur le monogramme.
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+
+  // Ouvre la photothèque pour choisir une photo de profil. Demande d'abord
+  // l'autorisation (iOS exige NSPhotoLibraryUsageDescription — voir app.json) ;
+  // une annulation laisse l'avatar inchangé. Recadrage carré pour épouser l'avatar
+  // rond.
+  const pickPhoto = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      // Refus (ou « ne plus demander ») : sans retour, l'appui resterait sans
+      // effet — on explique et on propose d'ouvrir les Réglages système.
+      Alert.alert(
+        "Accès aux photos refusé",
+        "Autorisez l'accès à vos photos dans les Réglages pour définir une photo de profil.",
+        [
+          { text: "Annuler", style: "cancel" },
+          { text: "Réglages", onPress: () => Linking.openSettings() },
+        ],
+      );
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.85,
+    });
+    if (!result.canceled && result.assets[0]?.uri) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  };
+
   // Monogramme dérivé du nom (modifiable) pour que l'avatar reste synchronisé.
   const initials =
     profile.fullName
@@ -191,14 +233,45 @@ export function ProfileScreen({
       >
         {/* ---- Hero d'identité (bleu marine) --------------------------- */}
         <View style={[styles.hero, { paddingTop: insets.top + TOP_GAP }]}>
-          <View
-            style={styles.avatar}
-            accessible
-            accessibilityRole="image"
-            accessibilityLabel={`${profile.fullName}, monogramme`}
+          {/* Avatar tactile — appuyer ouvre la photothèque pour définir une photo
+              de profil (pastille appareil photo en incrustation). Sans photo, on
+              affiche le monogramme. */}
+          <Pressable
+            onPress={pickPhoto}
+            accessibilityRole="button"
+            accessibilityLabel={
+              photoUri
+                ? `Photo de profil de ${profile.fullName}`
+                : `${profile.fullName}, monogramme`
+            }
+            accessibilityHint="Appuyer pour changer la photo de profil"
+            hitSlop={8}
+            style={({ pressed }) => [styles.avatarWrap, pressed ? { opacity: 0.85 } : null]}
           >
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
+            <View style={styles.avatar}>
+              {photoUri ? (
+                <Image
+                  source={{ uri: photoUri }}
+                  style={styles.avatarImage}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                />
+              ) : (
+                <Text style={styles.avatarText}>{initials}</Text>
+              )}
+            </View>
+            {/* Pastille appareil photo — disque blanc cerclé du navy du héros, en
+                bas à droite. Blanc sur le héros navy + glyphe navy sur le disque
+                blanc = fort contraste dans les deux cas. Décorative : le Pressable
+                parent annonce déjà l'action. */}
+            <View
+              style={styles.avatarBadge}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            >
+              <Camera size={11} color={INITIALS} strokeWidth={2.5} />
+            </View>
+          </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={styles.name} numberOfLines={1} accessibilityRole="header">
               {profile.fullName}
@@ -618,11 +691,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     columnGap: 12,
   },
+  // Conteneur de l'avatar — contexte de positionnement pour la pastille appareil
+  // photo qui déborde au coin bas-droit.
+  avatarWrap: {
+    width: 44,
+    height: 44,
+  },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: AVATAR,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden", // rogne la photo au cercle
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+  },
+  // Pastille appareil photo — petit disque blanc cerclé du navy du héros, ancré au
+  // coin bas-droit de l'avatar (léger débord pour chevaucher le bord).
+  avatarBadge: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: AVATAR,
+    borderWidth: 1.5,
+    borderColor: SURFACE,
     alignItems: "center",
     justifyContent: "center",
   },

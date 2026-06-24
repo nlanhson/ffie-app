@@ -13,10 +13,8 @@ sent anywhere.
 At the welcome screen you choose one of two paths:
 
 1. **Adhérer (Member)** — on the sign-in screen enter **any email/identifier**
-   and **any password**, then tap **Connect**. Or tap **SSO federation
-   connection**, **pick your federation** (map or list) + **Continue**, then
-   **Continue to sign in** (simulated secure redirect — no password is collected
-   in-app). Either way you'll land in the **member** experience.
+   and **any password**, then tap **Connect**. You'll land in the **member**
+   experience.
    Tabs: *Actualités · Partenaires · Bibliothèque · Profil*
 2. **Découvrir (Public visitor)** — no sign-in. You'll land in the **public**
    experience.
@@ -32,12 +30,13 @@ you can skip it.
 
 ## What to test
 
-- **Onboarding** — both paths (member + public); the login screen (Connect +
-  the SSO federation picker, with search); skipping Face ID.
+- **Onboarding** — both paths (member + public); the login screen (Connect);
+  skipping Face ID.
 - **Actualités (News)** — browse the news list and open items.
 - **Partenaires (Partners)** — browse partners.
 - **Bibliothèque (Library, members only)** — open the document library.
-- **Profil (members only)** — review the profile screen.
+- **Profil (members only)** — review the profile screen; tap the **avatar** to
+  pick a profile photo from your library (kept locally for the session).
 - **Métiers / Discover (public)** — explore the sector/industry content.
 - **Adhérer / Become a Member (public)** — the membership info screen, including
   the **map** of federations (tap markers / callouts).
