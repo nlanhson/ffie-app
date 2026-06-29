@@ -62,7 +62,6 @@ import { SavedBadge } from "@/components/ui/SavedBadge";
 import { LockTag } from "@/components/ui/LockTag";
 import { FilterButton, FilterSheet, type FilterSection } from "@/components/ui/FilterControls";
 import { DOCS, DOC_FAMILIES, docSubtitle, type Doc, type DocFamily } from "@/data/docs";
-import { PROFESSIONS } from "@/data/professions";
 import { DocDetailScreen } from "@/screens/DocDetailScreen";
 import { MemberOnlyPrompt } from "@/screens/MemberOnlyPrompt";
 import { canAccess, useRole } from "@/auth/roleContext";
@@ -176,60 +175,6 @@ const DOC_FILTER_GROUPS: { family: DocFamily; options: string[] }[] = [
     ],
   },
 ];
-
-// Filtre « Métier » (FFIE-DOC) — une facette transversale qui regroupe les
-// documents par métier d'intégrateur électricien. Aucun document ne porte
-// d'étiquette métier en propre ; chaque métier est donc rattaché aux VRAIES
-// facettes de catégorie FFIE (DOC_FILTER_GROUPS ci-dessus) qui relèvent de son
-// domaine — une vue éditoriale sur les catégories existantes, pas une donnée
-// par-document inventée (convention du repo « aucune donnée réelle fabriquée »).
-// Sélectionner un métier filtre donc les documents dont au moins une catégorie
-// appartient à l'une de ces facettes. Mapping PROVISOIRE — à valider avec la FFIE.
-const METIER_DOC_CATEGORIES: Record<string, string[]> = {
-  "building-electrician": [
-    "Commande et distribution électrique",
-    "Éclairage",
-    "CVC",
-    "Règles d'installation",
-    "Habilitations électriques",
-  ],
-  integrator: [
-    "Pilotage du bâtiment GTB / GTC / BACS",
-    "Commande et distribution électrique",
-    "Supervision / Hypervision",
-    "API (Interfaces de programmation)",
-    "IA Intelligence Artificielle",
-  ],
-  "smart-building": [
-    "Pilotage du bâtiment GTB / GTC / BACS",
-    "IA Intelligence Artificielle",
-    "Accessibilité /Silver Economie",
-    "Serrures connectées",
-    "API (Interfaces de programmation)",
-  ],
-  "ev-charging": ["IRVE", "Autoconsommation / Stockage"],
-  "solar-pv": [
-    "Photovoltaïque PV",
-    "Autoconsommation / Stockage",
-    "CEE",
-    "RE 2020 / RT 2012",
-  ],
-  networks: [
-    "Réseaux de communication",
-    "Fibre optique",
-    "PoE / SPE",
-    "Vidéoprotection",
-    "Contrôle d'accès",
-    "Audiovisuel / Sonorisation / Antennes",
-  ],
-};
-
-// Options de la facette Métier — dérivées de PROFESSIONS pour rester synchrones
-// avec l'onglet Métiers (clé = id du métier, libellé = intitulé du métier).
-const METIER_FILTER: { key: string; label: string }[] = PROFESSIONS.map((p) => ({
-  key: p.id,
-  label: p.role,
-}));
 
 // Rapproche l'intitulé d'une facette de filtre des valeurs `category`/`categories`
 // d'un document SANS dépendre d'un encodage identique au caractère près (accents,
@@ -498,80 +443,6 @@ function SectionToggleRow({
   );
 }
 
-// MetierTabRow — la rangée d'onglets « Métier » en haut de la Bibliothèque : un
-// filtre de premier niveau visible d'emblée, à l'image du contrôle segmenté de
-// l'onglet Outils. « Tous » (null) + un onglet par métier ; sélection unique —
-// retoucher l'onglet actif le désélectionne et revient à « Tous ». Défile
-// horizontalement (7 onglets aux libellés longs ne tiendraient pas dans un
-// contrôle segmenté statique). Le style des puces reprend celui de la feuille de
-// filtre (FilterControls) pour rester cohérent.
-function MetierTabRow({
-  themeName,
-  selected,
-  onSelect,
-}: {
-  themeName: ThemeName;
-  selected: string | null;
-  onSelect: (id: string | null) => void;
-}) {
-  const t = themes[themeName];
-  // « Tous » + un onglet par métier (ids + libellés de PROFESSIONS).
-  const tabs: { key: string | null; label: string }[] = [
-    { key: null, label: "Tous" },
-    ...METIER_FILTER,
-  ];
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      // La rangée défile ; on garde la gouttière des deux côtés pour l'alignement
-      // avec la recherche et le compteur de résultats.
-      contentContainerStyle={{ paddingHorizontal: GUTTER, columnGap: 8, paddingBottom: 14 }}
-      style={{ marginBottom: 4 }}
-    >
-      {tabs.map((tab) => {
-        const isSelected = tab.key === selected;
-        return (
-          <Pressable
-            key={tab.key ?? "all"}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isSelected }}
-            accessibilityLabel={tab.label}
-            onPress={() => onSelect(tab.key)}
-            style={({ pressed }) => ({
-              height: 36,
-              borderRadius: 18,
-              paddingVertical: 0,
-              paddingHorizontal: 16,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: isSelected
-                ? t.brand.accent
-                : pressed
-                  ? t.border.subtle
-                  : t.surface.subtle,
-              borderWidth: 1,
-              borderColor: isSelected ? t.brand.accent : t.border.subtle,
-            })}
-          >
-            <Text
-              numberOfLines={1}
-              style={{
-                color: isSelected ? "#FFFFFF" : t.text.body,
-                fontSize: 14,
-                fontFamily: ralewayFamily(isSelected ? "600" : "500"),
-                fontWeight: isSelected ? "600" : "500",
-              }}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
-  );
-}
-
 type Props = {
   themeName: ThemeName;
   density: DensityMode;
@@ -616,11 +487,6 @@ export function DocLibraryScreen({
   const [statusFilter, setStatusFilter] = useState<Set<SavedFilterKey>>(new Set());
   // Catégories FFIE cochées (clés = intitulés de facette de DOC_FILTER_GROUPS).
   const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
-  // Métier sélectionné dans la rangée d'onglets en haut de page (clé = id de
-  // PROFESSIONS, ou null = « Tous »). Un seul à la fois — c'est un onglet, pas une
-  // facette multi-sélection. Se résout en un ensemble de catégories FFIE via
-  // METIER_DOC_CATEGORIES.
-  const [metierFilter, setMetierFilter] = useState<string | null>(null);
   // Un document tapé ouvre soit son détail (accessible), soit l'incitation à
   // l'adhésion (un invité tapant un document verrouillé) — une seule surface à la
   // fois au-dessus de la liste.
@@ -678,16 +544,8 @@ export function DocLibraryScreen({
     const selectedCats = categoryFilter.size > 0
       ? new Set([...categoryFilter].map(normCat))
       : null;
-    // Métier sélectionné (onglet en haut de page) → ses catégories FFIE mappées
-    // (normalisées une seule fois). Un document passe s'il porte au moins une de
-    // ces catégories, combiné en ET avec les autres filtres.
-    const selectedMetierCats = metierFilter
-      ? new Set((METIER_DOC_CATEGORIES[metierFilter] ?? []).map(normCat))
-      : null;
     return DOCS.filter((d) => {
       if (selectedCats && !docCategorySet(d).some((c) => selectedCats.has(normCat(c))))
-        return false;
-      if (selectedMetierCats && !docCategorySet(d).some((c) => selectedMetierCats.has(normCat(c))))
         return false;
       const savedKey: SavedFilterKey = d.saved ? "saved" : "not-saved";
       if (hasStatusFilter && !statusFilter.has(savedKey)) return false;
@@ -698,12 +556,12 @@ export function DocLibraryScreen({
         d.categories.some((cat) => cat.toLowerCase().includes(q))
       );
     });
-  }, [query, statusFilter, categoryFilter, metierFilter]);
+  }, [query, statusFilter, categoryFilter]);
 
   // Tout changement de l'ensemble des résultats replie chaque section sur son aperçu.
   useEffect(() => {
     setExpandedSections(new Set());
-  }, [query, statusFilter, categoryFilter, metierFilter]);
+  }, [query, statusFilter, categoryFilter]);
 
   // Regroupe le corpus filtré en sections de familles, dans l'ordre canonique des
   // familles, en écartant les familles sans correspondance (pour que la recherche/le
@@ -732,9 +590,6 @@ export function DocLibraryScreen({
     if (next !== showBackToTop) setShowBackToTop(next);
   };
 
-  // L'onglet Métier est désormais une rangée d'onglets en haut de page (pas dans
-  // la feuille de filtre) — le compteur du bouton Filtrer ne compte donc que les
-  // filtres de la feuille (catégorie + hors ligne).
   const activeFilterCount = statusFilter.size + categoryFilter.size;
   const cachedCount = useMemo(() => DOCS.filter((d) => d.saved).length, []);
 
@@ -749,11 +604,10 @@ export function DocLibraryScreen({
 
   // Une section repliable par famille FFIE (reproduisant la barre latérale de
   // filtre du site), chacune listant ses catégories en puces — puis la facette
-  // Hors ligne (état du cache appareil, propre à l'app, gardée en dernier). La
-  // facette Métier vit désormais comme une rangée d'onglets en haut de page (hors
-  // feuille). Toutes les sections famille partagent le même `categoryFilter` ;
-  // chaque section ne reçoit que le sous-ensemble coché de SES options pour que le
-  // compteur d'accordéon (et la réinitialisation) restent justes.
+  // Hors ligne (état du cache appareil, propre à l'app, gardée en dernier). Toutes
+  // les sections famille partagent le même `categoryFilter` ; chaque section ne
+  // reçoit que le sous-ensemble coché de SES options pour que le compteur
+  // d'accordéon (et la réinitialisation) restent justes.
   const filterSections: FilterSection[] = [
     ...DOC_FILTER_GROUPS.map((g) => ({
       label: g.family,
@@ -862,18 +716,6 @@ export function DocLibraryScreen({
             }
           />
         </View>
-
-        {/* Rangée d'onglets « Métier » — un filtre transversal de premier niveau,
-            visible d'emblée en haut de page (comme le contrôle segmenté de
-            l'onglet Outils). « Tous » + un onglet par métier ; un seul à la fois.
-            Chaque métier se résout en un ensemble de catégories FFIE
-            (METIER_DOC_CATEGORIES). Défile horizontalement car 7 onglets ne
-            tiendraient pas dans un contrôle segmenté statique. */}
-        <MetierTabRow
-          themeName={themeName}
-          selected={metierFilter}
-          onSelect={(id) => setMetierFilter(id)}
-        />
 
         {/* Nombre de résultats — reprend la ligne « 335 documents » du site FFIE. */}
         <Text
