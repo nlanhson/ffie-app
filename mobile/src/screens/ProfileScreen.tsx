@@ -90,6 +90,10 @@ function withAlpha(hex: string, alpha: number): string {
 }
 
 const ROLE_LINE = withAlpha(WHITE, 0.72); // ligne d'intitulé de poste atténuée sur le bleu marine
+// Cercle translucide encadrant l'avatar : le fait se lire comme une photo de
+// profil modifiable (appui → photothèque), en écho au disque « profil » de
+// l'en-tête. Translucide pour rester discret sur le hero navy.
+const AVATAR_RING = withAlpha(WHITE, 0.7);
 const TOP_GAP = Platform.OS === "android" ? 14 : 12; // assorti à Home/AppHeader
 
 // Le véritable « Liquid Glass » d'iOS 26 (UIGlassEffect) n'existe que sur iOS 26+.
@@ -691,11 +695,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     columnGap: 12,
   },
-  // Conteneur de l'avatar — contexte de positionnement pour la pastille appareil
-  // photo qui déborde au coin bas-droit.
+  // Conteneur de l'avatar — sert AUSSI de cercle de contour. Plus grand que
+  // l'avatar de 4 pt de chaque côté : le contour blanc (borderWidth) puis un
+  // mince intervalle navy (padding) séparent l'anneau de l'avatar blanc, sinon
+  // un anneau blanc sur un avatar blanc serait invisible. Le contour signale que
+  // la photo de profil est modifiable (appui ouvre la photothèque) ; la pastille
+  // appareil photo au coin renforce cette affordance. Contexte de positionnement
+  // pour cette pastille qui déborde au coin bas-droit.
   avatarWrap: {
-    width: 44,
-    height: 44,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
+    borderColor: AVATAR_RING,
+    padding: 2, // intervalle navy entre l'anneau et l'avatar
+    alignItems: "center",
+    justifyContent: "center",
   },
   avatar: {
     width: 44,

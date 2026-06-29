@@ -25,7 +25,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes, type ThemeName, type DensityMode } from "@tokens";
 import { FONTS } from "@/theme/fonts";
 import { HomeScreen, type HomeNavTarget } from "@/screens/HomeScreen";
-import { DocLibraryScreen } from "@/screens/DocLibraryScreen";
+import { LibraryScreen } from "@/screens/LibraryScreen";
 import { NewsScreen } from "@/screens/NewsScreen";
 import { NotificationsScreen } from "@/screens/NotificationsScreen";
 import { NotificationCenterScreen } from "@/screens/NotificationCenterScreen";
@@ -322,8 +322,8 @@ function MemberShell({ onSignOut }: { onSignOut: () => void }) {
                 // destination.
                 const map: Partial<Record<HomeNavTarget, MemberTabKey>> = {
                   docs: "library",
-                  tools: "discover", // Onglet Découvrir → segment Outils
-                  trades: "discover", // Onglet Découvrir → segment Métiers
+                  tools: "discover", // Onglet Outils → grille de lancement
+                  trades: "library", // Onglet Docs → segment Métiers
                   partners: "partners",
                   news: "news",
                 };
@@ -485,13 +485,17 @@ function renderMemberTab(
         />
       );
     case "library":
+      // L'onglet Docs porte désormais deux segments — Docs (Bibliothèque) et
+      // Métiers (carrières, déplacé depuis l'onglet Outils). Le lien profond
+      // « trades » ouvre directement le segment Métiers.
       return (
-        <DocLibraryScreen
+        <LibraryScreen
           themeName={themeName}
           density={density}
           offline={offline}
           resetSignal={actions.resetSignal}
           onDetailChange={actions.onDetailChange}
+          initialSegment={actions.tradesSegment === "trades" ? "trades" : undefined}
           onDocPress={() => {
             // TODO : naviguer vers le Détail du document (Écran 2) quand il
             // arrivera.
@@ -509,13 +513,12 @@ function renderMemberTab(
     case "partners":
       return <PartnersScreen themeName={themeName} />;
     case "discover":
-      // Métiers — carrières, formation, ressources externes. Public et
-      // autonome, désormais aussi présent dans la nav adhérent (Julien).
+      // Outils — la grille de lancement (calculateurs + outils métier). Le lien
+      // profond « tools » l'ouvre depuis le raccourci « Outils FFIE » de l'Accueil.
       return (
         <DiscoverScreen
           themeName={themeName}
           resetSignal={actions.resetSignal}
-          initialSegment={actions.tradesSegment ?? undefined}
         />
       );
     case "profile":
@@ -687,8 +690,8 @@ function GuestShell() {
               );
               const map: Partial<Record<HomeNavTarget, GuestTabKey>> = {
                 docs: "library",
-                tools: "discover", // Onglet Découvrir → segment Outils
-                trades: "discover", // Onglet Découvrir → segment Métiers
+                tools: "discover", // Onglet Outils → grille de lancement
+                trades: "library", // Onglet Docs → segment Métiers
                 partners: "partners",
                 news: "news",
               };
@@ -888,13 +891,12 @@ function renderGuestTab(
         />
       );
     case "discover":
-      // L'onglet Métiers est entièrement public (P6) et autonome — uniquement
-      // carrières, formation et liens vers des ressources externes.
+      // L'onglet Outils — la grille de lancement (calculateurs + outils métier),
+      // entièrement publique (P6).
       return (
         <DiscoverScreen
           themeName={themeName}
           resetSignal={actions.resetSignal}
-          initialSegment={actions.tradesSegment ?? undefined}
         />
       );
     case "news":
@@ -918,16 +920,18 @@ function renderGuestTab(
       // l'exhaustivité du type GuestTabKey.
       return null;
     case "library":
-      // La Bibliothèque fait désormais aussi partie de l'expérience invité —
-      // les non-adhérents parcourent le même annuaire de documents (simulation
-      // v1 : accès complet).
+      // L'onglet Docs (Bibliothèque + segment Métiers) fait désormais aussi partie
+      // de l'expérience invité — les non-adhérents parcourent le même annuaire de
+      // documents (simulation v1 : accès complet) et la section carrières publique.
+      // Le lien profond « trades » ouvre directement le segment Métiers.
       return (
-        <DocLibraryScreen
+        <LibraryScreen
           themeName={themeName}
           density={density}
           offline={offline}
           resetSignal={actions.resetSignal}
           onDetailChange={actions.onDetailChange}
+          initialSegment={actions.tradesSegment === "trades" ? "trades" : undefined}
           // Un invité qui touche un document verrouillé obtient l'upsell ;
           // "Demander l'adhésion" ouvre l'annuaire des fédérations (carte +
           // liste départementale), "J'ai déjà un compte" ouvre la connexion —

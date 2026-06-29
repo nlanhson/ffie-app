@@ -81,12 +81,15 @@ const MODES: { key: ModeKey; label: string; icon: LucideIcon }[] = [
   { key: "writing", label: "Rédaction", icon: PenLine },
 ];
 
-// La hauteur de la barre d'onglets inférieure au-dessus de la marge de zone sûre
-// (BottomTabBar : minHeight 50 + 12 de padding haut + 12 de padding bas ≈ 74).
+// La hauteur de la barre d'onglets inférieure AU-DESSUS de la marge de zone sûre
+// (BottomTabBar : 8 de padding haut + onglet ~40 — icône 23 + libellé ; le padding
+// bas vaut l'inset de safe area, ajouté à part via insets.bottom — soit ≈ 48).
 // Le widget est monté comme un frère pleine largeur de la barre d'onglets, donc
 // ses enfants sont positionnés en coordonnées APPAREIL — on ajoute ceci + la
-// marge à la main pour dégager la rangée de navigation.
-const TAB_BAR_HEIGHT = 74;
+// marge à la main pour dégager la rangée de navigation. NB : doit rester aligné
+// sur la hauteur réelle de BottomTabBar, sinon le FAB (et les boutons « retour en
+// haut » qui s'empilent au-dessus) se décalent — c'est la source de vérité unique.
+const TAB_BAR_HEIGHT = 48;
 // Écart entre la barre d'onglets et le FAB.
 export const ASSISTANT_FAB_GAP = 16;
 // Diamètre du FAB. Exporté pour que les boutons « retour en haut » des écrans le

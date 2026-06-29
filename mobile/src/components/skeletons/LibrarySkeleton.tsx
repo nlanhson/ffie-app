@@ -78,6 +78,11 @@ export function LibrarySkeleton({ themeName = "light" }: { themeName?: ThemeName
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 32, paddingTop: 18 }} scrollEnabled={false}>
 
+          {/* Contrôle segmenté Docs / Métiers (barre fixe au-dessus de la liste). */}
+          <View style={{ paddingHorizontal: GUTTER, marginBottom: 18 }}>
+            <SkeletonBlock width="100%" height={40} radius={primitives.radii.md} themeName={themeName} />
+          </View>
+
           {/* Champ de recherche + bouton de filtre */}
           <View
             style={{

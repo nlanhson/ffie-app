@@ -60,8 +60,9 @@ export const MEMBER_TABS: ReadonlyArray<TabConfig<MemberTabKey>> = [
   { key: "home", label: "Accueil", icon: Home, access: "public" },
   { key: "news", label: "Actus", icon: Newspaper, access: "public" },
   { key: "library", label: "Docs", icon: BookOpen, access: "member-only" },
-  // Onglet « discover » — libellé « Outils » (le segment Métiers est temporairement
-  // retiré ; il ne propose plus que Vidéos + Calculateurs). Voir DiscoverScreen.
+  // Onglet « discover » — libellé « Outils » : la grille de lancement (outils +
+  // calculateurs). Le segment carrières « Métiers » vit désormais sous l'onglet
+  // Docs (LibraryScreen). Voir DiscoverScreen.
   { key: "discover", label: "Outils", icon: Compass, access: "public" },
   { key: "partners", label: "Partenaires", icon: Handshake, access: "public" },
   // Profil — désormais un onglet du bas (FFIE-14), en dernière position. Réservé aux

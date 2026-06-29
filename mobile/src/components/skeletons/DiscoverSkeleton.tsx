@@ -1,145 +1,70 @@
-// DiscoverSkeleton — espace réservé de chargement pour DiscoverScreen (Métiers). Le
-// reflète : grand titre + paragraphe d'introduction, l'accordéon des domaines (titres + « + »
-// avec fines lignes), deux cartes de mise en avant pleine largeur, le titre + l'introduction
-// « les métiers de demain », la grille de formations sur 2 colonnes, et le bouton « Voir plus ».
+// DiscoverSkeleton — espace réservé de chargement pour DiscoverScreen (onglet
+// Outils). Le reflète : la grille de lancement Outils (ToolsHubView) — deux
+// sections titrées, chacune coiffée d'un sur-titre en majuscules et d'une grille
+// de tuiles sur 2 colonnes (tuile d'icône carrée + titre). Mêmes gouttières,
+// hauteur de tuile et rythme que la vraie grille, pour que rien ne se décale.
 
 import React from "react";
-import { ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
-import { primitives, themes, type ThemeName } from "@tokens";
-import { GUTTER, useGroupedColors } from "@/components/ui/ios";
+import { ScrollView, View } from "react-native";
+import { primitives, type ThemeName } from "@tokens";
+import { GUTTER } from "@/components/ui/ios";
+import { useHomeColors } from "@/components/home/homeColors";
 import { SkeletonBlock, SkeletonGroup, SkeletonTextLine } from "@/components/ui/Skeleton";
 
-const GRID_GAP = 14;
+const GRID_GAP = 12;
 
-function FeatureCardSkeleton({ themeName }: { themeName: ThemeName }) {
-  const c = useGroupedColors(themeName);
+// Une tuile de lancement : carte surélevée avec une tuile d'icône carrée et un
+// titre — assortie à ToolCard (minHeight 116).
+function ToolCardSkeleton({ themeName }: { themeName: ThemeName }) {
+  const c = useHomeColors(themeName);
   return (
     <View
       style={{
+        flex: 1,
         backgroundColor: c.cardBg,
         borderRadius: primitives.radii.lg,
-        borderWidth: c.cardBorder ? 1 : 0,
+        borderWidth: 1,
         borderColor: c.cardBorder,
-        padding: 18,
+        padding: 16,
+        minHeight: 116,
       }}
     >
-      <SkeletonTextLine width="60%" height={16} themeName={themeName} />
-      <SkeletonBlock width={32} height={3} radius={2} themeName={themeName} style={{ marginTop: 10 }} />
+      <SkeletonBlock width={40} height={40} radius={primitives.radii.md} themeName={themeName} />
       <View style={{ marginTop: 14, rowGap: 6 }}>
-        <SkeletonTextLine width="100%" height={13} themeName={themeName} />
-        <SkeletonTextLine width="72%" height={13} themeName={themeName} />
+        <SkeletonTextLine width="80%" height={15} themeName={themeName} />
+        <SkeletonTextLine width="55%" height={15} themeName={themeName} />
       </View>
     </View>
   );
 }
 
-function TrainingCardSkeleton({ width, themeName }: { width: number; themeName: ThemeName }) {
-  const c = useGroupedColors(themeName);
+// Une section titrée : un sur-titre en majuscules + deux rangées de deux tuiles.
+function ToolSectionSkeleton({ themeName }: { themeName: ThemeName }) {
   return (
-    <View
-      style={{
-        width,
-        backgroundColor: c.cardBg,
-        borderRadius: primitives.radii.lg,
-        borderWidth: c.cardBorder ? 1 : 0,
-        borderColor: c.cardBorder,
-        overflow: "hidden",
-      }}
-    >
-      <SkeletonBlock width="100%" aspectRatio={4 / 3} radius={0} themeName={themeName} />
-      <View style={{ padding: 12 }}>
-        <SkeletonTextLine width="85%" height={14} themeName={themeName} />
-        <View style={{ marginTop: 8, rowGap: 5 }}>
-          <SkeletonTextLine width="100%" height={12} themeName={themeName} />
-          <SkeletonTextLine width="60%" height={12} themeName={themeName} />
-        </View>
-        <SkeletonTextLine width={72} height={12} themeName={themeName} style={{ marginTop: 12 }} />
+    <View style={{ paddingHorizontal: GUTTER, marginTop: 18 }}>
+      <SkeletonBlock width={150} height={12} themeName={themeName} style={{ marginBottom: 12 }} />
+      <View style={{ rowGap: GRID_GAP }}>
+        {Array.from({ length: 2 }).map((_, i) => (
+          <View key={i} style={{ flexDirection: "row", columnGap: GRID_GAP }}>
+            <ToolCardSkeleton themeName={themeName} />
+            <ToolCardSkeleton themeName={themeName} />
+          </View>
+        ))}
       </View>
     </View>
   );
 }
 
 export function DiscoverSkeleton({ themeName = "light" }: { themeName?: ThemeName }) {
-  const t = themes[themeName];
-  const c = useGroupedColors(themeName);
-  const { width: screenW } = useWindowDimensions();
-  const colW = (screenW - GUTTER * 2 - GRID_GAP) / 2;
+  const c = useHomeColors(themeName);
 
   return (
     <View style={{ flex: 1, backgroundColor: c.pageBg }}>
       <SkeletonGroup>
         <ScrollView contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }} scrollEnabled={false}>
-
-          {/* Contrôle segmenté Métiers / Outils. */}
-          <View style={{ paddingHorizontal: GUTTER, paddingTop: 6, paddingBottom: 18 }}>
-            <SkeletonBlock width="100%" height={40} radius={primitives.radii.md} themeName={themeName} />
-          </View>
-
-          {/* Paragraphe d'introduction */}
-          <View style={{ paddingHorizontal: GUTTER, paddingTop: 2, rowGap: 6 }}>
-            <SkeletonTextLine width="100%" height={14} themeName={themeName} />
-            <SkeletonTextLine width="95%" height={14} themeName={themeName} />
-            <SkeletonTextLine width="60%" height={14} themeName={themeName} />
-          </View>
-
-          {/* Accordéon des domaines */}
-          <View style={{ paddingHorizontal: GUTTER, marginTop: 22 }}>
-            <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: t.border.default }} />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <View key={i}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    columnGap: 12,
-                    minHeight: 52,
-                    paddingVertical: 16,
-                  }}
-                >
-                  <SkeletonTextLine width="55%" height={16} themeName={themeName} style={{ flex: 0 }} />
-                  <View style={{ flex: 1 }} />
-                  <SkeletonBlock width={22} height={22} radius={primitives.radii.sm} themeName={themeName} />
-                </View>
-                <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: t.border.default }} />
-              </View>
-            ))}
-          </View>
-
-          {/* Cartes de mise en avant */}
-          <View style={{ paddingHorizontal: GUTTER, marginTop: 24, rowGap: 14 }}>
-            <FeatureCardSkeleton themeName={themeName} />
-            <FeatureCardSkeleton themeName={themeName} />
-          </View>
-
-          {/* Titre « Les métiers de demain » + introduction */}
-          <View style={{ paddingHorizontal: GUTTER, marginTop: 34, rowGap: 10 }}>
-            <SkeletonTextLine width="70%" height={20} themeName={themeName} />
-            <View style={{ rowGap: 6, marginTop: 4 }}>
-              <SkeletonTextLine width="100%" height={13} themeName={themeName} />
-              <SkeletonTextLine width="80%" height={13} themeName={themeName} />
-            </View>
-          </View>
-
-          {/* Grille de formations */}
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              columnGap: GRID_GAP,
-              rowGap: 18,
-              paddingHorizontal: GUTTER,
-              marginTop: 20,
-            }}
-          >
-            {Array.from({ length: 4 }).map((_, i) => (
-              <TrainingCardSkeleton key={i} width={colW} themeName={themeName} />
-            ))}
-          </View>
-
-          {/* Bouton « Voir plus de formations » */}
-          <View style={{ alignItems: "center", marginTop: 22 }}>
-            <SkeletonBlock width={220} height={48} radius={primitives.radii.md} themeName={themeName} />
-          </View>
+          {/* Deux sections d'outils, comme TOOL_SECTIONS. */}
+          <ToolSectionSkeleton themeName={themeName} />
+          <ToolSectionSkeleton themeName={themeName} />
         </ScrollView>
       </SkeletonGroup>
     </View>
