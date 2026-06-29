@@ -35,7 +35,7 @@ import {
 
 // Pages légales RÉELLES de la FFIE (vérifiées sur ffie.fr — il n'existe pas de
 // page « CGU » distincte, seulement ces deux-là). Ouvertes dans le navigateur
-// intégré, comme les autres liens externes de l'app.
+// intégré, comme la carte d'affiliation FFB de l'Accueil.
 const MENTIONS_LEGALES_URL = "https://www.ffie.fr/footer/credits-et-mentions-legales";
 const CONFIDENTIALITE_URL = "https://www.ffie.fr/footer/notre-politique-de-confidentialite";
 
@@ -66,7 +66,7 @@ const ARTICLES: { title: string; body: string }[] = [
   {
     title: "Propriété intellectuelle",
     body:
-      "Les contenus, marques et logos présentés dans l'application — notamment ceux de la FFIE — restent la propriété de leurs titulaires respectifs et ne peuvent être réutilisés sans autorisation.",
+      "Les contenus, marques et logos présentés dans l'application — notamment ceux de la FFIE et de la FFB — restent la propriété de leurs titulaires respectifs et ne peuvent être réutilisés sans autorisation.",
   },
   {
     title: "Évolution des conditions",
@@ -88,7 +88,7 @@ export function LegalScreen({
 
   // Ouvre une page légale de ffie.fr dans le navigateur intégré (page sheet),
   // teinté aux couleurs de l'app — même présentation que les liens externes
-  // Actualités / Métiers.
+  // Actualités / Métiers / affiliation FFB.
   const openExternal = (url: string) => {
     WebBrowser.openBrowserAsync(url, {
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,

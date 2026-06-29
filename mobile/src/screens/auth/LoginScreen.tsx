@@ -39,6 +39,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { auth } from "@/screens/auth/tokens";
 import { FFIELogo } from "@/components/ui/FFIELogo";
+import { FFBLogo } from "@/components/ui/FFBLogo";
 import { ralewayFamily, displayFamily } from "@/theme/fonts";
 
 const L = auth.login;
@@ -189,8 +190,20 @@ export function LoginScreen({
           {/* Pousse le pied de page vers le bas quand le contenu est court. */}
           <View style={styles.flex} />
 
-          {/* Pied de page — barre d'adhésion. */}
+          {/* Pied de page — note d'affiliation FFB + barre d'adhésion. */}
           <View style={styles.footer}>
+            <View style={styles.fbbNote}>
+              {/* Le logo porte son propre fond blanc ; on le rogne en tuile
+                  arrondie pour qu'il se lise comme une pastille blanche sur le
+                  pied de page navy. */}
+              <View style={styles.fbbMark}>
+                <FFBLogo size={32} />
+              </View>
+              <Text style={styles.fbbText}>
+                La FFIE est membre{"\n"}de la FFB
+              </Text>
+            </View>
+
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Pas encore adhérent ? Adhérer à la FFIE"
@@ -334,6 +347,24 @@ const styles = StyleSheet.create({
 
   footer: {
     marginTop: 24,
+    rowGap: 16,
+  },
+  fbbNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: 8,
+  },
+  fbbMark: {
+    borderRadius: 6,
+    overflow: "hidden",
+    backgroundColor: "#FFFFFF",
+  },
+  fbbText: {
+    color: L.footer.noteText,
+    fontSize: 12,
+    lineHeight: 15,
+    fontFamily: ralewayFamily("400"),
   },
   joinBar: {
     height: 52,

@@ -498,6 +498,80 @@ function SectionToggleRow({
   );
 }
 
+// MetierTabRow — la rangée d'onglets « Métier » en haut de la Bibliothèque : un
+// filtre de premier niveau visible d'emblée, à l'image du contrôle segmenté de
+// l'onglet Outils. « Tous » (null) + un onglet par métier ; sélection unique —
+// retoucher l'onglet actif le désélectionne et revient à « Tous ». Défile
+// horizontalement (7 onglets aux libellés longs ne tiendraient pas dans un
+// contrôle segmenté statique). Le style des puces reprend celui de la feuille de
+// filtre (FilterControls) pour rester cohérent.
+function MetierTabRow({
+  themeName,
+  selected,
+  onSelect,
+}: {
+  themeName: ThemeName;
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const t = themes[themeName];
+  // « Tous » + un onglet par métier (ids + libellés de PROFESSIONS).
+  const tabs: { key: string | null; label: string }[] = [
+    { key: null, label: "Tous" },
+    ...METIER_FILTER,
+  ];
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      // La rangée défile ; on garde la gouttière des deux côtés pour l'alignement
+      // avec la recherche et le compteur de résultats.
+      contentContainerStyle={{ paddingHorizontal: GUTTER, columnGap: 8, paddingBottom: 14 }}
+      style={{ marginBottom: 4 }}
+    >
+      {tabs.map((tab) => {
+        const isSelected = tab.key === selected;
+        return (
+          <Pressable
+            key={tab.key ?? "all"}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isSelected }}
+            accessibilityLabel={tab.label}
+            onPress={() => onSelect(tab.key)}
+            style={({ pressed }) => ({
+              height: 36,
+              borderRadius: 18,
+              paddingVertical: 0,
+              paddingHorizontal: 16,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: isSelected
+                ? t.brand.accent
+                : pressed
+                  ? t.border.subtle
+                  : t.surface.subtle,
+              borderWidth: 1,
+              borderColor: isSelected ? t.brand.accent : t.border.subtle,
+            })}
+          >
+            <Text
+              numberOfLines={1}
+              style={{
+                color: isSelected ? "#FFFFFF" : t.text.body,
+                fontSize: 14,
+                fontFamily: ralewayFamily(isSelected ? "600" : "500"),
+                fontWeight: isSelected ? "600" : "500",
+              }}
+            >
+              {tab.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
 type Props = {
   themeName: ThemeName;
   density: DensityMode;
@@ -542,9 +616,11 @@ export function DocLibraryScreen({
   const [statusFilter, setStatusFilter] = useState<Set<SavedFilterKey>>(new Set());
   // Catégories FFIE cochées (clés = intitulés de facette de DOC_FILTER_GROUPS).
   const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
-  // Métiers cochés (clés = ids de PROFESSIONS) — chacun se résout en un ensemble
-  // de catégories FFIE via METIER_DOC_CATEGORIES.
-  const [metierFilter, setMetierFilter] = useState<Set<string>>(new Set());
+  // Métier sélectionné dans la rangée d'onglets en haut de page (clé = id de
+  // PROFESSIONS, ou null = « Tous »). Un seul à la fois — c'est un onglet, pas une
+  // facette multi-sélection. Se résout en un ensemble de catégories FFIE via
+  // METIER_DOC_CATEGORIES.
+  const [metierFilter, setMetierFilter] = useState<string | null>(null);
   // Un document tapé ouvre soit son détail (accessible), soit l'incitation à
   // l'adhésion (un invité tapant un document verrouillé) — une seule surface à la
   // fois au-dessus de la liste.
@@ -602,15 +678,11 @@ export function DocLibraryScreen({
     const selectedCats = categoryFilter.size > 0
       ? new Set([...categoryFilter].map(normCat))
       : null;
-    // Métiers cochés → union de leurs catégories FFIE mappées (normalisées une
-    // seule fois). Un document passe la facette Métier s'il porte au moins une de
-    // ces catégories — OU au sein de la facette, ET avec les autres facettes.
-    const selectedMetierCats = metierFilter.size > 0
-      ? new Set(
-          [...metierFilter]
-            .flatMap((id) => METIER_DOC_CATEGORIES[id] ?? [])
-            .map(normCat),
-        )
+    // Métier sélectionné (onglet en haut de page) → ses catégories FFIE mappées
+    // (normalisées une seule fois). Un document passe s'il porte au moins une de
+    // ces catégories, combiné en ET avec les autres filtres.
+    const selectedMetierCats = metierFilter
+      ? new Set((METIER_DOC_CATEGORIES[metierFilter] ?? []).map(normCat))
       : null;
     return DOCS.filter((d) => {
       if (selectedCats && !docCategorySet(d).some((c) => selectedCats.has(normCat(c))))
@@ -660,7 +732,10 @@ export function DocLibraryScreen({
     if (next !== showBackToTop) setShowBackToTop(next);
   };
 
-  const activeFilterCount = statusFilter.size + categoryFilter.size + metierFilter.size;
+  // L'onglet Métier est désormais une rangée d'onglets en haut de page (pas dans
+  // la feuille de filtre) — le compteur du bouton Filtrer ne compte donc que les
+  // filtres de la feuille (catégorie + hors ligne).
+  const activeFilterCount = statusFilter.size + categoryFilter.size;
   const cachedCount = useMemo(() => DOCS.filter((d) => d.saved).length, []);
 
   // Bascule une clé dans/hors d'un filtre à valeur d'ensemble (de façon immuable).
@@ -672,20 +747,14 @@ export function DocLibraryScreen({
       return next;
     });
 
-  // La facette Métier en tête (transversale, regroupe les documents par métier),
-  // puis une section repliable par famille FFIE (reproduisant la barre latérale de
+  // Une section repliable par famille FFIE (reproduisant la barre latérale de
   // filtre du site), chacune listant ses catégories en puces — puis la facette
-  // Hors ligne (état du cache appareil, propre à l'app, gardée en dernier). Toutes
-  // les sections famille partagent le même `categoryFilter` ; chaque section ne
-  // reçoit que le sous-ensemble coché de SES options pour que le compteur
-  // d'accordéon (et la réinitialisation) restent justes.
+  // Hors ligne (état du cache appareil, propre à l'app, gardée en dernier). La
+  // facette Métier vit désormais comme une rangée d'onglets en haut de page (hors
+  // feuille). Toutes les sections famille partagent le même `categoryFilter` ;
+  // chaque section ne reçoit que le sous-ensemble coché de SES options pour que le
+  // compteur d'accordéon (et la réinitialisation) restent justes.
   const filterSections: FilterSection[] = [
-    {
-      label: "Métier",
-      options: METIER_FILTER,
-      selected: metierFilter,
-      onToggle: toggleIn(setMetierFilter) as (key: string) => void,
-    },
     ...DOC_FILTER_GROUPS.map((g) => ({
       label: g.family,
       options: g.options.map((o) => ({ key: o, label: o })),
@@ -793,6 +862,18 @@ export function DocLibraryScreen({
             }
           />
         </View>
+
+        {/* Rangée d'onglets « Métier » — un filtre transversal de premier niveau,
+            visible d'emblée en haut de page (comme le contrôle segmenté de
+            l'onglet Outils). « Tous » + un onglet par métier ; un seul à la fois.
+            Chaque métier se résout en un ensemble de catégories FFIE
+            (METIER_DOC_CATEGORIES). Défile horizontalement car 7 onglets ne
+            tiendraient pas dans un contrôle segmenté statique. */}
+        <MetierTabRow
+          themeName={themeName}
+          selected={metierFilter}
+          onSelect={(id) => setMetierFilter(id)}
+        />
 
         {/* Nombre de résultats — reprend la ligne « 335 documents » du site FFIE. */}
         <Text
@@ -952,7 +1033,6 @@ export function DocLibraryScreen({
         onReset={() => {
           setCategoryFilter(new Set());
           setStatusFilter(new Set());
-          setMetierFilter(new Set());
         }}
         onClose={() => setFilterOpen(false)}
       />

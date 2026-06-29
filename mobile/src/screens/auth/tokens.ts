@@ -51,11 +51,12 @@ export const auth = {
     link: colors.brand.navy[700],         // #222D5D — Mot de passe oublié / Aide (≈10:1)
     accent: colors.brand.navy[700],       // #222D5D — « Adhérer » (≈11:1 sur blanc)
 
-    // Barre « Pas encore adhérent ? » — pilule blanche sur la page navy.
+    // Note du bas + barre « Pas encore adhérent ? » — pilule blanche sur la page navy.
     footer: {
       bg: colors.white,
       border: colors.brand.navy[400],     // #4F5C95 — limite ≈5:1 sur navy (1.4.11)
       noteText: colors.brand.navy[700],   // #222D5D — ≈10:1 sur navy
+      markBg: colors.white,               // le logo FFB repose déjà sur du blanc
     },
   },
 } as const;
